@@ -55,8 +55,8 @@ public final class InjectionVerifier {
         GTOHJSBootstrap.requireExecuted(GTOHJSBootstrap.RECIPE_TYPE);
         GTOHJSBootstrap.requireExecuted(GTOHJSBootstrap.AE);
         ULVFragmentWorldCollectionMachine.verifyLoaded();
-        Fix2RegistrationMethods.verifyLoaded();
         FullRegistrationMethods.verifyLoaded();
+        Fix2RegistrationMethods.verifyLoaded();
         ProofLog.record("fix3 twelve class transformations verified: PASS");
         // Client Data.commonInit is asynchronous; pending is not a missing transform.
         if (!GTOHJSBootstrap.allExecuted()) {

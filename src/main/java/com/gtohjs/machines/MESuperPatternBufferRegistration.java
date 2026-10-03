@@ -17,6 +17,9 @@ import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gtohjs.methods.ModLog;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.Block;
+
+import java.util.Collection;
 
 /** Registers the configurable ME pattern buffer and its native GTO proxy part. */
 public final class MESuperPatternBufferRegistration {
@@ -72,17 +75,30 @@ public final class MESuperPatternBufferRegistration {
                 .register();
         registered.setRenderer(new AmprosiumPatternBufferRenderer(GTValues.UHV,
                 GTCEu.id("block/machine/part/me_pattern_buffer")));
-        registerOutputAbilities(registered);
         return registered;
     }
 
     static void registerOutputAbilities(MachineDefinition registered) {
         int tier = registered.getTier();
         var block = registered.get();
-        PartAbility.EXPORT_ITEMS.register(tier, block);
-        PartAbility.EXPORT_FLUIDS.register(tier, block);
-        GTOPartAbility.DUAL_INPUT.register(tier, block);
-        GTOPartAbility.DUAL_OUTPUT.register(tier, block);
+        if (block == null) {
+            throw new IllegalStateException("ME pattern buffer block is not registered yet: " + registered.getId());
+        }
+        registerAbility(PartAbility.IMPORT_ITEMS, tier, block);
+        registerAbility(PartAbility.IMPORT_FLUIDS, tier, block);
+        registerAbility(PartAbility.EXPORT_ITEMS, tier, block);
+        registerAbility(PartAbility.EXPORT_FLUIDS, tier, block);
+        registerAbility(GTOPartAbility.DUAL_INPUT, tier, block);
+        registerAbility(GTOPartAbility.DUAL_OUTPUT, tier, block);
+    }
+
+    private static void registerAbility(PartAbility ability, int tier, Block block) {
+        ability.register(tier, block);
+        // Dev10 caches getAllBlocks() before addon registration; register() does not refresh it.
+        Collection<Block> allBlocks = ability.getAllBlocks();
+        if (!allBlocks.contains(block)) {
+            allBlocks.add(block);
+        }
     }
 
     private static MachineDefinition findOrRegisterProxy() {
@@ -128,6 +144,8 @@ public final class MESuperPatternBufferRegistration {
         if (state != State.REGISTERED) {
             throw new IllegalStateException("ME super pattern assemblies did not register; state=" + state);
         }
+        // Registrate resolves MachineDefinition.get() after the builder returns.
+        registerOutputAbilities(bufferDefinition);
         validate(bufferDefinition, BUFFER_ID);
         validate(proxyDefinition, PROXY_ID);
     }

@@ -2,6 +2,11 @@
 
 ## dev1-for-gtocore-0.6.0-dev10-fix4 - 2026-10-04
 
+Startup repair after the initial dev10 deployment: complete the two custom
+ME pattern buffers' ability registration after their blocks resolve, and
+refresh GTCEu's cached ability views before multiblock patterns are checked.
+The version identifiers remain dev1/fix4.
+
 Retargeted the existing fix4 feature set directly to GTO 0.6.0-dev10; dev9
 compatibility is outside this build. The artifact and Forge versions change
 only their target label from dev9 to dev10, retaining dev1 and fix4.
@@ -21,7 +26,9 @@ only their target label from dev9 to dev10, retaining dev1 and fix4.
 Validation: Java 21 online `./gradlew clean build` and all five generated
 recipe compilation samples passed. All twelve packaged CoreMod transformations
 and public static helper signatures passed against the original dev10 Core
-and nested GTCEu. The user requested no dev10 client launch or gameplay test.
+and nested GTCEu. The dev10 client then completed startup, validated all 23
+machine IDs and thirteen multiblock patterns, entered an existing single-player
+world, and exited normally. Further gameplay behavior remains unverified.
 The whole Core `src` comparison is available in the dedicated GTO-for-Codex
 Git review branch `review/gtocore-dev9-dev10-src`.
 

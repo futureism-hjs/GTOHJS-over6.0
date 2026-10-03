@@ -66,7 +66,6 @@ public final class MESuperWildcardPatternBufferRegistration {
                 .register();
         registered.setRenderer(new AmprosiumPatternBufferRenderer(GTValues.UHV,
                 new ResourceLocation("gtocore", "block/machine/part/me_pattern_buffer_red")));
-        MESuperPatternBufferRegistration.registerOutputAbilities(registered);
         return registered;
     }
 
@@ -93,6 +92,7 @@ public final class MESuperWildcardPatternBufferRegistration {
             throw new IllegalStateException("ME super wildcard pattern buffer did not register; state=" + state);
         }
         validateRegistryIdentity(definition);
+        MESuperPatternBufferRegistration.registerOutputAbilities(definition);
         validateAbilities(definition);
     }
 

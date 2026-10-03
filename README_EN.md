@@ -16,8 +16,9 @@ Fix4 makes only "GTO HJS" in the added-by tooltip scroll through GTO's native
 rainbow colors. It also corrects recipe-generator exports and validation, and
 moves corresponding tooltip, interface, renderer and utility modules to Kotlin.
 The Java 21 online clean build and static code checks passed against dev10.
-In-game testing is owned by the user; earlier dev9 world-entry evidence
-belongs to fix3 and does not establish dev10 gameplay behavior.
+The dev10 client also started, entered an existing single-player world, and
+closed normally after all addon load checks passed. Further gameplay testing
+remains with the user.
 
 ## Complete content overview
 
