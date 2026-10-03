@@ -1,5 +1,7 @@
 # GTOHJS for GTO 6.0+
 
+> **当前目标：GTO 0.6.0-dev10。** 当前 JAR 为 `gtohjs-dev1-for-gtocore-0.6.0-dev10-fix4.jar`，Forge 模组版本为 `1.0.0-dev10-fix4`。Java 21 联网清洁构建、生成配方检查及原版 dev10 Core 静态注入检查已通过；按本次要求不进行客户端测试。下文涉及 dev9 的旧记录仅供历史参考。
+
 [中文](README.md) | [English](README_EN.md)
 
 当前版本：`gtohjs-dev1-for-gtocore-0.6.0-dev9-fix4.jar`
@@ -161,5 +163,3 @@ CC BY-NC-SA 4.0；第三方资源继续遵循其上游许可，不由 HJS 重新
 
 保留的来源包括 ExtendedAE 配方编辑器图标、GTOCore/GTCEu 框架与仓室/覆盖材质，
 以及 GTLCore 世界碎片和采集器材质。dev9 适配沿用旧项目的资源。
-> **当前目标：GTO 0.6.0-dev10。** 当前 JAR 为 `gtohjs-dev1-for-gtocore-0.6.0-dev10-fix4.jar`，Forge 模组版本为 `1.0.0-dev10-fix4`。Java 21 联网清洁构建、生成配方检查及原版 dev10 Core 静态注入检查已通过；按本次要求不进行客户端测试。下文涉及 dev9 的旧记录仅供历史参考。
-
