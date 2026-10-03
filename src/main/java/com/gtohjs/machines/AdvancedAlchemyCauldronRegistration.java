@@ -8,7 +8,6 @@ import com.gregtechceu.gtceu.api.machine.multiblockpro.Symbols;
 import com.gregtechceu.gtceu.api.machine.MachineDefinition;
 import com.gregtechceu.gtceu.api.machine.MultiblockMachineDefinition;
 import com.gregtechceu.gtceu.api.machine.multiblock.PartAbility;
-import com.gregtechceu.gtceu.api.pattern.FactoryBlockPattern;
 import com.gregtechceu.gtceu.api.pattern.Predicates;
 import com.gregtechceu.gtceu.api.pattern.TraceabilityPredicate;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
@@ -145,10 +144,10 @@ public final class AdvancedAlchemyCauldronRegistration {
         validateSymbolCount('C', EXPECTED_PIPES);
         validateSymbolCount(' ', EXPECTED_IGNORED_SPACES);
         validateSymbolCount('S', 1);
-        if (candidate.getPatternFactory() == null || candidate.getPatternFactory().length != 1) {
+        if (!candidate.hasStructure()) {
             throw new IllegalStateException("Advanced alchemy cauldron pattern supplier was not created");
         }
-        if (buildPattern && candidate.getPatternFactory()[0].get() == null) {
+        if (buildPattern && candidate.getStructure() == null) {
             throw new IllegalStateException("Advanced alchemy cauldron pattern could not be built");
         }
         if (candidate.getRenderer() == null || !candidate.hasStructure() ||
@@ -184,7 +183,7 @@ public final class AdvancedAlchemyCauldronRegistration {
         try {
             validate(definition, true);
             int patternFactories = definition instanceof MultiblockDefinition gtoDefinition &&
-                    gtoDefinition.getPatternFactory() != null ? gtoDefinition.getPatternFactory().length : -1;
+                    gtoDefinition.hasStructure() ? 1 : 0;
             ModLog.info("Validated loaded {}; patternBuilt=true, patternFactories={}",
                     MACHINE_ID, patternFactories);
         } catch (Throwable error) {

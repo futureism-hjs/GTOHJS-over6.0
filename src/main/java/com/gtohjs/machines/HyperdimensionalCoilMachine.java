@@ -18,7 +18,6 @@ import com.lowdragmc.lowdraglib.gui.texture.IGuiTexture;
 import com.lowdragmc.lowdraglib.gui.texture.ItemStackTexture;
 import com.lowdragmc.lowdraglib.gui.widget.Widget;
 import com.lowdragmc.lowdraglib.gui.widget.WidgetGroup;
-import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.chat.Component;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -174,21 +173,10 @@ public final class HyperdimensionalCoilMachine extends CoilCrossRecipeMultiblock
         return modified;
     }
 
-    private void synchronizeParallelFromServer(long value, long limit) {
-        long acceptedLimit = clampLong(limit, 1L, MAX_CUSTOM_PARALLEL);
-        configuredParallel = clampLong(value, 1L, acceptedLimit);
-    }
-
-    private void synchronizeThreadFromServer(int value, int limit) {
-        int acceptedLimit = clampInt(limit, 1, MAX_CUSTOM_THREAD);
-        configuredThread = clampInt(value, 1, acceptedLimit);
-    }
 
     private static final class ParallelLimitConfigurator implements IFancyConfigurator {
         private final HyperdimensionalCoilMachine machine;
         private LongInputWidget input;
-        private long lastLimit = Long.MIN_VALUE;
-        private long lastValue = Long.MIN_VALUE;
 
         private ParallelLimitConfigurator(HyperdimensionalCoilMachine machine) {
             this.machine = machine;
@@ -219,49 +207,6 @@ public final class HyperdimensionalCoilMachine extends CoilCrossRecipeMultiblock
             return group;
         }
 
-        @Override
-        public void writeInitialData(FriendlyByteBuf buffer) {
-            long limit = machine.parallelLimitForUi();
-            long value = machine.getConfiguredParallel();
-            lastLimit = limit;
-            lastValue = value;
-            buffer.writeVarLong(limit);
-            buffer.writeVarLong(value);
-        }
-
-        @Override
-        public void readInitialData(FriendlyByteBuf buffer) {
-            applyServerState(buffer.readVarLong(), buffer.readVarLong());
-        }
-
-        @Override
-        public void detectAndSendChange(java.util.function.BiConsumer<Integer,
-                java.util.function.Consumer<FriendlyByteBuf>> sender) {
-            long limit = machine.parallelLimitForUi();
-            long value = machine.getConfiguredParallel();
-            if (limit != lastLimit || value != lastValue) {
-                lastLimit = limit;
-                lastValue = value;
-                sender.accept(0, buffer -> {
-                    buffer.writeVarLong(limit);
-                    buffer.writeVarLong(value);
-                });
-            }
-        }
-
-        @Override
-        public void readUpdateInfo(int id, FriendlyByteBuf buffer) {
-            if (id == 0) {
-                applyServerState(buffer.readVarLong(), buffer.readVarLong());
-            }
-        }
-
-        private void applyServerState(long limit, long value) {
-            machine.synchronizeParallelFromServer(value, limit);
-            lastLimit = Math.max(1L, limit);
-            lastValue = machine.getConfiguredParallel();
-            applyRange(lastLimit);
-        }
 
         private void applyRange(long limit) {
             if (input != null) {
@@ -274,8 +219,6 @@ public final class HyperdimensionalCoilMachine extends CoilCrossRecipeMultiblock
     private static final class ThreadLimitConfigurator implements IFancyConfigurator {
         private final HyperdimensionalCoilMachine machine;
         private IntInputWidget input;
-        private int lastLimit = Integer.MIN_VALUE;
-        private int lastValue = Integer.MIN_VALUE;
 
         private ThreadLimitConfigurator(HyperdimensionalCoilMachine machine) {
             this.machine = machine;
@@ -306,49 +249,6 @@ public final class HyperdimensionalCoilMachine extends CoilCrossRecipeMultiblock
             return group;
         }
 
-        @Override
-        public void writeInitialData(FriendlyByteBuf buffer) {
-            int limit = machine.threadLimitForUi();
-            int value = machine.getConfiguredThread();
-            lastLimit = limit;
-            lastValue = value;
-            buffer.writeVarInt(limit);
-            buffer.writeVarInt(value);
-        }
-
-        @Override
-        public void readInitialData(FriendlyByteBuf buffer) {
-            applyServerState(buffer.readVarInt(), buffer.readVarInt());
-        }
-
-        @Override
-        public void detectAndSendChange(java.util.function.BiConsumer<Integer,
-                java.util.function.Consumer<FriendlyByteBuf>> sender) {
-            int limit = machine.threadLimitForUi();
-            int value = machine.getConfiguredThread();
-            if (limit != lastLimit || value != lastValue) {
-                lastLimit = limit;
-                lastValue = value;
-                sender.accept(0, buffer -> {
-                    buffer.writeVarInt(limit);
-                    buffer.writeVarInt(value);
-                });
-            }
-        }
-
-        @Override
-        public void readUpdateInfo(int id, FriendlyByteBuf buffer) {
-            if (id == 0) {
-                applyServerState(buffer.readVarInt(), buffer.readVarInt());
-            }
-        }
-
-        private void applyServerState(int limit, int value) {
-            machine.synchronizeThreadFromServer(value, limit);
-            lastLimit = Math.max(1, limit);
-            lastValue = machine.getConfiguredThread();
-            applyRange(lastLimit);
-        }
 
         private void applyRange(int limit) {
             if (input != null) {

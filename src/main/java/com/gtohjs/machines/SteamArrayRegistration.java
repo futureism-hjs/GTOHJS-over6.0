@@ -8,7 +8,6 @@ import com.gregtechceu.gtceu.api.machine.multiblockpro.Symbols;
 import com.gregtechceu.gtceu.api.machine.MachineDefinition;
 import com.gregtechceu.gtceu.api.machine.MultiblockMachineDefinition;
 import com.gregtechceu.gtceu.api.machine.multiblock.PartAbility;
-import com.gregtechceu.gtceu.api.pattern.FactoryBlockPattern;
 import com.gregtechceu.gtceu.api.pattern.Predicates;
 import com.gregtechceu.gtceu.api.pattern.TraceabilityPredicate;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
@@ -108,10 +107,10 @@ public final class SteamArrayRegistration {
                 candidate.getRecipeTypes()[0] != GTRecipeTypes.DUMMY_RECIPES) {
             throw new IllegalStateException("Unexpected steam array recipe type");
         }
-        if (candidate.getPatternFactory() == null || candidate.getPatternFactory().length != 1) {
+        if (!candidate.hasStructure()) {
             throw new IllegalStateException("Steam array pattern supplier was not created");
         }
-        if (buildPattern && candidate.getPatternFactory()[0].get() == null) {
+        if (buildPattern && candidate.getStructure() == null) {
             throw new IllegalStateException("Steam array pattern could not be built");
         }
         if (GTCEu.isClientSide() && !(candidate.getRenderer() instanceof ArrayMachineRenderer)) {

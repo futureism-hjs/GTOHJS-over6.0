@@ -8,7 +8,6 @@ import com.gregtechceu.gtceu.api.machine.multiblockpro.Symbols;
 import com.gregtechceu.gtceu.api.machine.MachineDefinition;
 import com.gregtechceu.gtceu.api.machine.MultiblockMachineDefinition;
 import com.gregtechceu.gtceu.api.machine.multiblock.PartAbility;
-import com.gregtechceu.gtceu.api.pattern.FactoryBlockPattern;
 import com.gregtechceu.gtceu.api.pattern.Predicates;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gtocore.api.machine.part.GTOPartAbility;
@@ -134,10 +133,10 @@ public final class LargePetalApothecaryRegistration {
         validateSymbolCount('A', EXPECTED_CASINGS);
         validateSymbolCount(' ', EXPECTED_AIR);
         validateSymbolCount('S', 1);
-        if (candidate.getPatternFactory() == null || candidate.getPatternFactory().length != 1) {
+        if (!candidate.hasStructure()) {
             throw new IllegalStateException("Large petal apothecary pattern supplier was not created");
         }
-        if (buildPattern && candidate.getPatternFactory()[0].get() == null) {
+        if (buildPattern && candidate.getStructure() == null) {
             throw new IllegalStateException("Large petal apothecary pattern could not be built");
         }
         if (candidate.getRenderer() == null || !candidate.hasStructure() ||
@@ -161,7 +160,7 @@ public final class LargePetalApothecaryRegistration {
         try {
             validate(definition, true);
             int patternFactories = definition instanceof MultiblockDefinition gtoDefinition &&
-                    gtoDefinition.getPatternFactory() != null ? gtoDefinition.getPatternFactory().length : -1;
+                    gtoDefinition.hasStructure() ? 1 : 0;
             ModLog.info("Validated loaded {}; structure=5x3x5, patternBuilt=true, patternFactories={}",
                     MACHINE_ID, patternFactories);
         } catch (Throwable error) {

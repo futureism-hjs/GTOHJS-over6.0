@@ -39,12 +39,13 @@ repositories {
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
     // Compile against the authoritative release API; never embed its JAR.
-    compileOnly fg.deobf('local.gtohjs:gtocore-forge-1.20.1:26.9.5')
-    compileOnly fg.deobf('local.gtohjs:gtceu-1.20.1-forge-1.20.1:26.9.70')
+    // Core keeps its artifact version across pack snapshots; isolate the dev10 mapped cache.
+    compileOnly fg.deobf('local.gtohjs.dev10:gtocore-forge-1.20.1:26.9.5')
+    compileOnly fg.deobf('local.gtohjs:gtceu-1.20.1-forge-1.20.1:26.10.8')
     compileOnly fg.deobf('local.gtohjs:datasynclib-forge-1.20.1:26.9.4')
     compileOnly('com.gto.fastcollection:FastCollection:26.8.7') { transitive = false }
     compileOnly fg.deobf('local.gtohjs:ldlib-forge-1.20.1:1.0.52.a')
-    compileOnly fg.deobf('local.gtohjs:appliedenergistics2-forge-1.20.1:15.269.3')
+    compileOnly fg.deobf('local.gtohjs:appliedenergistics2-forge-1.20.1:15.2610.2')
     compileOnly fg.deobf('local.gtohjs:fastrecipesearch-1.20.1:26.8.4-forge')
     compileOnly('local.gtohjs:RecipeSearch:26.8.4')
     compileOnly fg.deobf('local.gtohjs:Botania-1.20.1:456-FORGE')
@@ -59,9 +60,12 @@ tasks.register('verifyGeneratedRecipes', JavaExec) {
     javaLauncher = javaToolchains.launcherFor { languageVersion = JavaLanguageVersion.of(21) }
     classpath = sourceSets.test.runtimeClasspath + sourceSets.main.compileClasspath
     mainClass = 'com.gtohjs.methods.GeneratedRecipeCodeCheck'
-    args layout.buildDirectory.dir('generated-recipe-check').get().asFile.absolutePath,
-            (sourceSets.main.output + sourceSets.main.compileClasspath).asPath,
-            file('src/main/resources').absolutePath
+    // New mapped dependencies must resolve outside this task's configuration guard.
+    doFirst {
+        setArgs([layout.buildDirectory.dir('generated-recipe-check').get().asFile.absolutePath,
+                (sourceSets.main.output + sourceSets.main.compileClasspath).asPath,
+                file('src/main/resources').absolutePath])
+    }
 }
 tasks.named('check').configure { dependsOn tasks.named('verifyGeneratedRecipes') }
 tasks.withType(JavaCompile).configureEach {
@@ -86,7 +90,7 @@ tasks.named('jar', Jar).configure {
     from('LICENSE') { into 'META-INF'; rename { 'LICENSE_GTOHJS' } }
     manifest {
         attributes 'Implementation-Version': project.version,
-                   'Implementation-Title': 'GTOHJS dev9 machine adaptation'
+                   'Implementation-Title': 'GTOHJS dev10 machine adaptation'
     }
     finalizedBy 'reobfJar'
 }

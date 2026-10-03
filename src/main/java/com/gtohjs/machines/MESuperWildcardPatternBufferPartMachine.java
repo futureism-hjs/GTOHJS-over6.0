@@ -4,6 +4,7 @@ import com.gtocore.config.GTOConfig;
 
 import com.gtohjs.config.MEPatternBufferConfig;
 import com.gtocore.common.machine.multiblock.part.ae.MEPatternBufferPartMachine;
+import com.gtocore.common.machine.multiblock.part.ae.PatternBufferType;
 import com.gtocore.common.machine.multiblock.part.ae.MEPatternPartMachine;
 
 import com.gtolib.GTOCore;
@@ -128,8 +129,8 @@ public final class MESuperWildcardPatternBufferPartMachine extends MEOutputCapab
     private final Map<IPatternDetails, Integer> equivalentGeneratedPatternSlots = new HashMap<>();
     private final Set<IPatternDetails> ambiguousGeneratedPatterns = new HashSet<>();
 
-    public MESuperWildcardPatternBufferPartMachine(@NotNull MetaMachineBlockEntity holder) {
-        super(holder, MEPatternBufferConfig.wildcardPatternCount());
+    public MESuperWildcardPatternBufferPartMachine(@NotNull MetaMachineBlockEntity holder, PatternBufferType type) {
+        super(holder, type);
 
         blacklistedItems = new CustomItemStackHandler(18);
         blacklistedItemsStorageTransfer = new ItemStackTransfer(36);

@@ -8,7 +8,6 @@ import com.gregtechceu.gtceu.api.machine.multiblockpro.Symbols;
 import com.gregtechceu.gtceu.api.machine.MachineDefinition;
 import com.gregtechceu.gtceu.api.machine.MultiblockMachineDefinition;
 import com.gregtechceu.gtceu.api.machine.multiblock.PartAbility;
-import com.gregtechceu.gtceu.api.pattern.FactoryBlockPattern;
 import com.gregtechceu.gtceu.api.pattern.Predicates;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
@@ -156,10 +155,10 @@ public final class HyperdimensionalBiochemicalFactoryRegistration {
                 HyperdimensionalPatternResources.countSymbol(PATTERN_NAME, 'P') != EXPECTED_COIL_POSITIONS) {
             throw new IllegalStateException("Hyperdimensional biochemical factory pattern marker counts are invalid");
         }
-        if (candidate.getPatternFactory() == null || candidate.getPatternFactory().length != 1) {
+        if (!candidate.hasStructure()) {
             throw new IllegalStateException("Hyperdimensional biochemical factory pattern supplier was not created");
         }
-        if (buildPattern && candidate.getPatternFactory()[0].get() == null) {
+        if (buildPattern && candidate.getStructure() == null) {
             throw new IllegalStateException("Hyperdimensional biochemical factory pattern could not be built");
         }
         if (candidate.getRenderer() == null || !candidate.hasStructure() ||
@@ -167,7 +166,7 @@ public final class HyperdimensionalBiochemicalFactoryRegistration {
             throw new IllegalStateException("Hyperdimensional biochemical factory renderer/preview is missing");
         }
         if (!(candidate instanceof MultiblockDefinition gtoDefinition) ||
-                gtoDefinition.getPatternFactory() == null || gtoDefinition.getPatternFactory().length < 1) {
+                !gtoDefinition.hasStructure()) {
             if (buildPattern) {
                 throw new IllegalStateException("Hyperdimensional biochemical factory cached pattern is missing");
             }

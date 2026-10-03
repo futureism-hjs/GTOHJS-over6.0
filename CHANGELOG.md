@@ -1,5 +1,30 @@
 # GTO HJS Changelog
 
+## dev1-for-gtocore-0.6.0-dev10-fix4 - 2026-10-04
+
+Retargeted the existing fix4 feature set directly to GTO 0.6.0-dev10; dev9
+compatibility is outside this build. The artifact and Forge versions change
+only their target label from dev9 to dev10, retaining dev1 and fix4.
+
+- Compiles against the original dev10 Core and its GTCEu 26.10.8 and AE2
+  15.2610.2 dependencies. Build metadata and loader dependency ranges match.
+- Reuses the existing thirteen machine structures through GTCEu's current
+  `hasStructure()` / `getStructure()` APIs and the current two-argument
+  `PageView` constructor.
+- Registers both custom ME buffers through native `PatternBufferType.Builder`,
+  retaining configurable slots, output abilities and their renderer.
+- Uses the current UIPro number widgets for coil controls and removes the
+  configurator packet callbacks removed from dev10.
+- Keeps the existing fix4 recipe generation, Kotlin modules, IDs and CoreMod
+  hook implementation; changes only the checker/diagnostic target wording.
+
+Validation: Java 21 online `./gradlew clean build` and all five generated
+recipe compilation samples passed. All twelve packaged CoreMod transformations
+and public static helper signatures passed against the original dev10 Core
+and nested GTCEu. The user requested no dev10 client launch or gameplay test.
+The whole Core `src` comparison is available in the dedicated GTO-for-Codex
+Git review branch `review/gtocore-dev9-dev10-src`.
+
 ## dev1-for-gtocore-0.6.0-dev9-fix4 - 2026-10-04
 
 Compared with the previous clean build `dev1-for-gtocore-0.6.0-dev9-fix3`:
@@ -103,4 +128,3 @@ Fixed:
 
 Verification: Java 21 online clean build and deployment passed. The repaired
 client reached the menu and confirmed native machine/type registration.
-

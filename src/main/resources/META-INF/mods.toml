@@ -7,7 +7,7 @@ modId="${mod_id}"
 version="${mod_loader_version}"
 displayName="${mod_name}"
 authors="${mod_authors}"
-description='''GTOHJS dev9: multiblocks, recipes, hatches, ME assemblies, pattern buffers, tools, component packs and colored addon attribution.'''
+description='''GTOHJS dev10: multiblocks, recipes, hatches, ME assemblies, pattern buffers, tools, component packs and colored addon attribution.'''
 
 [[dependencies.${mod_id}]]
 modId="minecraft"
@@ -33,13 +33,13 @@ side="BOTH"
 [[dependencies.${mod_id}]]
 modId="gtceu"
 mandatory=true
-versionRange="[26.9.70,)"
+versionRange="[26.10.8,)"
 ordering="AFTER"
 side="BOTH"
 
 [[dependencies.${mod_id}]]
 modId="ae2"
 mandatory=true
-versionRange="[15.269.3,)"
+versionRange="[15.2610.2,)"
 ordering="AFTER"
 side="BOTH"

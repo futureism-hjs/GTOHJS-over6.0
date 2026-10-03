@@ -10,7 +10,6 @@ import com.gregtechceu.gtceu.api.machine.MachineDefinition;
 import com.gregtechceu.gtceu.api.machine.MultiblockMachineDefinition;
 import com.gregtechceu.gtceu.api.machine.SimpleTieredMachine;
 import com.gregtechceu.gtceu.api.machine.multiblock.PartAbility;
-import com.gregtechceu.gtceu.api.pattern.FactoryBlockPattern;
 import com.gregtechceu.gtceu.api.pattern.Predicates;
 import com.gregtechceu.gtceu.api.recipe.modifier.RecipeModifier;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
@@ -149,11 +148,11 @@ public final class FragmentWorldCollectionMachineRegistration {
                         FragmentWorldCollectionRecipeTypeRegistration.definition()) {
             throw new IllegalStateException("Unexpected large collector recipe type");
         }
-        if (largeDefinition.getPatternFactory() == null || largeDefinition.getPatternFactory().length != 1 ||
+        if (!largeDefinition.hasStructure() ||
                 largeDefinition.getRenderer() == null) {
             throw new IllegalStateException("Large collector pattern or renderer is missing");
         }
-        if (buildPattern && largeDefinition.getPatternFactory()[0].get() == null) {
+        if (buildPattern && largeDefinition.getStructure() == null) {
             throw new IllegalStateException("Large collector pattern could not be built");
         }
         if (!largeDefinition.hasStructure() || !largeDefinition.isRenderXEIPreview()) {
@@ -167,7 +166,7 @@ public final class FragmentWorldCollectionMachineRegistration {
         }
         validate(true);
         int patternFactories = largeDefinition instanceof MultiblockDefinition gtoDefinition &&
-                gtoDefinition.getPatternFactory() != null ? gtoDefinition.getPatternFactory().length : -1;
+                gtoDefinition.hasStructure() ? 1 : 0;
         ModLog.info("Validated fragment-world machines; largePatternBuilt=true, patternFactories={}",
                 patternFactories);
     }

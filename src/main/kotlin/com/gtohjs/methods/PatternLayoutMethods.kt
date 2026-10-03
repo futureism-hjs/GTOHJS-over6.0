@@ -32,7 +32,7 @@ object PatternLayoutMethods {
         val perPage = columns * rows
         val count = machine.maxPatternCount
         val pages = PageView(maxOf(width, columns * UISizes.SLOT),
-            headerHeight + rows * UISizes.SLOT, machine.newPageField) {}
+            headerHeight + rows * UISizes.SLOT)
         for (start in 0 until count step perPage) {
             val end = minOf(count, start + perPage)
             pages.addPage { page ->

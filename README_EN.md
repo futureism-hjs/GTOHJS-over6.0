@@ -2,22 +2,22 @@
 
 [中文](README.md) | English
 
-Current version: `gtohjs-dev1-for-gtocore-0.6.0-dev9-fix4.jar`
+Current version: `gtohjs-dev1-for-gtocore-0.6.0-dev10-fix4.jar`
 
 - [Changelog](CHANGELOG.md)
 - [Local build dependencies](libs/README.md)
 
 GTO HJS expands the Minecraft 1.20.1 Forge edition of GregTech Odyssey
-0.6.0-dev9 with additional machines, recipes and development tools. It registers
+0.6.0-dev10 with additional machines, recipes and development tools. It registers
 its content through GTO's native loading windows. The original GTOCore,
 GTOLib and GTOSeal files are read-only references.
 
 Fix4 makes only "GTO HJS" in the added-by tooltip scroll through GTO's native
 rainbow colors. It also corrects recipe-generator exports and validation, and
 moves corresponding tooltip, interface, renderer and utility modules to Kotlin.
-The Java 21 online clean build and code checks passed, and the JAR is deployed.
-In-game testing of fix4 is owned by the user; earlier world-entry evidence
-belongs to fix3.
+The Java 21 online clean build and static code checks passed against dev10.
+In-game testing is owned by the user; earlier dev9 world-entry evidence
+belongs to fix3 and does not establish dev10 gameplay behavior.
 
 ## Complete content overview
 
@@ -49,19 +49,19 @@ belongs to fix3.
 | Minecraft | 1.20.1 |
 | Forge | 47.4.20 |
 | Java | Java 21; Java and Kotlin bytecode target JVM 21 |
-| GTOCore | dev9, original artifact version 26.9.5 |
-| GTM / GTCEu | 26.9.70 |
-| AE2 | 15.269.3 |
+| GTOCore | dev10, original artifact version 26.9.5 |
+| GTM / GTCEu | 26.10.8 |
+| AE2 | 15.2610.2 |
 | Configuration | 3.1.0 |
 | Kotlin | Compiler/stdlib API 2.3.20; runtime supplied by the existing pack |
 
 Botania, AppBot, LDLib, DataSyncLib and related integrations use the versions
-already supplied by the target dev9 pack. Third-party Mod JARs are not embedded
+already supplied by the target dev10 pack. Third-party Mod JARs are not embedded
 in GTOHJS. The separately published ME Placement Tool for gto is not a dependency.
 
 ## Install and build
 
-Close Minecraft, place the current GTOHJS JAR in the dev9 instance's `mods`
+Close Minecraft, place the current GTOHJS JAR in the dev10 instance's `mods`
 directory, and keep only one GTOHJS version there. Keep the original GTOCore and
 GTOSeal artifacts supplied by the pack.
 
@@ -73,8 +73,8 @@ Java 21 runtime configured, run:
 ```
 
 The artifact is written to
-`build/libs/gtohjs-dev1-for-gtocore-0.6.0-dev9-fix4.jar`.
-Its numeric Forge loader version is `1.0.0-dev9-fix4`.
+`build/libs/gtohjs-dev1-for-gtocore-0.6.0-dev10-fix4.jar`.
+Its numeric Forge loader version is `1.0.0-dev10-fix4`.
 
 ## Standalone items and block
 
@@ -182,6 +182,6 @@ assets remain under their upstream licenses and are not relicensed by HJS.
 
 Retained asset provenance includes ExtendedAE's Recipe Editor icon, GTOCore/
 GTCEu framework and hatch/cover overlays, and GTLCore world-fragment and collector
-textures. The dev9 adaptation reuses these assets from the read-only old project.
+textures. This adaptation reuses these assets from the read-only old project.
 This source workspace and its local validation JAR do not constitute a newly
 published upstream or third-party release.

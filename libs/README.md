@@ -1,16 +1,17 @@
 # Local Build Dependencies
 
-Place the target dev9 dependency JARs in this directory before building a
+Place the target dev10 dependency JARs in this directory or the configured
+local reference directories before building a
 standalone checkout. They are compile-only references, are ignored by Git and
 are not redistributed in GTOHJS.
 
 Required flat-directory artifacts match the aliases in build.gradle:
 
-- gtocore-forge-1.20.1-26.9.5.jar (original dev9 Core)
-- gtceu-1.20.1-forge-1.20.1-26.9.70.jar (GTM embedded in the original Core)
+- gtocore-forge-1.20.1-26.9.5.jar (original dev10 Core; filename is unchanged)
+- gtceu-1.20.1-forge-1.20.1-26.10.8.jar (GTM embedded in the original dev10 Core)
 - datasynclib-forge-1.20.1-26.9.4.jar
 - ldlib-forge-1.20.1-1.0.52.a.jar
-- appliedenergistics2-forge-1.20.1-15.269.3.jar
+- appliedenergistics2-forge-1.20.1-15.2610.2.jar
 - fastrecipesearch-1.20.1-26.8.4-forge.jar
 - RecipeSearch-26.8.4.jar (nested library in that FastRecipeSearch artifact)
 - Botania-1.20.1-456-FORGE.jar

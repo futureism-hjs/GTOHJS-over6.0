@@ -7,7 +7,6 @@ import com.gregtechceu.gtceu.api.machine.multiblockpro.Symbols;
 import com.gregtechceu.gtceu.api.machine.MachineDefinition;
 import com.gregtechceu.gtceu.api.machine.MultiblockMachineDefinition;
 import com.gregtechceu.gtceu.api.machine.multiblock.PartAbility;
-import com.gregtechceu.gtceu.api.pattern.FactoryBlockPattern;
 import com.gregtechceu.gtceu.api.pattern.Predicates;
 import com.gregtechceu.gtceu.api.pattern.util.RelativeDirection;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
@@ -136,10 +135,10 @@ public final class OneStopRareEarthProcessingPlantRegistration {
                 candidate.getRecipeTypes()[0] != OneStopRareEarthRecipeTypeRegistration.definition()) {
             throw new IllegalStateException("Unexpected rare-earth processing recipe type");
         }
-        if (candidate.getPatternFactory() == null || candidate.getPatternFactory().length != 1) {
+        if (!candidate.hasStructure()) {
             throw new IllegalStateException("Rare-earth processing pattern supplier was not created");
         }
-        if (buildPattern && candidate.getPatternFactory()[0].get() == null) {
+        if (buildPattern && candidate.getStructure() == null) {
             throw new IllegalStateException("Rare-earth processing pattern could not be built");
         }
         if (candidate.getRenderer() == null) {
@@ -157,7 +156,7 @@ public final class OneStopRareEarthProcessingPlantRegistration {
         try {
             validate(definition, true);
             int patternFactories = definition instanceof MultiblockDefinition gtoDefinition &&
-                    gtoDefinition.getPatternFactory() != null ? gtoDefinition.getPatternFactory().length : -1;
+                    gtoDefinition.hasStructure() ? 1 : 0;
             ModLog.info("Validated loaded {}; structure=8x10x7, patternBuilt=true, patternFactories={}",
                     MACHINE_ID, patternFactories);
         } catch (Throwable error) {

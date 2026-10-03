@@ -6,7 +6,9 @@ import com.gtohjs.machines.MESuperPatternBufferPartMachine;
 import com.gtocore.api.machine.part.GTOPartAbility;
 import com.gtocore.common.data.translation.GTOMachineTooltips;
 import com.gtocore.common.machine.multiblock.part.ae.MEPatternBufferProxyPartMachine;
+import com.gtocore.common.machine.multiblock.part.ae.PatternBufferType;
 import com.gtocore.utils.register.MachineRegisterUtils;
+import com.gtolib.api.registries.GTORegistration;
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.machine.MachineDefinition;
@@ -60,22 +62,27 @@ public final class MESuperPatternBufferRegistration {
         if (existing != null) {
             return existing;
         }
-        return MachineRegisterUtils.machine(
-                        BUFFER_ID.getPath(),
-                        "ME\u8d85\u7ea7\u6837\u677f\u603b\u6210",
-                        MESuperPatternBufferPartMachine::new)
-                .langValue("ME Super Pattern Buffer")
+        MachineDefinition registered = PatternBufferType.builder(GTORegistration.GTO, BUFFER_ID.getPath())
+                .name("ME\u8d85\u7ea7\u6837\u677f\u603b\u6210", "ME Super Pattern Buffer")
+                .slots(MEPatternBufferConfig::patternCount)
                 .tier(9)
-                .allRotation()
-                .abilities(PartAbility.IMPORT_ITEMS, PartAbility.IMPORT_FLUIDS,
-                        PartAbility.EXPORT_ITEMS, PartAbility.EXPORT_FLUIDS,
-                        GTOPartAbility.DUAL_INPUT, GTOPartAbility.DUAL_OUTPUT)
-                .renderer(() -> new AmprosiumPatternBufferRenderer(GTValues.UHV,
-                        GTCEu.id("block/machine/part/me_pattern_buffer")))
-                .tooltips(Component.translatable("gtohjs.machine.me_super_pattern_buffer.capacity",
-                        MEPatternBufferConfig.patternCount()))
-                .tooltips(GTOMachineTooltips.AutoConnectMETooltips)
+                .machine(MESuperPatternBufferPartMachine::new)
+                .tooltips(() -> java.util.List.of(Component.translatable(
+                        "gtohjs.machine.me_super_pattern_buffer.capacity", MEPatternBufferConfig.patternCount())))
                 .register();
+        registered.setRenderer(new AmprosiumPatternBufferRenderer(GTValues.UHV,
+                GTCEu.id("block/machine/part/me_pattern_buffer")));
+        registerOutputAbilities(registered);
+        return registered;
+    }
+
+    static void registerOutputAbilities(MachineDefinition registered) {
+        int tier = registered.getTier();
+        var block = registered.get();
+        PartAbility.EXPORT_ITEMS.register(tier, block);
+        PartAbility.EXPORT_FLUIDS.register(tier, block);
+        GTOPartAbility.DUAL_INPUT.register(tier, block);
+        GTOPartAbility.DUAL_OUTPUT.register(tier, block);
     }
 
     private static MachineDefinition findOrRegisterProxy() {

@@ -8,7 +8,7 @@ import javax.tools.ToolProvider;
 import org.objectweb.asm.*;
 import org.objectweb.asm.tree.*;
 
-/** Real generator -> javac with actual dev9 API -> production discovery/ABI checks. No game launch. */
+/** Real generator -> javac with the active dev10 API -> production discovery/ABI checks. No game launch. */
 public final class GeneratedRecipeCodeCheck {
     private static void require(boolean value, String message) {
         if (!value) throw new AssertionError(message);
@@ -117,7 +117,7 @@ public final class GeneratedRecipeCodeCheck {
                 "-classpath", args[1], "-d", classes.toString()));
         compilerArgs.addAll(files);
         int status = ToolProvider.getSystemJavaCompiler().run(null, System.out, System.err, compilerArgs.toArray(String[]::new));
-        require(status == 0, "Actual generated sources did not compile against dev9 API");
+        require(status == 0, "Actual generated sources did not compile against dev10 API");
         // Put the exact production scanner beside fixtures so its own code source is their root.
         Path scanner = classes.resolve("com/gtohjs/methods/RecipeSourceDiscovery.class");
         Files.createDirectories(scanner.getParent());
@@ -165,7 +165,7 @@ public final class GeneratedRecipeCodeCheck {
                 "Chinese attribution segmentation lost");
         require(Files.readString(resources.resolve("assets/gtohjs/lang/en_us.json")).contains("\"Added by %s\""),
                 "English attribution segmentation lost");
-        System.out.println("PASS five actual generator samples compiled against dev9/JVM21, production directory/JAR discovery 3 GT + 2 crafting");
+        System.out.println("PASS five actual generator samples compiled against dev10/JVM21, production directory/JAR discovery 3 GT + 2 crafting");
         System.out.println("PASS control-character Java/SNBT round-trip, quantities/NBT/blank-grid source, invalid data and collision controls");
         System.out.println("PASS twelve Kotlin class targets and static native-rainbow event ABI; no game/runtime acceptance claimed");
     }

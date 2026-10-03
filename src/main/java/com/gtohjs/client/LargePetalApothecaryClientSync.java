@@ -15,7 +15,7 @@ import java.util.Collections;
 import java.util.IdentityHashMap;
 import java.util.LinkedHashSet;
 import java.util.Set;
-/** Reuses dev9's public display constructor and category/cache APIs. */
+/** Reuses the target Core's public display constructor and category/cache APIs. */
 @Mod.EventBusSubscriber(modid=GTOHJS.MOD_ID,bus=Mod.EventBusSubscriber.Bus.FORGE,value=Dist.CLIENT)
 public final class LargePetalApothecaryClientSync {
     private static final Set<EmiRecipe> LAST=Collections.newSetFromMap(new IdentityHashMap<>());

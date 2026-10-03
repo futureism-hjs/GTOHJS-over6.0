@@ -6,7 +6,9 @@ import com.gtohjs.machines.MESuperWildcardPatternBufferPartMachine;
 import com.gtohjs.methods.ModLog;
 import com.gtocore.api.machine.part.GTOPartAbility;
 import com.gtocore.common.data.translation.GTOMachineTooltips;
+import com.gtocore.common.machine.multiblock.part.ae.PatternBufferType;
 import com.gtocore.utils.register.MachineRegisterUtils;
+import com.gtolib.api.registries.GTORegistration;
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.machine.MachineDefinition;
 import com.gregtechceu.gtceu.api.machine.multiblock.PartAbility;
@@ -52,24 +54,20 @@ public final class MESuperWildcardPatternBufferRegistration {
         if (existing != null) {
             return existing;
         }
-        return MachineRegisterUtils.machine(
-                        BUFFER_ID.getPath(),
-                        "ME\u8d85\u7ea7\u901a\u914d\u7b26\u6837\u677f\u603b\u6210",
-                        MESuperWildcardPatternBufferPartMachine::new)
-                .langValue("ME Super Wildcard Pattern Buffer")
+        MachineDefinition registered = PatternBufferType.builder(GTORegistration.GTO, BUFFER_ID.getPath())
+                .name("ME\u8d85\u7ea7\u901a\u914d\u7b26\u6837\u677f\u603b\u6210", "ME Super Wildcard Pattern Buffer")
+                .slots(MEPatternBufferConfig::wildcardPatternCount)
                 .tier(GTValues.UHV)
-                .allRotation()
-                .abilities(PartAbility.IMPORT_ITEMS, PartAbility.IMPORT_FLUIDS,
-                        PartAbility.EXPORT_ITEMS, PartAbility.EXPORT_FLUIDS,
-                        GTOPartAbility.DUAL_INPUT, GTOPartAbility.DUAL_OUTPUT)
-                .renderer(() -> new AmprosiumPatternBufferRenderer(
-                        GTValues.UHV,
-                        new ResourceLocation("gtocore", "block/machine/part/me_pattern_buffer_red")))
+                .machine(MESuperWildcardPatternBufferPartMachine::new)
                 .tooltips(GTOMachineTooltips.MeWildcardPatternBufferTooltips)
-                .tooltips(Component.translatable("gtohjs.machine.me_super_wildcard_pattern_buffer.capacity",
-                        MEPatternBufferConfig.wildcardPatternCount()))
-                .tooltips(GTOMachineTooltips.AutoConnectMETooltips)
+                .tooltips(() -> java.util.List.of(Component.translatable(
+                        "gtohjs.machine.me_super_wildcard_pattern_buffer.capacity",
+                        MEPatternBufferConfig.wildcardPatternCount())))
                 .register();
+        registered.setRenderer(new AmprosiumPatternBufferRenderer(GTValues.UHV,
+                new ResourceLocation("gtocore", "block/machine/part/me_pattern_buffer_red")));
+        MESuperPatternBufferRegistration.registerOutputAbilities(registered);
+        return registered;
     }
 
     private static void validateRegistryIdentity(MachineDefinition machine) {

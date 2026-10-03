@@ -30,13 +30,13 @@ public final class InjectionVerifier {
 
     public static void verifyLoading() {
         var core = ModList.get().getModContainerById("gtocore").orElseThrow(
-                () -> new IllegalStateException("GTOHJS requires GTOCore dev9 capabilities"));
+                () -> new IllegalStateException("GTOHJS requires GTOCore dev10 capabilities"));
         Object packVersion = core.getModInfo().getModProperties().get("pack_version");
         if (packVersion == null) {
             throw new IllegalStateException("GTOHJS requires GTOCore pack_version metadata");
         }
         ProofLog.record("GTOCore=" + core.getModInfo().getVersion() +
-                " pack=" + packVersion + " profile=dev9 semantic anchors");
+                " pack=" + packVersion + " profile=dev10 semantic anchors");
         ClassLoader loader = InjectionVerifier.class.getClassLoader();
         for (String[] target : TARGETS) {
             try {

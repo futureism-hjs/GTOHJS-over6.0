@@ -1,6 +1,7 @@
 package com.gtohjs.machines;
 
 import com.gtocore.common.machine.multiblock.part.ae.MEPatternBufferPartMachine;
+import com.gtocore.common.machine.multiblock.part.ae.PatternBufferType;
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.TickableSubscription;
 import com.gregtechceu.gtceu.api.recipe.GTRecipe;
@@ -51,8 +52,8 @@ public abstract class MEOutputCapablePatternBufferPartMachine extends MEPatternB
     @Nullable
     private TickableSubscription gtohjsOutputSubscription;
 
-    protected MEOutputCapablePatternBufferPartMachine(MetaMachineBlockEntity holder, int maxPatternCount) {
-        super(holder, maxPatternCount);
+    protected MEOutputCapablePatternBufferPartMachine(MetaMachineBlockEntity holder, PatternBufferType type) {
+        super(holder, type);
         gtohjsOutputHandler = new OutputHandler(this);
         var handlers = new ArrayList<>(super.getRecipeHandlers());
         handlers.add(RecipeHandlerUnit.of(IO.OUT, this, List.of(gtohjsOutputHandler)));
