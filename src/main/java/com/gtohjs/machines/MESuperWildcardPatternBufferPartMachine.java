@@ -31,8 +31,9 @@ import com.gregtechceu.gtceu.api.recipe.GTRecipeDefinition;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
 import com.gregtechceu.gtceu.api.recipe.handler.IO;
 import com.gregtechceu.gtceu.api.recipe.handler.RecipeHandlerUnit;
-import com.gregtechceu.gtceu.api.transfer.fluid.CustomFluidTank;
-import com.gregtechceu.gtceu.api.transfer.item.CustomItemStackHandler;
+import com.gregtechceu.gtceu.api.transfer.forge.ForgeFluidAdapter;
+import com.gregtechceu.gtceu.api.transfer.key.KeyInventory;
+import com.gregtechceu.gtceu.api.transfer.key.StackInventory;
 import com.gregtechceu.gtceu.common.data.GTMaterials;
 
 import net.minecraft.ChatFormatting;
@@ -109,13 +110,13 @@ public final class MESuperWildcardPatternBufferPartMachine extends MEOutputCapab
     @SaveToDisk
     private int maxItemsOutput = 1;
     @SaveToDisk
-    private final CustomItemStackHandler blacklistedItems;
+    private final StackInventory blacklistedItems;
     @SaveToDisk
     private final ItemStackTransfer blacklistedItemsStorageTransfer;
     @SaveToDisk
-    private final CustomFluidTank[] blacklistedFluids;
+    private final KeyInventory<AEFluidKey> blacklistedFluids;
     @SaveToDisk
-    private final CustomItemStackHandler blacklistedAltProcessableMachines;
+    private final StackInventory blacklistedAltProcessableMachines;
     @SaveToDisk
     private final ItemStackTransfer blacklistedAltProcessableMachinesStorageTransfer;
     private final Int2ReferenceOpenHashMap<Material> blacklistedMaterials = new Int2ReferenceOpenHashMap<>();
@@ -132,12 +133,11 @@ public final class MESuperWildcardPatternBufferPartMachine extends MEOutputCapab
     public MESuperWildcardPatternBufferPartMachine(@NotNull MetaMachineBlockEntity holder, PatternBufferType type) {
         super(holder, type);
 
-        blacklistedItems = new CustomItemStackHandler(18);
+        blacklistedItems = new StackInventory(18);
         blacklistedItemsStorageTransfer = new ItemStackTransfer(36);
-        blacklistedFluids = new CustomFluidTank[18];
-        blacklistedAltProcessableMachines = new CustomItemStackHandler(6);
+        blacklistedFluids = KeyInventory.fluids(18, 1);
+        blacklistedAltProcessableMachines = new StackInventory(6);
         blacklistedAltProcessableMachinesStorageTransfer = new ItemStackTransfer(6);
-        Arrays.setAll(blacklistedFluids, i -> new CustomFluidTank(1));
 
         for (var internalSlot : getInternalInventory()) {
             internalSlot.shareTank.addChangedListener(this::requestPatternUpdate);
@@ -279,10 +279,10 @@ public final class MESuperWildcardPatternBufferPartMachine extends MEOutputCapab
                 blacklistedMaterialSet.add(mat);
             }
         }
-        for (; i < blacklistedItems.getSlots() + blacklistedFluids.length; i++) {
-            var tank = blacklistedFluids[i - blacklistedItems.getSlots()];
-            if (tank.isEmpty()) continue;
-            var mat = ChemicalHelper.getMaterial(tank.getFluid().getFluid());
+        for (; i < blacklistedItems.getSlots() + blacklistedFluids.size(); i++) {
+            var fluid = blacklistedFluids.keyAt(i - blacklistedItems.getSlots());
+            if (fluid == null) continue;
+            var mat = ChemicalHelper.getMaterial(fluid.getFluid());
             if (mat != GTMaterials.NULL) {
                 blacklistedMaterials.put(i, mat);
                 blacklistedMaterialSet.add(mat);
@@ -413,8 +413,9 @@ public final class MESuperWildcardPatternBufferPartMachine extends MEOutputCapab
         }
         blacklistedItemsStorageTransfer.deserializeNBT(tag.getCompound("blacklistedItems"));
         var fluidsTag = tag.getList("blacklistedFluids", 10);
-        for (int i = 0; i < Math.min(fluidsTag.size(), blacklistedFluids.length); i++) {
-            blacklistedFluids[i].deserializeNBT(fluidsTag.getCompound(i));
+        for (int i = 0; i < Math.min(fluidsTag.size(), blacklistedFluids.size()); i++) {
+            FluidStack fluid = FluidStack.loadFluidStackFromNBT(fluidsTag.getCompound(i));
+            blacklistedFluids.set(i, fluid.isEmpty() ? null : AEFluidKey.of(fluid), fluid.getAmount());
         }
         blacklistedAltProcessableMachinesStorageTransfer.deserializeNBT(tag.getCompound("blacklistedAltProcessableMachines"));
         loadBlacklistData();
@@ -428,8 +429,10 @@ public final class MESuperWildcardPatternBufferPartMachine extends MEOutputCapab
         tag.putInt("maxItemsOutput", maxItemsOutput);
         tag.put("blacklistedItems", blacklistedItemsStorageTransfer.serializeNBT());
         var fluidsTag = new ListTag();
-        for (var tank : blacklistedFluids) {
-            fluidsTag.add(tank.serializeNBT());
+        for (int i = 0; i < blacklistedFluids.size(); i++) {
+            AEFluidKey key = blacklistedFluids.keyAt(i);
+            FluidStack fluid = key == null ? FluidStack.EMPTY : key.toStack((int) blacklistedFluids.amountAt(i));
+            fluidsTag.add(fluid.writeToNBT(new CompoundTag()));
         }
         tag.put("blacklistedFluids", fluidsTag);
         tag.put("blacklistedAltProcessableMachines", blacklistedAltProcessableMachinesStorageTransfer.serializeNBT());
@@ -514,11 +517,13 @@ public final class MESuperWildcardPatternBufferPartMachine extends MEOutputCapab
     }
 
     private boolean checkProb(GTRecipeDefinition recipe) {
-        for (var ingredient : recipe.itemInputs) {
-            if (ingredient.chance != 10000 && ingredient.chance != 0) return false;
+        for (int i = 0; i < recipe.itemInputs.size(); i++) {
+            int chance = recipe.itemInputs.chance(i);
+            if (chance != 10000 && chance != 0) return false;
         }
-        for (var ingredient : recipe.fluidInputs) {
-            if (ingredient.chance != 10000 && ingredient.chance != 0) return false;
+        for (int i = 0; i < recipe.fluidInputs.size(); i++) {
+            int chance = recipe.fluidInputs.chance(i);
+            if (chance != 10000 && chance != 0) return false;
         }
         return true;
     }
@@ -841,13 +846,16 @@ public final class MESuperWildcardPatternBufferPartMachine extends MEOutputCapab
             for (int x = 0; x < rowSize; x++) {
                 int fluidIndex = index++;
                 inner.addWidget(new PhantomFluidWidget(
-                        this.blacklistedFluids[fluidIndex], fluidIndex,
+                        new ForgeFluidAdapter(blacklistedFluids), fluidIndex,
                         x * 18, y * 18, 18, 18,
-                        () -> this.blacklistedFluids[fluidIndex].getFluid(),
+                        () -> {
+                            AEFluidKey key = blacklistedFluids.keyAt(fluidIndex);
+                            return key == null ? FluidStack.EMPTY : key.toStack((int) blacklistedFluids.amountAt(fluidIndex));
+                        },
                         (fluid -> {
                             int shiftedIndex = fluidIndex + shift;
                             if (fluid.isEmpty()) {
-                                this.blacklistedFluids[fluidIndex].setFluid(fluid);
+                                this.blacklistedFluids.set(fluidIndex, null, 0);
                                 if (!blacklistedMaterials.isEmpty() && blacklistedMaterials.containsKey(shiftedIndex)) {
                                     blacklistedMaterials.remove(shiftedIndex);
                                 }
@@ -1005,7 +1013,7 @@ public final class MESuperWildcardPatternBufferPartMachine extends MEOutputCapab
     private void setFluid(int index, FluidStack fs) {
         var newFluid = fs.copy();
         newFluid.setAmount(1);
-        this.blacklistedFluids[index].setFluid(newFluid);
+        this.blacklistedFluids.set(index, newFluid.isEmpty() ? null : AEFluidKey.of(newFluid), newFluid.isEmpty() ? 0 : 1);
         loadBlacklistData();
     }
 

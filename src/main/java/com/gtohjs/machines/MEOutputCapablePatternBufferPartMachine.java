@@ -5,12 +5,10 @@ import com.gtocore.common.machine.multiblock.part.ae.PatternBufferType;
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.api.machine.TickableSubscription;
 import com.gregtechceu.gtceu.api.recipe.GTRecipe;
-import com.gregtechceu.gtceu.api.recipe.content.Content;
 import com.gregtechceu.gtceu.api.recipe.handler.IO;
 import com.gregtechceu.gtceu.api.recipe.handler.IRecipeHandler;
+import com.gregtechceu.gtceu.api.recipe.handler.PlanScratch;
 import com.gregtechceu.gtceu.api.recipe.handler.RecipeHandlerUnit;
-import com.gregtechceu.gtceu.api.recipe.ingredient.FluidIngredient;
-import com.gregtechceu.gtceu.api.recipe.ingredient.ItemIngredient;
 import com.gregtechceu.gtceu.integration.ae2.utils.KeyStorage;
 
 import net.minecraft.nbt.CompoundTag;
@@ -24,9 +22,9 @@ import appeng.api.networking.IGridNodeListener;
 import appeng.api.stacks.AEFluidKey;
 import appeng.api.stacks.AEItemKey;
 import appeng.api.stacks.AEKey;
+import appeng.api.stacks.AEKeyType;
 import appeng.api.storage.StorageHelper;
 import com.gto.datasynclib.annotations.SaveToDisk;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -130,11 +128,15 @@ public abstract class MEOutputCapablePatternBufferPartMachine extends MEPatternB
         if (sharedItems != null) {
             shareInventory.storage.deserializeNBT(sharedItems);
         }
-        ListTag sharedFluids = tag.getList("st", Tag.TAG_COMPOUND);
-        var tanks = shareTank.getStorages();
-        int tankCount = Math.min(tanks.length, sharedFluids.size());
-        for (int index = 0; index < tankCount; index++) {
-            tanks[index].deserializeNBT(sharedFluids.getCompound(index));
+        Tag sharedFluids = tag.get("st");
+        if (sharedFluids instanceof ListTag legacyTanks) {
+            int tankCount = Math.min(shareTank.storage.size(), legacyTanks.size());
+            for (int index = 0; index < tankCount; index++) {
+                FluidStack fluid = FluidStack.loadFluidStackFromNBT(legacyTanks.getCompound(index));
+                if (!fluid.isEmpty()) shareTank.storage.set(index, AEFluidKey.of(fluid), fluid.getAmount());
+            }
+        } else if (sharedFluids != null) {
+            shareTank.storage.deserializeNBT(sharedFluids);
         }
         Tag circuit = tag.get("ci");
         if (circuit != null) {
@@ -281,77 +283,42 @@ public abstract class MEOutputCapablePatternBufferPartMachine extends MEPatternB
         }
 
         @Override
-        public boolean canHandleItem() {
+        public boolean handlesItems() {
             return true;
         }
 
         @Override
-        public boolean canHandleFluid() {
+        public boolean handlesFluids() {
             return true;
         }
 
         @Override
-        public boolean isInfiniteItemCapacity() {
-            return true;
+        public boolean isInfiniteCapacity(AEKeyType type) {
+            return type == AEKeyType.items() || type == AEKeyType.fluids();
         }
 
         @Override
-        public boolean isInfiniteFluidCapacity() {
-            return true;
+        public long reserveOutput(PlanScratch plan, int member, AEKeyType type, int entry, AEKey key, long amount) {
+            return amount > 0 && ((type == AEKeyType.items() && key instanceof AEItemKey) ||
+                    (type == AEKeyType.fluids() && key instanceof AEFluidKey)) ? amount : 0;
         }
 
         @Override
-        public boolean handleRecipeItem(IO io, GTRecipe recipe,
-                                        List<Content<ItemIngredient>> items, boolean simulate) {
-            if (io != IO.OUT) {
-                throw new IllegalStateException("ME pattern-buffer output handler received " + io);
+        public long insertOutput(AEKeyType type, AEKey key, long amount) {
+            if (amount <= 0) return 0;
+            if (type == AEKeyType.items() && key instanceof AEItemKey) {
+                owner.gtohjsAcceptOutput(key, amount, owner.gtohjsOutputItems);
+            } else if (type == AEKeyType.fluids() && key instanceof AEFluidKey) {
+                owner.gtohjsAcceptOutput(key, amount, owner.gtohjsOutputFluids);
+            } else {
+                return 0;
             }
-            if (simulate) {
-                items.clear();
-                return true;
-            }
-            for (var iterator = items.iterator(); iterator.hasNext();) {
-                Content<ItemIngredient> output = iterator.next();
-                if (output.isEmpty() || output.amount < 1) {
-                    iterator.remove();
-                    continue;
-                }
-                ItemStack stack = output.inner.getInnerItemStack();
-                AEItemKey key = AEItemKey.of(stack);
-                if (key != null) {
-                    owner.gtohjsAcceptOutput(key, output.amount, owner.gtohjsOutputItems);
-                }
-                iterator.remove();
-            }
+            return amount;
+        }
+
+        @Override
+        public void onRecipeCommitted(GTRecipe recipe) {
             owner.gtohjsFlushOutputs();
-            return true;
-        }
-
-        @Override
-        public boolean handleRecipeFluid(IO io, GTRecipe recipe,
-                                         List<Content<FluidIngredient>> fluids, boolean simulate) {
-            if (io != IO.OUT) {
-                throw new IllegalStateException("ME pattern-buffer output handler received " + io);
-            }
-            if (simulate) {
-                fluids.clear();
-                return true;
-            }
-            for (var iterator = fluids.iterator(); iterator.hasNext();) {
-                Content<FluidIngredient> output = iterator.next();
-                if (output.isEmpty() || output.amount < 1) {
-                    iterator.remove();
-                    continue;
-                }
-                FluidStack stack = output.inner.getFluidStack();
-                AEFluidKey key = AEFluidKey.of(stack);
-                if (key != null) {
-                    owner.gtohjsAcceptOutput(key, output.amount, owner.gtohjsOutputFluids);
-                }
-                iterator.remove();
-            }
-            owner.gtohjsFlushOutputs();
-            return true;
         }
     }
 }

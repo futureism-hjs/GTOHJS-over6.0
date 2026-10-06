@@ -23,17 +23,12 @@ import com.gregtechceu.gtceu.api.recipe.info.ContentRecipeInfo;
 import com.gregtechceu.gtceu.api.recipe.info.FluidRecipeInfo;
 import com.gregtechceu.gtceu.api.recipe.info.ItemRecipeInfo;
 import com.gregtechceu.gtceu.api.recipe.info.RecipeInfo;
-import com.gregtechceu.gtceu.api.recipe.ingredient.FluidIngredient;
-import com.gregtechceu.gtceu.api.recipe.ingredient.ItemIngredient;
+import com.gregtechceu.gtceu.api.transfer.key.KeyInventory;
 import com.gregtechceu.gtceu.api.recipe.ui.GTRecipeTypeUI;
 import com.gregtechceu.gtceu.common.data.GTMachines;
 import com.gregtechceu.gtceu.common.data.GTRecipeTypes;
-import com.gregtechceu.gtceu.common.data.machines.GTMachineUtils;
-import com.gregtechceu.gtceu.data.recipe.CustomTags;
 import com.gregtechceu.gtceu.integration.ae2.gui.widget.AETextInputButtonWidget;
 import com.gregtechceu.gtceu.integration.xei.widgets.GTRecipeWidget;
-import com.gtocore.common.data.GTOItems;
-import com.gtocore.common.item.ItemMap;
 import com.gto.datasynclib.datastream.DataComponentMap;
 import com.gtohjs.data.GTOHJSItems;
 import com.gtolib.api.machine.DummyMachine;
@@ -71,6 +66,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.CraftingTableBlock;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraftforge.fluids.FluidStack;
+import appeng.api.stacks.AEFluidKey;
+import appeng.api.stacks.AEItemKey;
 
 import java.io.IOException;
 import java.nio.file.Path;
@@ -192,7 +189,7 @@ public final class GTOHJSRecipeEditorBehavior implements IItemUIFactory {
                     WidgetGroup group = new WidgetGroup(0, 0, maxCount * 18 + 8, totalRows * 18 + 8);
                     int index = 0;
                     for (var entry : slotsByCapability.entrySet()) {
-                        if (!(entry.getKey() instanceof ContentRecipeInfo<?, ?> capability) ||
+                        if (!(entry.getKey() instanceof ContentRecipeInfo capability) ||
                                 capability.getWidgetClass() == null) {
                             continue;
                         }
@@ -203,10 +200,9 @@ public final class GTOHJSRecipeEditorBehavior implements IItemUIFactory {
                             int tankIndex = slotIndex;
                             Widget slot = itemCapability ? new ServerSafePhantomSlotWidget() :
                                     new AmountEditablePhantomFluidWidget(
-                                            isOutputs ? () -> machine.exportFluids.getFluidInTank(tankIndex) :
-                                                    () -> machine.importFluids.getFluidInTank(tankIndex),
-                                            isOutputs ? fluid -> machine.exportFluids.setFluidInTank(tankIndex, fluid) :
-                                                    fluid -> machine.importFluids.setFluidInTank(tankIndex, fluid));
+                                            () -> fluidStack(isOutputs ? machine.exportFluids : machine.importFluids, tankIndex),
+                                            fluid -> setFluid(isOutputs ? machine.exportFluids : machine.importFluids,
+                                                    tankIndex, fluid));
                             slot.setSelfPosition(new Position((index % 3) * 18 + 4, (index / 3) * 18 + 4));
                             slot.setBackground(getSlotOverlay(isOutputs, capability, slotIndex == capabilityCount - 1));
                             slot.setId(capability.slotName(isOutputs ? IO.OUT : IO.IN, slotIndex));
@@ -249,7 +245,7 @@ public final class GTOHJSRecipeEditorBehavior implements IItemUIFactory {
                         for (var capabilityEntry : recipeHolder.storages().rowMap().entrySet()) {
                             IO io = capabilityEntry.getKey();
                             for (var storageEntry : capabilityEntry.getValue().entrySet()) {
-                                if (!(storageEntry.getKey() instanceof ContentRecipeInfo<?, ?> capability)) continue;
+                                if (!(storageEntry.getKey() instanceof ContentRecipeInfo capability)) continue;
                                 Class<? extends Widget> widgetClass = capability.getWidgetClass();
                                 if (widgetClass == null) continue;
                                 Object storage = storageEntry.getValue();
@@ -257,7 +253,7 @@ public final class GTOHJSRecipeEditorBehavior implements IItemUIFactory {
                                         "^%s_[0-9]+$".formatted(capability.slotName(io)), widgetClass, child -> {
                                             int index = WidgetUtils.widgetIdIndex(child);
                                             capability.applyWidgetInfo(child, index, false, io, recipeHolder,
-                                                    machine.recipeType, null, null, storage, 0, 0);
+                                                    machine.recipeType, null, null, -1, storage, 0, 0);
                                             if (child instanceof TankWidget tank) {
                                                 tank.setAllowClickDrained(true).setAllowClickFilled(true);
                                             } else if (child instanceof SlotWidget slot) {
@@ -382,12 +378,12 @@ public final class GTOHJSRecipeEditorBehavior implements IItemUIFactory {
         private static String resolveRecipeId(DummyMachine machine) {
             String id = machine.id == null ? "" : machine.id.trim();
             if (!id.isEmpty()) return id;
-            for (int index = 0; index < machine.exportItems.size; index++) {
-                ItemStack stack = machine.exportItems.stacks[index];
+            for (int index = 0; index < machine.exportItems.size(); index++) {
+                ItemStack stack = itemStack(machine.exportItems, index);
                 if (!stack.isEmpty()) return ItemUtils.getIdLocation(stack.getItem()).getPath();
             }
-            for (int index = 0; index < machine.exportFluids.getTanks(); index++) {
-                FluidStack stack = machine.exportFluids.getFluidInTank(index);
+            for (int index = 0; index < machine.exportFluids.size(); index++) {
+                FluidStack stack = fluidStack(machine.exportFluids, index);
                 if (!stack.isEmpty()) return FluidUtils.getIdLocation(stack.getFluid()).getPath();
             }
             return "";
@@ -399,7 +395,24 @@ public final class GTOHJSRecipeEditorBehavior implements IItemUIFactory {
                     stack.getTag() == null ? "" : stack.getTag().toString());
         }
 
-        private static RecipeSourceGenerator.StackSpec[] itemSpecs(ItemStack[] stacks) {
+        private static ItemStack itemStack(KeyInventory<AEItemKey> inventory, int slot) {
+            AEItemKey key = inventory.keyAt(slot);
+            return key == null ? ItemStack.EMPTY : key.toStack((int) Math.min(inventory.amountAt(slot), Integer.MAX_VALUE));
+        }
+
+        private static FluidStack fluidStack(KeyInventory<AEFluidKey> inventory, int slot) {
+            AEFluidKey key = inventory.keyAt(slot);
+            return key == null ? FluidStack.EMPTY : key.toStack((int) Math.min(inventory.amountAt(slot), Integer.MAX_VALUE));
+        }
+
+        private static void setFluid(KeyInventory<AEFluidKey> inventory, int slot, FluidStack fluid) {
+            inventory.set(slot, fluid == null || fluid.isEmpty() ? null : AEFluidKey.of(fluid),
+                    fluid == null ? 0 : fluid.getAmount());
+        }
+
+        private static RecipeSourceGenerator.StackSpec[] itemSpecs(KeyInventory<AEItemKey> inventory) {
+            ItemStack[] stacks = new ItemStack[inventory.size()];
+            for (int i = 0; i < stacks.length; i++) stacks[i] = itemStack(inventory, i);
             return java.util.Arrays.stream(stacks).map(EditorUI::itemSpec)
                     .filter(java.util.Objects::nonNull).toArray(RecipeSourceGenerator.StackSpec[]::new);
         }
@@ -415,10 +428,10 @@ public final class GTOHJSRecipeEditorBehavior implements IItemUIFactory {
         private static String buildMachineRecipeSource(DummyMachine machine, String recipeId) {
             java.util.List<FluidStack> inputs = new java.util.ArrayList<>();
             java.util.List<FluidStack> outputs = new java.util.ArrayList<>();
-            for (int i = 0; i < machine.importFluids.getTanks(); i++) inputs.add(machine.importFluids.getFluidInTank(i));
-            for (int i = 0; i < machine.exportFluids.getTanks(); i++) outputs.add(machine.exportFluids.getFluidInTank(i));
+            for (int i = 0; i < machine.importFluids.size(); i++) inputs.add(fluidStack(machine.importFluids, i));
+            for (int i = 0; i < machine.exportFluids.size(); i++) outputs.add(fluidStack(machine.exportFluids, i));
             return RecipeSourceGenerator.gt(machine.recipeType.registryName.toString(), recipeId,
-                    itemSpecs(machine.importItems.stacks), itemSpecs(machine.exportItems.stacks),
+                    itemSpecs(machine.importItems), itemSpecs(machine.exportItems),
                     fluidSpecs(inputs), fluidSpecs(outputs), machine.eut, machine.duration,
                     machine.circuit, machine.temp, machine.manat);
         }
@@ -428,17 +441,17 @@ public final class GTOHJSRecipeEditorBehavior implements IItemUIFactory {
         }
 
         private static ItemStack findCraftingOutput(DummyMachine machine) {
-            for (int index = 0; index < machine.exportItems.size; index++) {
-                ItemStack stack = machine.exportItems.stacks[index];
+            for (int index = 0; index < machine.exportItems.size(); index++) {
+                ItemStack stack = itemStack(machine.exportItems, index);
                 if (!stack.isEmpty()) return stack;
             }
             return ItemStack.EMPTY;
         }
 
         private static boolean hasCraftingInput(DummyMachine machine) {
-            int slotCount = Math.min(9, machine.importItems.size);
+            int slotCount = Math.min(9, machine.importItems.size());
             for (int index = 0; index < slotCount; index++) {
-                if (!machine.importItems.stacks[index].isEmpty()) return true;
+                if (!itemStack(machine.importItems, index).isEmpty()) return true;
             }
             return false;
         }
@@ -446,19 +459,8 @@ public final class GTOHJSRecipeEditorBehavior implements IItemUIFactory {
         private static String buildCraftingRecipeSource(DummyMachine machine, ItemStack outputStack,
                                                         String recipeId) {
             RecipeSourceGenerator.StackSpec[] grid = new RecipeSourceGenerator.StackSpec[9];
-            for (int i = 0; i < Math.min(9, machine.importItems.size); i++) grid[i] = itemSpec(machine.importItems.stacks[i]);
+            for (int i = 0; i < Math.min(9, machine.importItems.size()); i++) grid[i] = itemSpec(itemStack(machine.importItems, i));
             return RecipeSourceGenerator.crafting(recipeId, itemSpec(outputStack), grid);
-        }
-
-        private static ItemIngredient getItemIngredient(ItemStack stack) {
-            if (ItemMap.UNIVERSAL_CIRCUITS.contains(stack.getItem())) {
-                for (int tier : GTMachineUtils.ALL_TIERS) {
-                    if (GTOItems.UNIVERSAL_CIRCUIT[tier].is(stack.getItem())) {
-                        return ItemIngredient.of(CustomTags.CIRCUITS_ARRAY[tier], stack.getCount());
-                    }
-                }
-            }
-            return ItemIngredient.of(stack);
         }
 
         @Override

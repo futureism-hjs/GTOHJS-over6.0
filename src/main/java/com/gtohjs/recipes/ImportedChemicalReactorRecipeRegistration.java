@@ -1,13 +1,11 @@
 package com.gtohjs.recipes;
 
-import com.google.gson.JsonElement;
 import com.gregtechceu.gtceu.api.data.chemical.ChemicalHelper;
 import com.gregtechceu.gtceu.api.data.chemical.material.Material;
 import com.gregtechceu.gtceu.api.data.tag.TagPrefix;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeDefinition;
-import com.gregtechceu.gtceu.api.recipe.content.Content;
-import com.gregtechceu.gtceu.api.recipe.ingredient.FluidIngredient;
-import com.gregtechceu.gtceu.api.recipe.ingredient.ItemIngredient;
+import com.gregtechceu.gtceu.api.recipe.content.ContentList;
+import com.gregtechceu.gtceu.api.recipe.content.KeyIngredient;
 import com.gregtechceu.gtceu.common.data.GTMaterials;
 import com.gtocore.common.data.GTORecipeTypes;
 import com.gtohjs.GTOHJS;
@@ -24,6 +22,7 @@ import net.minecraft.tags.TagKey;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.material.Fluid;
+import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.registries.ForgeRegistries;
 
 /** Registers the four chemical-reactor recipes imported from the recipe editor drafts. */
@@ -239,7 +238,7 @@ public final class ImportedChemicalReactorRecipeRegistration {
     }
 
     private static void validateDust(
-            List<Content<ItemIngredient>> contents,
+            ContentList contents,
             Material material,
             int amount,
             boolean allowUnificationTag,
@@ -249,38 +248,35 @@ public final class ImportedChemicalReactorRecipeRegistration {
             throw new IllegalStateException("Expected exactly one item " + direction + " in " + recipeId);
         }
 
-        Content<ItemIngredient> content = contents.get(0);
-        validateDeterministic(content, "item " + direction, recipeId);
-        if (content.getIntAmount() != amount) {
+        validateDeterministic(contents, 0, "item " + direction, recipeId);
+        if (contents.amount(0) != amount) {
             throw new IllegalStateException("Unexpected item " + direction + " amount in " + recipeId + ": " +
-                    content.getIntAmount() + ", expected " + amount);
+                    contents.amount(0) + ", expected " + amount);
         }
 
         ItemStack expectedStack = ChemicalHelper.get(TagPrefix.dust, material);
         if (expectedStack.isEmpty()) {
             throw new IllegalStateException("Missing dust item for " + materialName(material));
         }
-        ItemIngredient ingredient = content.inner;
-        if (ingredient == null || ingredient.isEmpty() || !ingredient.test(expectedStack)) {
+        KeyIngredient ingredient = contents.ingredient(0);
+        if (ingredient == null || !ingredient.test(expectedStack)) {
             throw new IllegalStateException("Unexpected dust " + direction + " in " + recipeId + ": " +
                     ingredient);
         }
 
-        JsonElement actualJson = ingredient.inner.toJson();
-        JsonElement exactItemJson = ItemIngredient.of(expectedStack, amount).inner.toJson();
-        boolean exact = actualJson.equals(exactItemJson);
+        boolean exact = ingredient.equals(KeyIngredient.of(expectedStack));
         if (!exact && allowUnificationTag) {
             TagKey<Item> expectedTag = ChemicalHelper.getTag(TagPrefix.dust, material);
-            exact = expectedTag != null && actualJson.equals(ItemIngredient.of(expectedTag, amount).inner.toJson());
+            exact = expectedTag != null && ingredient.equals(KeyIngredient.itemTag(expectedTag));
         }
         if (!exact) {
             throw new IllegalStateException("Dust " + direction + " does not use the exact material item/tag in " +
-                    recipeId + ": " + actualJson);
+                    recipeId + ": " + ingredient);
         }
     }
 
     private static void validateFluid(
-            List<Content<FluidIngredient>> contents,
+            ContentList contents,
             Material material,
             int amount,
             String direction,
@@ -289,26 +285,28 @@ public final class ImportedChemicalReactorRecipeRegistration {
             throw new IllegalStateException("Expected exactly one fluid " + direction + " in " + recipeId);
         }
 
-        Content<FluidIngredient> content = contents.get(0);
-        validateDeterministic(content, "fluid " + direction, recipeId);
-        FluidIngredient ingredient = content.inner;
+        validateDeterministic(contents, 0, "fluid " + direction, recipeId);
+        KeyIngredient ingredient = contents.ingredient(0);
         Fluid expectedFluid = material.getFluid();
-        if (ingredient == null || ingredient.getFluid() != expectedFluid || ingredient.nbt != null ||
-                content.getIntAmount() != amount) {
-            ResourceLocation actualFluidId = ingredient == null || ingredient.getFluid() == null ? null :
-                    ForgeRegistries.FLUIDS.getKey(ingredient.getFluid());
+        FluidStack[] fluids = ingredient == null ? new FluidStack[0] : ingredient.getFluids(1);
+        FluidStack stack = fluids.length == 1 ? fluids[0] : FluidStack.EMPTY;
+        if (stack.isEmpty() || stack.getFluid() != expectedFluid || stack.hasTag() ||
+                contents.amount(0) != amount) {
+            ResourceLocation actualFluidId = stack.isEmpty() ? null :
+                    ForgeRegistries.FLUIDS.getKey(stack.getFluid());
             throw new IllegalStateException("Unexpected fluid " + direction + " in " + recipeId +
                     ": fluid=" + actualFluidId + ", amount=" +
-                    (ingredient == null ? 0 : content.getIntAmount()) + ", expected=" +
+                    contents.amount(0) + ", expected=" +
                     ForgeRegistries.FLUIDS.getKey(expectedFluid) + " x " + amount);
         }
     }
 
-    private static void validateDeterministic(Content<?> content, String description, ResourceLocation recipeId) {
-        if (content == null || content.inner == null || content.chance != Content.MAX_CHANCE ||
-                content.tierChanceBoost != 0) {
+    private static void validateDeterministic(ContentList contents, int index, String description,
+                                              ResourceLocation recipeId) {
+        if (contents.ingredient(index) == null || contents.chance(index) != ContentList.MAX_CHANCE ||
+                contents.boost(index) != 0) {
             throw new IllegalStateException("Expected deterministic " + description + " in " + recipeId +
-                    ": " + content);
+                    " at " + index);
         }
     }
 

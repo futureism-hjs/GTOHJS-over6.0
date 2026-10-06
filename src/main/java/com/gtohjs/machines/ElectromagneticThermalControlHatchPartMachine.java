@@ -128,8 +128,9 @@ public final class ElectromagneticThermalControlHatchPartMachine
             }
             var fluidHandler = getFluidHandlerCap(side, false);
             if (fluidHandler != null) {
-                for (int tank = 0; tank < fluidHandler.getTanks(); tank++) {
-                    fluidHandler.setFluidInTank(tank, FluidStack.EMPTY);
+                for (int tank = 0; tank < fluidHandler.size(); tank++) {
+                    var key = fluidHandler.keyAt(tank);
+                    if (key != null) fluidHandler.extract(tank, key, fluidHandler.amountAt(tank), false);
                 }
             }
         }

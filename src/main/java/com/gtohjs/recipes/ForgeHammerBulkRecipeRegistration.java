@@ -5,8 +5,8 @@ import com.gregtechceu.gtceu.api.data.chemical.material.Material;
 import com.gregtechceu.gtceu.api.data.chemical.material.properties.PropertyKey;
 import com.gregtechceu.gtceu.api.data.tag.TagPrefix;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeDefinition;
-import com.gregtechceu.gtceu.api.recipe.content.Content;
-import com.gregtechceu.gtceu.api.recipe.ingredient.ItemIngredient;
+import com.gregtechceu.gtceu.api.recipe.content.ContentList;
+import com.gregtechceu.gtceu.api.recipe.content.KeyIngredient;
 import com.gtocore.common.data.GTORecipeTypes;
 import com.gtohjs.GTOHJS;
 import com.gtohjs.methods.ModLog;
@@ -136,18 +136,20 @@ public final class ForgeHammerBulkRecipeRegistration {
 
         ItemStack expectedIngot = ChemicalHelper.get(TagPrefix.ingot, material, 1);
         ItemStack expectedDust = ChemicalHelper.get(TagPrefix.dust, material, 1);
-        validateItemContent(candidate.itemInputs.get(0), expectedIngot, "input", candidate.id);
-        validateItemContent(candidate.itemOutputs.get(0), expectedDust, "output", candidate.id);
+        validateItemContent(candidate.itemInputs, expectedIngot, "input", candidate.id);
+        validateItemContent(candidate.itemOutputs, expectedDust, "output", candidate.id);
     }
 
-    private static void validateItemContent(Content<ItemIngredient> content, ItemStack expected,
+    private static void validateItemContent(ContentList contents, ItemStack expected,
                                             String direction, ResourceLocation recipeId) {
-        if (content == null || content.inner == null || content.chance != Content.MAX_CHANCE ||
-                content.tierChanceBoost != 0 || content.getIntAmount() != AMOUNT) {
+        if (contents.size() != 1 || contents.chance(0) != ContentList.MAX_CHANCE ||
+                contents.boost(0) != 0 || contents.amount(0) != AMOUNT) {
             throw new IllegalStateException("Unexpected bulk cluster " + direction + " content in " + recipeId);
         }
-        ItemStack actual = content.inner.getItem();
-        if (actual.isEmpty() || expected.isEmpty() || actual.getItem() != expected.getItem()) {
+        KeyIngredient ingredient = contents.ingredient(0);
+        ItemStack[] items = ingredient.getItems();
+        ItemStack actual = items.length == 1 ? items[0] : ItemStack.EMPTY;
+        if (actual.isEmpty() || expected.isEmpty() || !ingredient.equals(KeyIngredient.of(expected))) {
             ResourceLocation actualId = actual.isEmpty() ? null : ForgeRegistries.ITEMS.getKey(actual.getItem());
             ResourceLocation expectedId = expected.isEmpty() ? null : ForgeRegistries.ITEMS.getKey(expected.getItem());
             throw new IllegalStateException("Unexpected bulk cluster " + direction + " item in " + recipeId +

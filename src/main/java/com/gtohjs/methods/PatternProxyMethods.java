@@ -6,13 +6,12 @@ import com.gtocore.common.machine.multiblock.part.ae.MEPatternBufferPartMachine;
 import com.gtocore.common.machine.multiblock.part.ae.MEPatternBufferProxyPartMachine;
 import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMultiPart;
 import com.gregtechceu.gtceu.api.recipe.GTRecipe;
-import com.gregtechceu.gtceu.api.recipe.content.Content;
 import com.gregtechceu.gtceu.api.recipe.handler.IO;
 import com.gregtechceu.gtceu.api.recipe.handler.IRecipeHandler;
+import com.gregtechceu.gtceu.api.recipe.handler.PlanScratch;
 import com.gregtechceu.gtceu.api.recipe.handler.RecipeHandlerUnit;
-import com.gregtechceu.gtceu.api.recipe.ingredient.FluidIngredient;
-import com.gregtechceu.gtceu.api.recipe.ingredient.ItemIngredient;
-
+import appeng.api.stacks.AEKey;
+import appeng.api.stacks.AEKeyType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,39 +43,37 @@ public final class PatternProxyMethods {
         }
 
         @Override
-        public boolean canHandleItem() {
+        public boolean handlesItems() {
             return true;
         }
 
         @Override
-        public boolean canHandleFluid() {
+        public boolean handlesFluids() {
             return true;
         }
 
         @Override
-        public boolean isInfiniteItemCapacity() {
+        public boolean isInfiniteCapacity(AEKeyType type) {
             IRecipeHandler target = target();
-            return target != null && target.isInfiniteItemCapacity();
+            return target != null && target.isInfiniteCapacity(type);
         }
 
         @Override
-        public boolean isInfiniteFluidCapacity() {
+        public long reserveOutput(PlanScratch plan, int member, AEKeyType type, int entry, AEKey key, long amount) {
             IRecipeHandler target = target();
-            return target != null && target.isInfiniteFluidCapacity();
+            return target == null ? 0 : target.reserveOutput(plan, member, type, entry, key, amount);
         }
 
         @Override
-        public boolean handleRecipeItem(IO io, GTRecipe recipe,
-                                        List<Content<ItemIngredient>> items, boolean simulate) {
+        public long insertOutput(AEKeyType type, AEKey key, long amount) {
             IRecipeHandler target = target();
-            return target != null && target.handleRecipeItem(io, recipe, items, simulate);
+            return target == null ? 0 : target.insertOutput(type, key, amount);
         }
 
         @Override
-        public boolean handleRecipeFluid(IO io, GTRecipe recipe,
-                                         List<Content<FluidIngredient>> fluids, boolean simulate) {
+        public void onRecipeCommitted(GTRecipe recipe) {
             IRecipeHandler target = target();
-            return target != null && target.handleRecipeFluid(io, recipe, fluids, simulate);
+            if (target != null) target.onRecipeCommitted(recipe);
         }
     }
 }

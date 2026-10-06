@@ -7,7 +7,7 @@ import com.gregtechceu.gtceu.api.gui.fancy.IFancyUIProvider;
 import com.gregtechceu.gtceu.api.machine.TickableSubscription;
 import com.gregtechceu.gtceu.api.blockentity.ITickSubscription;
 import com.gregtechceu.gtceu.api.machine.feature.IAutoOutputFluid;
-import com.gregtechceu.gtceu.api.machine.trait.NotifiableFluidTank;
+import com.gregtechceu.gtceu.api.machine.trait.NotifiableInventory;
 import com.gregtechceu.gtceu.api.recipe.handler.IO;
 import com.gregtechceu.gtceu.common.data.GTItems;
 import com.gregtechceu.gtceu.common.data.GTMaterials;
@@ -37,6 +37,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
+import appeng.api.stacks.AEFluidKey;
 import java.util.List;
 
 /** MV infinite intake hatch with selectable air, oxygen and nitrogen production. */
@@ -88,8 +89,8 @@ public class AdvancedInfiniteIntakeHatchPartMachine extends
     }
 
     @Override
-    protected NotifiableFluidTank createTank(int initialCapacity, int slots, Object... args) {
-        return new NotifiableFluidTank(this, slots, initialCapacity, IO.IN, IO.BOTH);
+    protected NotifiableInventory<AEFluidKey> createTank(int initialCapacity, int slots, Object... args) {
+        return NotifiableInventory.fluids(this, slots, initialCapacity, IO.IN, IO.BOTH);
     }
 
     /** The custom generator owns intake/output ticks; do not start FluidHatch auto-import. */
@@ -201,16 +202,16 @@ public class AdvancedInfiniteIntakeHatchPartMachine extends
         if (autoOutputFluids) tank.exportToNearby(getOutputFacingFluids());
         Fluid fluid = FILTERS[mode];
         int amount = maintainFull
-                ? capacity - tank.getFluidInTank(0).getAmount()
+                ? capacity - (int) tank.amountAt(0)
                 : RATE_PER_SECOND[mode];
         if (amount <= 0) return;
-        tank.fillInternal(new FluidStack(fluid, amount), IFluidHandler.FluidAction.EXECUTE);
+        tank.insert(AEFluidKey.of(fluid), amount, false);
         updateIntakeSubscription();
     }
 
     private void applyFilter() {
         Fluid selected = FILTERS[Math.max(0, Math.min(filterMode, FILTERS.length - 1))];
-        tank.setFilter(stack -> stack != null && !stack.isEmpty() && stack.getFluid() == selected);
+        tank.setFilter(key -> key instanceof AEFluidKey fluidKey && fluidKey.getFluid() == selected);
     }
 
     public int getFilterMode() { return filterMode; }
@@ -218,18 +219,18 @@ public class AdvancedInfiniteIntakeHatchPartMachine extends
     public void setFilterMode(int mode) {
         if (isRemote()) return;
         int next = Math.max(0, Math.min(FILTERS.length - 1, mode));
-        FluidStack stored = tank.getFluidInTank(0);
-        Fluid existing = stored.getFluid();
-        if (!maintainFull && !stored.isEmpty() && existing != FILTERS[next]) return;
-        if (maintainFull && !stored.isEmpty() && existing != FILTERS[next]) {
-            tank.drainInternal(Integer.MAX_VALUE, IFluidHandler.FluidAction.EXECUTE);
+        AEFluidKey stored = tank.keyAt(0);
+        Fluid existing = stored == null ? null : stored.getFluid();
+        if (!maintainFull && stored != null && existing != FILTERS[next]) return;
+        if (maintainFull && stored != null && existing != FILTERS[next]) {
+            tank.extract(0, stored, tank.amountAt(0), false);
         }
         filterMode = next;
         applyFilter();
         if (maintainFull && canIntake()) {
-            int missing = capacity - tank.getFluidInTank(0).getAmount();
+            int missing = capacity - (int) tank.amountAt(0);
             if (missing > 0) {
-                tank.fillInternal(new FluidStack(FILTERS[next], missing), IFluidHandler.FluidAction.EXECUTE);
+                tank.insert(AEFluidKey.of(FILTERS[next]), missing, false);
             }
         }
         onChanged();

@@ -23,7 +23,14 @@ object HyperdimensionalPatternResources {
         "hyperdimensional_biochemical_factory" to intArrayOf(43, 22, 49),
         "advanced_alchemy_cauldron" to intArrayOf(5, 3, 5),
         "large_petal_apothecary" to intArrayOf(5, 3, 5),
-        "universal_steam_factory" to intArrayOf(5, 5, 5)
+        "universal_steam_factory" to intArrayOf(5, 5, 5),
+        "neutron_control_factory" to intArrayOf(15, 21, 13),
+        "platinum_refining_matrix" to intArrayOf(29, 19, 33),
+        "dragon_field_proliferation_core" to intArrayOf(75, 73, 78),
+        "plasma_machine_tool" to intArrayOf(17, 12, 23),
+        "hadron_catalytic_refinery" to intArrayOf(17, 25, 17),
+        "quantum_mass_spectrum_array" to intArrayOf(23, 13, 19),
+        "superconducting_fusion_assembler" to intArrayOf(21, 14, 21)
     )
 
     @JvmStatic

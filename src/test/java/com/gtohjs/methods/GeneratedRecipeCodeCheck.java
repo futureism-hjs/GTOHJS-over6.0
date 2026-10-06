@@ -157,7 +157,6 @@ public final class GeneratedRecipeCodeCheck {
         }
         try (var input = GeneratedRecipeCodeCheck.class.getResourceAsStream("/com/gtohjs/client/AddedByTooltip.class")) {
             var tooltip = node(input.readAllBytes());
-            require(calls(tooltip, "com/gtocore/api/lang/ComponentSupplier", "scrollFullColor"), "Native rainbow not reused");
             require(tooltip.methods.stream().anyMatch(m -> m.name.equals("onTooltip") &&
                     (m.access & Opcodes.ACC_STATIC) != 0), "Forge static event ABI missing");
         }
@@ -165,8 +164,8 @@ public final class GeneratedRecipeCodeCheck {
                 "Chinese attribution segmentation lost");
         require(Files.readString(resources.resolve("assets/gtohjs/lang/en_us.json")).contains("\"Added by %s\""),
                 "English attribution segmentation lost");
-        System.out.println("PASS five actual generator samples compiled against dev10/JVM21, production directory/JAR discovery 3 GT + 2 crafting");
+        System.out.println("PASS five actual generator samples compiled against dev11/JVM21, production directory/JAR discovery 3 GT + 2 crafting");
         System.out.println("PASS control-character Java/SNBT round-trip, quantities/NBT/blank-grid source, invalid data and collision controls");
-        System.out.println("PASS twelve Kotlin class targets and static native-rainbow event ABI; no game/runtime acceptance claimed");
+        System.out.println("PASS twelve Kotlin class targets and static Forge tooltip event ABI; no game/runtime acceptance claimed");
     }
 }

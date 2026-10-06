@@ -1,13 +1,12 @@
 package com.gtohjs.recipes;
 
 import com.gregtechceu.gtceu.api.recipe.GTRecipeDefinition;
-import com.gregtechceu.gtceu.api.recipe.content.Content;
-import com.gregtechceu.gtceu.api.recipe.ingredient.ItemIngredient;
+import com.gregtechceu.gtceu.api.recipe.content.ContentList;
 import com.gtocore.common.data.GTORecipeTypes;
 import com.gtohjs.methods.ModLog;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Map;
+import appeng.api.stacks.AEItemKey;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -97,18 +96,21 @@ public final class PlatinumGroupSludgeRecipeRegistration {
         }
     }
 
-    private static Map<ResourceLocation, Integer> itemMap(List<Content<ItemIngredient>> contents) {
+    private static Map<ResourceLocation, Integer> itemMap(ContentList contents) {
         Map<ResourceLocation, Integer> result = new LinkedHashMap<>();
-        for (Content<ItemIngredient> content : contents) {
-            if (content.chance != Content.MAX_CHANCE || content.tierChanceBoost != 0) {
-                throw new IllegalStateException("Expected deterministic item content: " + content);
+        for (int i = 0; i < contents.size(); i++) {
+            if (contents.chance(i) != ContentList.MAX_CHANCE || contents.boost(i) != 0) {
+                throw new IllegalStateException("Expected deterministic item content: " + contents);
             }
-            ItemStack stack = content.inner.getItem();
+            if (!(contents.ingredient(i).displayKey() instanceof AEItemKey key)) {
+                throw new IllegalStateException("Expected item ingredient: " + contents.ingredient(i));
+            }
+            ItemStack stack = key.toStack(1);
             ResourceLocation itemId = ForgeRegistries.ITEMS.getKey(stack.getItem());
             if (stack.isEmpty() || itemId == null) {
-                throw new IllegalStateException("Recipe contains an empty or unregistered item: " + content);
+                throw new IllegalStateException("Recipe contains an empty or unregistered item: " + contents);
             }
-            result.merge(itemId, content.getIntAmount(), Integer::sum);
+            result.merge(itemId, Math.toIntExact(contents.amount(i)), Integer::sum);
         }
         return Map.copyOf(result);
     }

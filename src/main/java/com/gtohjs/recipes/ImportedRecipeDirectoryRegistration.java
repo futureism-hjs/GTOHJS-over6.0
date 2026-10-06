@@ -6,9 +6,8 @@ import com.gregtechceu.gtceu.api.data.chemical.material.Material;
 import com.gregtechceu.gtceu.api.data.tag.TagPrefix;
 import com.gregtechceu.gtceu.api.machine.MachineDefinition;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeDefinition;
-import com.gregtechceu.gtceu.api.recipe.content.Content;
-import com.gregtechceu.gtceu.api.recipe.ingredient.FluidIngredient;
-import com.gregtechceu.gtceu.api.recipe.ingredient.ItemIngredient;
+import com.gregtechceu.gtceu.api.recipe.content.ContentList;
+import com.gregtechceu.gtceu.api.recipe.content.KeyIngredient;
 import com.gregtechceu.gtceu.common.data.GTItems;
 import com.gregtechceu.gtceu.common.data.GTMaterials;
 import com.gregtechceu.gtceu.data.recipe.CustomTags;
@@ -314,34 +313,51 @@ public final class ImportedRecipeDirectoryRegistration {
     }
 
     private static void validateItems(
-            List<Content<ItemIngredient>> actual,
+            ContentList actual,
             List<ItemSpec> expected,
             ResourceLocation recipeId,
             String direction) {
-        com.gtohjs.methods.RecipeSourceSupport.validateItems(actual,
-                expected.stream().map(ItemSpec::ingredient).toList(), recipeId, direction);
+        if (actual.size() != expected.size()) {
+            throw new IllegalStateException("Unexpected item " + direction + " count in " + recipeId);
+        }
+        for (int index = 0; index < expected.size(); index++) {
+            ItemSpec spec = expected.get(index);
+            if (actual.chance(index) != ContentList.MAX_CHANCE || actual.boost(index) != 0 ||
+                    actual.amount(index) != spec.amount() ||
+                    !actual.ingredient(index).equals(spec.ingredient())) {
+                throw new IllegalStateException("Unexpected item " + direction + " #" + index + " in " + recipeId);
+            }
+        }
     }
 
     private static void validateFluids(
-            List<Content<FluidIngredient>> actual,
+            ContentList actual,
             List<FluidSpec> expected,
             ResourceLocation recipeId,
             String direction) {
-        com.gtohjs.methods.RecipeSourceSupport.validateFluids(actual,
-                expected.stream().map(spec -> new net.minecraftforge.fluids.FluidStack(
-                        spec.material().getFluid(), spec.amount())).toList(), recipeId, direction);
+        if (actual.size() != expected.size()) {
+            throw new IllegalStateException("Unexpected fluid " + direction + " count in " + recipeId);
+        }
+        for (int index = 0; index < expected.size(); index++) {
+            FluidSpec spec = expected.get(index);
+            if (actual.chance(index) != ContentList.MAX_CHANCE || actual.boost(index) != 0 ||
+                    actual.amount(index) != spec.amount() ||
+                    !actual.ingredient(index).equals(KeyIngredient.fluid(spec.material().getFluid()))) {
+                throw new IllegalStateException("Unexpected fluid " + direction + " #" + index + " in " + recipeId);
+            }
+        }
     }
 
     private static void validateExpectedResources(RecipeSpec spec) {
         for (ItemSpec itemSpec : spec.itemInputs()) {
-            ItemIngredient ingredient = itemSpec.ingredient();
-            if (ingredient == null || ingredient.isEmpty() || ingredient.getAmount() <= 0) {
+            KeyIngredient ingredient = itemSpec.ingredient();
+            if (ingredient == null || itemSpec.amount() <= 0) {
                 throw new IllegalStateException("Missing imported recipe input for " + spec.rawId());
             }
         }
         for (ItemSpec itemSpec : spec.itemOutputs()) {
-            ItemIngredient ingredient = itemSpec.ingredient();
-            if (ingredient == null || ingredient.isEmpty() || ingredient.getAmount() <= 0) {
+            KeyIngredient ingredient = itemSpec.ingredient();
+            if (ingredient == null || itemSpec.amount() <= 0) {
                 throw new IllegalStateException("Missing imported recipe output for " + spec.rawId());
             }
         }
@@ -427,8 +443,8 @@ public final class ImportedRecipeDirectoryRegistration {
                 throw new IllegalStateException("Missing material item: " + prefix + " / " +
                         resolved.getResourceLocation());
             }
-            return ItemIngredient.of(item, amount);
-        });
+            return KeyIngredient.item(item);
+        }, amount);
     }
 
     private static ItemSpec item(String rawId, int amount) {
@@ -436,17 +452,17 @@ public final class ImportedRecipeDirectoryRegistration {
     }
 
     private static ItemSpec item(Supplier<? extends Item> item, int amount) {
-        return new ItemSpec(() -> ItemIngredient.of(
-                Objects.requireNonNull(item.get(), "Imported recipe item"), amount));
+        return new ItemSpec(() -> KeyIngredient.item(
+                Objects.requireNonNull(item.get(), "Imported recipe item")), amount);
     }
 
     private static ItemSpec machine(Supplier<? extends MachineDefinition> machine, int amount) {
-        return new ItemSpec(() -> ItemIngredient.of(
-                Objects.requireNonNull(machine.get(), "Imported recipe machine").asItem(), amount));
+        return new ItemSpec(() -> KeyIngredient.item(
+                Objects.requireNonNull(machine.get(), "Imported recipe machine").asItem()), amount);
     }
 
     private static ItemSpec tag(TagKey<Item> tag, int amount) {
-        return new ItemSpec(() -> ItemIngredient.of(tag, amount));
+        return new ItemSpec(() -> KeyIngredient.itemTag(tag), amount);
     }
 
     private static FluidSpec fluid(Supplier<Material> material, int amount) {
@@ -471,8 +487,8 @@ public final class ImportedRecipeDirectoryRegistration {
             int duration) {
     }
 
-    private record ItemSpec(Supplier<ItemIngredient> ingredientSupplier) {
-        private ItemIngredient ingredient() {
+    private record ItemSpec(Supplier<KeyIngredient> ingredientSupplier, int amount) {
+        private KeyIngredient ingredient() {
             return Objects.requireNonNull(ingredientSupplier.get(), "Imported recipe ingredient");
         }
     }

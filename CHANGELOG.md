@@ -1,5 +1,32 @@
 # GTO HJS Changelog
 
+## dev1-for-gtocore-0.6.0-dev11-fix5 - 2026-10-06
+
+- Retargeted the preserved working tree to original GTO 0.6.0-dev11 Core
+  26.10.1, GTCEu 26.10.17 and AE2 15.2610.4. Migrated recipe content,
+  AE Key inventories, stocking input transactions and ME output handlers to
+  the dev11 contracts.
+- Added seven GTL-derived multiblocks and three dedicated recipe types. The
+  four order-processing machines accept native item and fluid export hatches,
+  including parts with the same abilities, on X/Q while I remains casing.
+- Adapted the advanced generator array's loss override to dev11 EnergyPort
+  kinds while retaining the stock array's configured loss.
+- Java 21 online IDEA MCP `./gradlew clean build` passed, including generated
+  recipe checks. The original dev11 client passed all twelve CoreMod markers,
+  30 machine IDs, twenty multiblock checks, main-menu startup and single-player
+  world entry. The user confirmed testing passed. The installed addon matches
+  the built JAR by SHA-256; original Core and Seal were not replaced.
+
+## Dev10 source repair - 2026-10-05
+
+- Repaired the item and fluid recipe-output path for the ME Super Pattern
+  Buffer and ME Super Wildcard Pattern Buffer on dev10. Their shared handler now
+  declares the item/fluid content types required by GTCEu's controller output
+  grouping; the late-bound super-buffer proxy uses the same contract.
+- The previous full dev10 check failed the stale `Native rainbow not reused`
+  assertion after the separate tooltip edit. Fix5 updated the check and the
+  dev11 clean build passes.
+
 ## dev1-for-gtocore-0.6.0-dev10-fix4 - 2026-10-04
 
 Startup repair after the initial dev10 deployment: complete the two custom

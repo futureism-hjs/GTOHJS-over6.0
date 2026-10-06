@@ -5,9 +5,7 @@ import com.gregtechceu.gtceu.api.data.chemical.ChemicalHelper;
 import com.gregtechceu.gtceu.api.data.chemical.material.Material;
 import com.gregtechceu.gtceu.api.data.tag.TagPrefix;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeDefinition;
-import com.gregtechceu.gtceu.api.recipe.content.Content;
-import com.gregtechceu.gtceu.api.recipe.ingredient.FluidIngredient;
-import com.gregtechceu.gtceu.api.recipe.ingredient.ItemIngredient;
+import com.gregtechceu.gtceu.api.recipe.content.ContentList;
 import com.gregtechceu.gtceu.common.data.GTMaterials;
 import com.gtocore.common.data.GTOMaterials;
 import com.gtohjs.GTOHJS;
@@ -24,6 +22,7 @@ import java.util.function.Supplier;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.material.Fluid;
+import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.registries.ForgeRegistries;
 
 /** Validates the three recipe-editor drafts injected into GTO's native recipe loading window. */
@@ -266,22 +265,22 @@ public final class OneStopRareEarthRecipeRegistration {
     }
 
     private static Map<ResourceLocation, Integer> actualItemMap(
-            List<Content<ItemIngredient>> contents,
+            ContentList contents,
             ResourceLocation recipeId,
             String direction) {
         if (contents == null) {
             throw new IllegalStateException("Missing item " + direction + " list in " + recipeId);
         }
         Map<ResourceLocation, Integer> result = new LinkedHashMap<>();
-        for (Content<ItemIngredient> content : contents) {
-            validateDeterministic(content, "item " + direction, recipeId);
-            ItemIngredient ingredient = content.inner;
-            ItemStack stack = ingredient == null ? ItemStack.EMPTY : ingredient.getItem();
+        for (int index = 0; index < contents.size(); index++) {
+            validateDeterministic(contents, index, "item " + direction, recipeId);
+            ItemStack[] items = contents.ingredient(index).getItems();
+            ItemStack stack = items.length == 1 ? items[0] : ItemStack.EMPTY;
             ResourceLocation itemId = stack.isEmpty() ? null : ForgeRegistries.ITEMS.getKey(stack.getItem());
             if (itemId == null) {
                 throw new IllegalStateException("Empty or unregistered item " + direction + " in " + recipeId);
             }
-            result.merge(itemId, content.getIntAmount(), Integer::sum);
+            result.merge(itemId, Math.toIntExact(contents.amount(index)), Integer::sum);
         }
         return Map.copyOf(result);
     }
@@ -301,31 +300,33 @@ public final class OneStopRareEarthRecipeRegistration {
     }
 
     private static Map<ResourceLocation, Integer> actualFluidMap(
-            List<Content<FluidIngredient>> contents,
+            ContentList contents,
             ResourceLocation recipeId,
             String direction) {
         if (contents == null) {
             throw new IllegalStateException("Missing fluid " + direction + " list in " + recipeId);
         }
         Map<ResourceLocation, Integer> result = new LinkedHashMap<>();
-        for (Content<FluidIngredient> content : contents) {
-            validateDeterministic(content, "fluid " + direction, recipeId);
-            FluidIngredient ingredient = content.inner;
-            Fluid fluid = ingredient == null ? null : ingredient.getFluid();
+        for (int index = 0; index < contents.size(); index++) {
+            validateDeterministic(contents, index, "fluid " + direction, recipeId);
+            FluidStack[] fluids = contents.ingredient(index).getFluids(1);
+            FluidStack stack = fluids.length == 1 ? fluids[0] : FluidStack.EMPTY;
+            Fluid fluid = stack.isEmpty() ? null : stack.getFluid();
             ResourceLocation fluidId = fluid == null ? null : ForgeRegistries.FLUIDS.getKey(fluid);
-            if (fluidId == null || ingredient.nbt != null) {
+            if (fluidId == null || stack.hasTag()) {
                 throw new IllegalStateException("Invalid fluid " + direction + " in " + recipeId);
             }
-            result.merge(fluidId, content.getIntAmount(), Integer::sum);
+            result.merge(fluidId, Math.toIntExact(contents.amount(index)), Integer::sum);
         }
         return Map.copyOf(result);
     }
 
-    private static void validateDeterministic(Content<?> content, String description, ResourceLocation recipeId) {
-        if (content == null || content.inner == null || content.chance != Content.MAX_CHANCE ||
-                content.tierChanceBoost != 0 || content.getIntAmount() <= 0) {
+    private static void validateDeterministic(ContentList contents, int index, String description,
+                                              ResourceLocation recipeId) {
+        if (contents.ingredient(index) == null || contents.chance(index) != ContentList.MAX_CHANCE ||
+                contents.boost(index) != 0 || contents.amount(index) <= 0) {
             throw new IllegalStateException("Expected deterministic positive " + description + " in " +
-                    recipeId + ": " + content);
+                    recipeId + " at " + index);
         }
     }
 

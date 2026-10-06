@@ -14,7 +14,7 @@ import com.gregtechceu.gtceu.api.machine.TickableSubscription;
 import com.gregtechceu.gtceu.api.machine.fancyconfigurator.CircuitFancyConfigurator;
 import com.gregtechceu.gtceu.api.machine.feature.IDataStickInteractable;
 import com.gregtechceu.gtceu.api.machine.trait.CircuitHandler;
-import com.gregtechceu.gtceu.api.machine.trait.NotifiableItemStackHandler;
+import com.gregtechceu.gtceu.api.machine.trait.NotifiableInventory;
 import com.gregtechceu.gtceu.api.recipe.handler.IFilteredHandler;
 import com.gregtechceu.gtceu.api.recipe.handler.IO;
 import com.gregtechceu.gtceu.api.recipe.handler.RecipeHandlerUnit;
@@ -55,7 +55,7 @@ public class MEInputAssemblyPartMachine extends StatusTrackedMEPartMachine imple
     protected final ExportOnlyAEFluidList fluidHandler;
 
     @SaveToDisk
-    protected final NotifiableItemStackHandler circuitInventory;
+    protected final NotifiableInventory<AEItemKey> circuitInventory;
 
     @SaveToDisk(defaultValue = "0")
     private int priority;
@@ -279,9 +279,10 @@ public class MEInputAssemblyPartMachine extends StatusTrackedMEPartMachine imple
     protected CompoundTag writeConfigToTag() {
         CompoundTag tag = new CompoundTag();
         tag.putBoolean("DistinctBuses", isDistinct());
-        if (!circuitInventory.storage.getStackInSlot(0).isEmpty()) {
+        AEItemKey circuit = circuitInventory.storage.keyAt(0);
+        if (circuit != null) {
             tag.putByte("GhostCircuit",
-                    (byte) IntCircuitBehaviour.getCircuitConfiguration(circuitInventory.storage.getStackInSlot(0)));
+                    (byte) IntCircuitBehaviour.getCircuitConfiguration(circuit.toStack(1)));
         }
         CompoundTag itemConfigs = new CompoundTag();
         for (int i = 0; i < itemHandler.getInventory().length; i++) {
@@ -307,9 +308,9 @@ public class MEInputAssemblyPartMachine extends StatusTrackedMEPartMachine imple
             setDistinct(tag.getBoolean("DistinctBuses"));
         }
         if (tag.contains("GhostCircuit")) {
-            circuitInventory.setStackInSlot(0, IntCircuitBehaviour.stack(tag.getByte("GhostCircuit")));
+            circuitInventory.storage.set(0, AEItemKey.of(IntCircuitBehaviour.stack(tag.getByte("GhostCircuit"))), 1);
         } else {
-            circuitInventory.setStackInSlot(0, ItemStack.EMPTY);
+            circuitInventory.storage.set(0, null, 0);
         }
         readItemConfigs(tag.getCompound("ItemConfigStacks"));
         readFluidConfigs(tag.getCompound("FluidConfigStacks"));

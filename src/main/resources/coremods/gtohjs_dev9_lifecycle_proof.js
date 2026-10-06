@@ -486,10 +486,14 @@ function generatorBridge(clazz) {
     var recipe=uniqueMethod(clazz,'getRealRecipe','(Lcom/gregtechceu/gtceu/api/recipe/handler/RecipeHandlerUnit;Lcom/gregtechceu/gtceu/api/recipe/GTRecipe;)Lcom/gregtechceu/gtceu/api/recipe/GTRecipe;');
     var tick=uniqueMethod(clazz,'handleTickRecipe','(Lcom/gregtechceu/gtceu/api/recipe/GTRecipe;)Z');
     var rules='com/gtocore/config/GTORules', helper='com/gtohjs/methods/AdvancedGeneratorArraySupport';
-    var limit=null,multiplier=null,lossCalls=[];
+    var limit=null,multiplier=null,portKind=null,deposits=[];
     var nodes=constructor.instructions.toArray();
-    for(var i=0;i<nodes.length;i++) if(nodes[i].getOpcode()===Opcodes.GETSTATIC && nodes[i].owner===rules && nodes[i].name==='GENERATOR_ARRAY_LIMIT') {
-        if(limit!==null)throw new Error('Duplicate generator limit'); limit=nextOpcode(nodes[i]);
+    for(var i=0;i<nodes.length;i++) if(nodes[i].getOpcode()===Opcodes.GETSTATIC) {
+        if(nodes[i].owner===rules && nodes[i].name==='GENERATOR_ARRAY_LIMIT') {
+            if(limit!==null)throw new Error('Duplicate generator limit'); limit=nextOpcode(nodes[i]);
+        } else if(nodes[i].owner==='com/gtocore/api/wireless/energy/PortKind' && nodes[i].name==='GENERATOR_ARRAY') {
+            if(portKind!==null)throw new Error('Duplicate generator port kind'); portKind=nodes[i];
+        }
     }
     nodes=recipe.instructions.toArray();
     for(var i=0;i<nodes.length;i++) if(nodes[i].getOpcode()===Opcodes.GETSTATIC && nodes[i].owner===rules && nodes[i].name==='GENERATOR_ARRAY_MULTIPLY') {
@@ -497,20 +501,21 @@ function generatorBridge(clazz) {
     }
     nodes=tick.instructions.toArray();
     for(var i=0;i<nodes.length;i++) if(nodes[i].getOpcode()===Opcodes.INVOKEVIRTUAL &&
-        nodes[i].owner==='com/gtolib/api/wireless/ExtendWirelessEnergyContainer' && nodes[i].name==='setLoss' && nodes[i].desc==='(I)V')lossCalls.push(nodes[i]);
+        nodes[i].owner==='com/gtocore/api/wireless/energy/EnergyPort' && nodes[i].name==='depositAll' && nodes[i].desc==='(JI)Z')deposits.push(nodes[i]);
     if(limit===null || limit.owner!=='com/gtolib/api/rule/IntRule' || limit.name!=='get' || limit.desc!=='()I')throw new Error('Generator dev9 limit anchor changed');
     if(multiplier===null || multiplier.owner!=='com/gtolib/api/rule/DoubleRule' || multiplier.name!=='get' || multiplier.desc!=='()D')throw new Error('Generator dev9 multiplier anchor changed');
-    if(lossCalls.length!==2)throw new Error('Generator dev9 loss set/restore anchors changed: '+lossCalls.length);
+    if(portKind===null || portKind.desc!=='Lcom/gtocore/api/wireless/energy/PortKind;')throw new Error('Generator dev11 port kind anchor changed');
+    if(deposits.length!==1)throw new Error('Generator dev11 deposit anchor changed: '+deposits.length);
     var insns=new InsnList();insns.add(new VarInsnNode(Opcodes.ALOAD,1));insns.add(new InsnNode(Opcodes.SWAP));
     insns.add(ASMAPI.buildMethodCall(helper,'resolveLimit','(Lcom/gregtechceu/gtceu/api/blockentity/MetaMachineBlockEntity;I)I',ASMAPI.MethodType.STATIC));
     constructor.instructions.insert(limit,insns);
     insns=new InsnList();insns.add(new VarInsnNode(Opcodes.ALOAD,0));
     insns.add(ASMAPI.buildMethodCall(helper,'resolveMultiplierValue','(DLcom/gtocore/common/machine/multiblock/generator/GeneratorArrayMachine;)D',ASMAPI.MethodType.STATIC));
     recipe.instructions.insert(multiplier,insns);
-    insns=new InsnList();insns.add(new VarInsnNode(Opcodes.ALOAD,0));
-    insns.add(ASMAPI.buildMethodCall(helper,'resolveAppliedWirelessLoss','(ILcom/gtocore/common/machine/multiblock/generator/GeneratorArrayMachine;)I',ASMAPI.MethodType.STATIC));
-    tick.instructions.insertBefore(lossCalls[0],insns);
-    constructor.maxStack=Math.max(constructor.maxStack,5);recipe.maxStack+=1;tick.maxStack+=1;
+    insns=new InsnList();insns.add(new VarInsnNode(Opcodes.ALOAD,1));
+    insns.add(ASMAPI.buildMethodCall(helper,'resolvePortKind','(Lcom/gtocore/api/wireless/energy/PortKind;Lcom/gregtechceu/gtceu/api/blockentity/MetaMachineBlockEntity;)Lcom/gtocore/api/wireless/energy/PortKind;',ASMAPI.MethodType.STATIC));
+    constructor.instructions.insert(portKind,insns);
+    constructor.maxStack=Math.max(constructor.maxStack,6);recipe.maxStack+=1;
     recordMarker(clazz,marker);return clazz;
 }
 function coverBridge(clazz) {

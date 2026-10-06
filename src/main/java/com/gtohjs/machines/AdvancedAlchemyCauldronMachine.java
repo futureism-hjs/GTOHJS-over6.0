@@ -3,11 +3,9 @@ import com.gtohjs.methods.HyperdimensionalRecipeSupport;
 
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gregtechceu.gtceu.api.recipe.GTRecipe;
-import com.gregtechceu.gtceu.api.recipe.content.Content;
-import com.gregtechceu.gtceu.api.recipe.content.ContentInner;
+import com.gregtechceu.gtceu.api.recipe.content.ContentList;
 import com.gregtechceu.gtceu.api.recipe.handler.RecipeHandlerUnit;
 import com.gtocore.common.machine.mana.multiblock.ElectricManaMultiblockMachine;
-import java.util.List;
 import org.jetbrains.annotations.NotNull;
 
 /** Applies the advanced cauldron's lossless-input and guaranteed-output rules. */
@@ -31,32 +29,33 @@ public final class AdvancedAlchemyCauldronMachine extends ElectricManaMultiblock
         return super.getRealRecipe(unit, recipe);
     }
 
-    private static <T extends ContentInner> List<Content<T>> makeChanceInputsNonConsumable(
-            List<Content<T>> contents) {
+    private static ContentList makeChanceInputsNonConsumable(ContentList contents) {
         return normalizeChances(contents, true);
     }
 
-    private static <T extends ContentInner> List<Content<T>> guaranteeChanceOutputs(
-            List<Content<T>> contents) {
+    private static ContentList guaranteeChanceOutputs(ContentList contents) {
         return normalizeChances(contents, false);
     }
 
-    private static <T extends ContentInner> List<Content<T>> normalizeChances(List<Content<T>> contents, boolean input) {
-        java.util.ArrayList<Content<T>> changed = null;
+    private static ContentList normalizeChances(ContentList contents, boolean input) {
+        ContentList.Builder changed = null;
         for (int index = 0; index < contents.size(); index++) {
-            Content<T> content = contents.get(index);
-            boolean replace = input ? content.chance > 0 && content.chance < Content.MAX_CHANCE
-                    : content.chance < Content.MAX_CHANCE;
+            int chance = contents.chance(index);
+            boolean replace = input ? chance > 0 && chance < ContentList.MAX_CHANCE
+                    : chance < ContentList.MAX_CHANCE;
             if (replace && changed == null) {
-                changed = new java.util.ArrayList<>(contents.size());
-                for (int prior = 0; prior < index; prior++) changed.add(contents.get(prior));
+                changed = new ContentList.Builder(contents.size());
+                for (int prior = 0; prior < index; prior++) {
+                    changed.add(contents.ingredient(prior), contents.amount(prior), contents.chance(prior),
+                            contents.boost(prior), contents.rollUnit(prior));
+                }
             }
-            if (changed != null) changed.add(replace ? withChance(content, input ? 0 : Content.MAX_CHANCE) : content);
+            if (changed != null) {
+                changed.add(contents.ingredient(index), contents.amount(index),
+                        replace ? (input ? 0 : ContentList.MAX_CHANCE) : chance,
+                        contents.boost(index), contents.rollUnit(index));
+            }
         }
-        return changed == null ? contents : changed;
-    }
-
-    private static <T extends ContentInner> Content<T> withChance(Content<T> content, int chance) {
-        return new Content<>(content.inner, content.amount, chance, content.tierChanceBoost);
+        return changed == null ? contents : changed.build();
     }
 }

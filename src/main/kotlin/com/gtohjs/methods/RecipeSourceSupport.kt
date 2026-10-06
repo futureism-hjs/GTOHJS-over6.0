@@ -1,10 +1,8 @@
 package com.gtohjs.methods
 
 import com.gregtechceu.gtceu.api.recipe.GTRecipeDefinition
-import com.gregtechceu.gtceu.api.recipe.content.Content
-import com.gregtechceu.gtceu.api.recipe.ingredient.ItemIngredient
-import com.gregtechceu.gtceu.api.recipe.ingredient.FluidIngredient
-import com.gregtechceu.gtceu.api.recipe.ingredient.IntCircuitIngredient
+import com.gregtechceu.gtceu.api.recipe.content.ContentList
+import com.gregtechceu.gtceu.api.recipe.content.KeyIngredient
 import com.gregtechceu.gtceu.api.registry.GTRegistries
 import com.gregtechceu.gtceu.common.data.GTRecipeDataKeys
 import com.gregtechceu.gtceu.common.data.GTRecipes
@@ -68,30 +66,28 @@ object RecipeSourceSupport {
 
     /** Extracted from the already verified imported-directory checks. */
     @JvmStatic
-    fun validateItems(actual: List<Content<ItemIngredient>>, expected: List<ItemIngredient>,
+    fun validateItems(actual: ContentList, expected: List<ItemStack>,
                       recipeId: ResourceLocation, direction: String) {
-        check(actual.size == expected.size) { "Unexpected item $direction count in $recipeId" }
+        check(actual.size() == expected.size) { "Unexpected item $direction count in $recipeId" }
         for (index in expected.indices) {
-            val content = actual[index]
-            val ingredient = expected[index]
-            check(content.chance == Content.MAX_CHANCE && content.tierChanceBoost == 0 &&
-                content.amount == ingredient.amount.toLong() &&
-                content.inner.inner.toJson() == ingredient.inner.toJson()) {
+            val stack = expected[index]
+            check(actual.chance(index) == ContentList.MAX_CHANCE && actual.boost(index) == 0 &&
+                actual.amount(index) == stack.count.toLong() &&
+                actual.ingredient(index) == KeyIngredient.of(stack)) {
                 "Unexpected item $direction #$index in $recipeId"
             }
         }
     }
 
     @JvmStatic
-    fun validateFluids(actual: List<Content<FluidIngredient>>, expected: List<FluidStack>,
+    fun validateFluids(actual: ContentList, expected: List<FluidStack>,
                        recipeId: ResourceLocation, direction: String) {
-        check(actual.size == expected.size) { "Unexpected fluid $direction count in $recipeId" }
+        check(actual.size() == expected.size) { "Unexpected fluid $direction count in $recipeId" }
         for (index in expected.indices) {
-            val content = actual[index]
             val stack = expected[index]
-            check(content.chance == Content.MAX_CHANCE && content.tierChanceBoost == 0 &&
-                content.amount == stack.amount.toLong() &&
-                content.inner.fluid === stack.fluid && content.inner.nbt == stack.tag) {
+            check(actual.chance(index) == ContentList.MAX_CHANCE && actual.boost(index) == 0 &&
+                actual.amount(index) == stack.amount.toLong() &&
+                actual.ingredient(index) == KeyIngredient.of(stack)) {
                 "Unexpected fluid $direction #$index in $recipeId"
             }
         }
@@ -103,17 +99,29 @@ object RecipeSourceSupport {
         fluidInputs: Array<FluidStack>, fluidOutputs: Array<FluidStack>,
         eut: Long, circuit: Int, temperature: Int, mana: Long) {
         val id = definition.id
-        val circuits = definition.itemInputs.filter { it.inner is IntCircuitIngredient }
-        val regularInputs = definition.itemInputs.filterNot { it.inner is IntCircuitIngredient }
-        validateItems(regularInputs, itemInputs.map { ItemIngredient.of(it) }, id, "input")
-        validateItems(definition.itemOutputs, itemOutputs.map { ItemIngredient.of(it) }, id, "output")
+        val circuits = (0 until definition.itemInputs.size()).filter {
+            definition.itemInputs.ingredient(it).kind == KeyIngredient.CIRCUIT
+        }
+        val regularInputs = (0 until definition.itemInputs.size()).filterNot { it in circuits }
+        check(regularInputs.size == itemInputs.size) { "Generated item input count mismatch: $id" }
+        for ((index, sourceIndex) in regularInputs.withIndex()) {
+            val actual = definition.itemInputs
+            val stack = itemInputs[index]
+            check(actual.chance(sourceIndex) == ContentList.MAX_CHANCE && actual.boost(sourceIndex) == 0 &&
+                actual.amount(sourceIndex) == stack.count.toLong() &&
+                actual.ingredient(sourceIndex) == KeyIngredient.of(stack)) {
+                "Unexpected item input #$index in $id"
+            }
+        }
+        validateItems(definition.itemOutputs, itemOutputs.toList(), id, "output")
         validateFluids(definition.fluidInputs, fluidInputs.toList(), id, "input")
         validateFluids(definition.fluidOutputs, fluidOutputs.toList(), id, "output")
         check(circuits.size == if (circuit > 0) 1 else 0) { "Generated circuit count mismatch: $id" }
         if (circuit > 0) {
-            val content = circuits.single()
-            check((content.inner as IntCircuitIngredient).configuration == circuit &&
-                content.amount == 1L && content.chance == 0 && content.tierChanceBoost == 0) {
+            val index = circuits.single()
+            val content = definition.itemInputs
+            check(content.ingredient(index).circuitConfiguration() == circuit &&
+                content.amount(index) == 1L && content.chance(index) == 0 && content.boost(index) == 0) {
                 "Generated circuit metadata mismatch: $id"
             }
         }

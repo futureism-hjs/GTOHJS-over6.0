@@ -2,34 +2,35 @@
 
 [中文](README.md) | English
 
-Current version: `gtohjs-dev1-for-gtocore-0.6.0-dev10-fix4.jar`
+Current version: `gtohjs-dev1-for-gtocore-0.6.0-dev11-fix5.jar`
 
 - [Changelog](CHANGELOG.md)
 - [Local build dependencies](libs/README.md)
 
 GTO HJS expands the Minecraft 1.20.1 Forge edition of GregTech Odyssey
-0.6.0-dev10 with additional machines, recipes and development tools. It registers
+0.6.0-dev11 with additional machines, recipes and development tools. It registers
 its content through GTO's native loading windows. The original GTOCore,
 GTOLib and GTOSeal files are read-only references.
 
-Fix4 makes only "GTO HJS" in the added-by tooltip scroll through GTO's native
-rainbow colors. It also corrects recipe-generator exports and validation, and
-moves corresponding tooltip, interface, renderer and utility modules to Kotlin.
-The Java 21 online clean build and static code checks passed against dev10.
-The dev10 client also started, entered an existing single-player world, and
-closed normally after all addon load checks passed. Further gameplay testing
-remains with the user.
+Fix5 preserves the current source changes and targets dev11's recipe content,
+AE Key inventory and ME recipe-handler APIs. It adds seven GTL-derived
+multiblocks. The four order-processing structures accept item and fluid output
+hatches on their original X/Q service positions while I remains robust casing.
+Java 21 online clean build and generated recipe checks passed. The original
+dev11 client passed all addon load checks and entered a single-player world;
+the user confirmed testing passed.
 
 ## Complete content overview
 
 - 22 independent `gtohjs` items: Recipe Editor, Custom Multiblock Structure
   Exporter, Vacuum Cover, two preloaded AE Component Packs, Integral Bronze
   Framework and sixteen world fragments.
-- 23 `gtocore` machine or part definitions: thirteen multiblocks plus the
+- 30 `gtocore` machine or part definitions: twenty multiblocks plus the
   collector, thermal forms, intake hatches and ME assemblies/buffers.
 - One Vacuum Cover definition with vacuum levels 1-3.
-- Four additional recipe types: Rare Earth Processing, Fragment World
-  Collection, Hyperdimensional Biochemical Processing and Large Petal Apothecary.
+- Seven additional recipe types: Rare Earth Processing, Fragment World
+  Collection, Hyperdimensional Biochemical Processing, Large Petal Apothecary,
+  Platinum Refining, Exotic Proliferation and Lightning Processing.
 - 268 finite GT recipes and 23 shaped crafting recipes. Dynamic material
   processing and Botania proxy families registered 408 and 71 recipes in the
   fix3 test environment; their totals depend on the loaded materials and recipes.
@@ -50,19 +51,19 @@ remains with the user.
 | Minecraft | 1.20.1 |
 | Forge | 47.4.20 |
 | Java | Java 21; Java and Kotlin bytecode target JVM 21 |
-| GTOCore | dev10, original artifact version 26.9.5 |
-| GTM / GTCEu | 26.10.8 |
-| AE2 | 15.2610.2 |
+| GTOCore | dev11, original artifact version 26.10.1 |
+| GTM / GTCEu | 26.10.17 |
+| AE2 | 15.2610.4 |
 | Configuration | 3.1.0 |
 | Kotlin | Compiler/stdlib API 2.3.20; runtime supplied by the existing pack |
 
 Botania, AppBot, LDLib, DataSyncLib and related integrations use the versions
-already supplied by the target dev10 pack. Third-party Mod JARs are not embedded
+already supplied by the target dev11 pack. Third-party Mod JARs are not embedded
 in GTOHJS. The separately published ME Placement Tool for gto is not a dependency.
 
 ## Install and build
 
-Close Minecraft, place the current GTOHJS JAR in the dev10 instance's `mods`
+Close Minecraft, place the current GTOHJS JAR in the dev11 instance's `mods`
 directory, and keep only one GTOHJS version there. Keep the original GTOCore and
 GTOSeal artifacts supplied by the pack.
 
@@ -74,8 +75,8 @@ Java 21 runtime configured, run:
 ```
 
 The artifact is written to
-`build/libs/gtohjs-dev1-for-gtocore-0.6.0-dev10-fix4.jar`.
-Its numeric Forge loader version is `1.0.0-dev10-fix4`.
+`build/libs/gtohjs-dev1-for-gtocore-0.6.0-dev11-fix5.jar`.
+Its numeric Forge loader version is `1.0.0-dev11-fix5`.
 
 ## Standalone items and block
 
@@ -98,7 +99,7 @@ items and all explicitly owned machine items; only the "GTO HJS" name is rainbow
 
 ## All machines and multiblock parts
 
-All 23 definitions use the `gtocore` namespace.
+All 30 definitions use the `gtocore` namespace.
 
 | Name | Registry path | Core behavior |
 | --- | --- | --- |
@@ -125,6 +126,13 @@ All 23 definitions use the `gtocore` namespace.
 | Electromagnetic Thermal Control Machine | `electromagnetic_thermal_control_machine` | Standalone zero-energy heat form and selectable output direction. |
 | Advanced Infinite Intake Hatch | `advanced_infinite_intake_hatch` | MV intake with selectable air, oxygen or nitrogen. |
 | Ultimate Infinite Intake Hatch | `ultimate_infinite_intake_hatch` | IV intake with large capacity and per-tick refill. |
+| Plasma Machine Tool | `plasma_machine_tool` | Order-aware processing with item and fluid outputs on X/Q. |
+| Hadron Catalytic Refinery | `hadron_catalytic_refinery` | Order-aware processing with item and fluid outputs on X/Q. |
+| Quantum Mass Spectrum Array | `quantum_mass_spectrum_array` | Order-aware processing with item and fluid outputs on X/Q. |
+| Superconducting Fusion Assembler | `superconducting_fusion_assembler` | Order-aware processing with item and fluid outputs on X/Q. |
+| Neutron Control Factory | `neutron_control_factory` | GTL-derived neutron processing structure. |
+| Platinum Refining Matrix | `platinum_refining_matrix` | GTL-derived platinum refining structure. |
+| Dragon Field Proliferation Core | `dragon_field_proliferation_core` | GTL-derived proliferation structure. |
 
 Existing multiblock shapes, useful persistence keys and ordinary front animations
 are retained.

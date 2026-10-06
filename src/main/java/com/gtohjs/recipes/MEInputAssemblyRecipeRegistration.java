@@ -1,8 +1,7 @@
 package com.gtohjs.recipes;
 
 import com.gregtechceu.gtceu.api.recipe.GTRecipeDefinition;
-import com.gregtechceu.gtceu.api.recipe.content.Content;
-import com.gregtechceu.gtceu.api.recipe.ingredient.ItemIngredient;
+import com.gregtechceu.gtceu.api.recipe.content.ContentList;
 import com.gtocore.common.data.GTORecipeTypes;
 import com.gtohjs.GTOHJS;
 import com.gtohjs.methods.ModLog;
@@ -151,19 +150,19 @@ public final class MEInputAssemblyRecipeRegistration {
         }
     }
 
-    private static Map<ResourceLocation, Integer> itemMap(List<Content<ItemIngredient>> contents) {
+    private static Map<ResourceLocation, Integer> itemMap(ContentList contents) {
         Map<ResourceLocation, Integer> result = new LinkedHashMap<>();
-        for (Content<ItemIngredient> content : contents) {
-            if (content == null || content.inner == null || content.chance != Content.MAX_CHANCE ||
-                    content.tierChanceBoost != 0) {
-                throw new IllegalStateException("Expected deterministic item content: " + content);
+        for (int index = 0; index < contents.size(); index++) {
+            if (contents.chance(index) != ContentList.MAX_CHANCE || contents.boost(index) != 0) {
+                throw new IllegalStateException("Expected deterministic item content at " + index);
             }
-            ItemStack stack = content.inner.getItem();
+            ItemStack[] items = contents.ingredient(index).getItems();
+            ItemStack stack = items.length == 1 ? items[0] : ItemStack.EMPTY;
             ResourceLocation itemId = stack.isEmpty() ? null : ForgeRegistries.ITEMS.getKey(stack.getItem());
             if (itemId == null) {
-                throw new IllegalStateException("Recipe contains an empty or unregistered item: " + content);
+                throw new IllegalStateException("Recipe contains an empty or unregistered item at " + index);
             }
-            result.merge(itemId, content.getIntAmount(), Math::addExact);
+            result.merge(itemId, Math.toIntExact(contents.amount(index)), Math::addExact);
         }
         return Map.copyOf(result);
     }

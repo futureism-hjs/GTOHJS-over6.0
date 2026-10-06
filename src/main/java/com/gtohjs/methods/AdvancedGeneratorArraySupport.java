@@ -3,6 +3,7 @@ import com.gtohjs.machines.ScrollableMachineModeFancyConfigurator;
 
 import com.gregtechceu.gtceu.api.blockentity.MetaMachineBlockEntity;
 import com.gtocore.common.machine.multiblock.generator.GeneratorArrayMachine;
+import com.gtocore.api.wireless.energy.PortKind;
 import net.minecraft.resources.ResourceLocation;
 
 /** Runtime hooks that keep the advanced generator array isolated from GTO's configurable base array. */
@@ -44,6 +45,12 @@ public final class AdvancedGeneratorArraySupport {
      */
     public static int resolveAppliedWirelessLoss(int temporaryLoss, GeneratorArrayMachine machine) {
         return isAdvancedArray(machine) ? WIRELESS_LOSS : temporaryLoss;
+    }
+
+    /** Dev11 models generator loss through the port kind; HATCH carries zero extra loss. */
+    public static PortKind resolvePortKind(PortKind configured, MetaMachineBlockEntity holder) {
+        return holder != null && holder.definition != null && MACHINE_ID.equals(holder.definition.getId())
+                ? PortKind.HATCH : configured;
     }
 
     private static boolean isAdvancedArray(GeneratorArrayMachine machine) {

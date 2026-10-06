@@ -2,8 +2,7 @@ package com.gtohjs.recipes;
 
 import com.gtohjs.machines.FragmentWorldCollectionRecipeTypeRegistration;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeDefinition;
-import com.gregtechceu.gtceu.api.recipe.content.Content;
-import com.gregtechceu.gtceu.api.recipe.ingredient.ItemIngredient;
+import com.gregtechceu.gtceu.api.recipe.content.ContentList;
 import com.gtohjs.GTOHJS;
 import com.gtohjs.methods.ModLog;
 import com.gtolib.api.recipe.RecipeBuilder;
@@ -151,21 +150,17 @@ public final class FragmentWorldCollectionRecipeRegistration {
     }
 
     private static void validateNoUnavailableCrystals(
-            List<Content<ItemIngredient>> contents,
+            ContentList contents,
             ResourceLocation recipeId,
             String direction) {
-        for (Content<ItemIngredient> content : contents) {
-            if (content == null || content.inner == null) {
-                continue;
-            }
-            ItemStack stack = content.inner.getItem();
-            if (stack.isEmpty()) {
-                continue;
-            }
-            ResourceLocation id = ForgeRegistries.ITEMS.getKey(stack.getItem());
-            if (id != null && OMITTED_GTL_CRYSTALS.contains(id)) {
-                throw new IllegalStateException("Unavailable crystal leaked into " + direction + " of " +
-                        recipeId + ": " + id);
+        for (int index = 0; index < contents.size(); index++) {
+            for (ItemStack stack : contents.ingredient(index).getItems()) {
+                if (stack.isEmpty()) continue;
+                ResourceLocation id = ForgeRegistries.ITEMS.getKey(stack.getItem());
+                if (id != null && OMITTED_GTL_CRYSTALS.contains(id)) {
+                    throw new IllegalStateException("Unavailable crystal leaked into " + direction + " of " +
+                            recipeId + ": " + id);
+                }
             }
         }
     }

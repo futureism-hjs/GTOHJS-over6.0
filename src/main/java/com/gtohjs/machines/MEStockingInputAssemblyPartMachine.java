@@ -9,13 +9,10 @@ import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMultiController;
 import com.gregtechceu.gtceu.api.machine.feature.multiblock.IMultiPart;
 import com.gregtechceu.gtceu.api.recipe.GTRecipe;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
-import com.gregtechceu.gtceu.api.recipe.content.Content;
-import com.gregtechceu.gtceu.api.recipe.handler.IO;
+import com.gregtechceu.gtceu.api.recipe.content.KeyIngredient;
+import com.gregtechceu.gtceu.api.recipe.handler.PlanScratch;
 import com.gregtechceu.gtceu.api.recipe.handler.RecipeHandlerUnit;
-import com.gregtechceu.gtceu.api.recipe.ingredient.FluidIngredient;
-import com.gregtechceu.gtceu.api.recipe.ingredient.ItemIngredient;
 import com.gregtechceu.gtceu.integration.ae2.machine.feature.multiblock.IMEStockingPart;
-import com.gregtechceu.gtceu.utils.function.ObjLongPredicate;
 import com.gregtechceu.gtceu.utils.TaskHandler;
 import com.gto.datasynclib.annotations.SaveToDisk;
 import com.gtohjs.methods.ModLog;
@@ -28,15 +25,14 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraftforge.fluids.FluidStack;
 import appeng.api.config.Actionable;
 import appeng.api.networking.IGrid;
 import appeng.api.networking.IGridNodeListener;
 import appeng.api.stacks.AEFluidKey;
 import appeng.api.stacks.AEItemKey;
 import appeng.api.stacks.AEKey;
+import appeng.api.stacks.AEKeyType;
 import appeng.api.stacks.AEKeyMap;
 import appeng.api.stacks.GenericStack;
 import appeng.api.storage.MEStorage;
@@ -44,12 +40,10 @@ import appeng.api.storage.MEStorage;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.Comparator;
-import java.util.IdentityHashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.PriorityQueue;
-import java.util.function.ObjLongConsumer;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -440,112 +434,112 @@ public final class MEStockingInputAssemblyPartMachine extends MEInputAssemblyPar
 
     private static final class ExtractionPlan {
         private final Map<AEKey, Long> extractions = new LinkedHashMap<>();
-        private final Map<Content<?>, Long> consumedByContent = new IdentityHashMap<>();
 
-        private void allocate(AEKey key, Content<?> content, long amount) {
+        private void allocate(AEKey key, long amount) {
             extractions.merge(key, amount, Math::addExact);
-            consumedByContent.merge(content, amount, Math::addExact);
         }
 
         private boolean isEmpty() {
             return extractions.isEmpty();
         }
+    }
 
-        private void apply(List<? extends Content<?>> contents) {
-            for (Map.Entry<Content<?>, Long> entry : consumedByContent.entrySet()) {
-                entry.getKey().shrink(entry.getValue());
-            }
-            contents.removeIf(Content::isEmpty);
+    private void restorePlan(ExtractionPlan plan) {
+        if (plan.isEmpty()) return;
+        MEStorage network = networkStorage();
+        if (network == null) {
+            ModLog.error("ME assembly rollback could not reach the network");
+            return;
         }
+        for (Map.Entry<AEKey, Long> entry : plan.extractions.entrySet()) {
+            long restored = network.insert(
+                    entry.getKey(), entry.getValue(), Actionable.MODULATE, getActionSourceField());
+            if (restored != entry.getValue()) {
+                ModLog.error("ME assembly rollback was incomplete for {}: restored={}, expected={}",
+                        entry.getKey(), restored, entry.getValue());
+            }
+            if (restored > 0) throughputCounter.add(entry.getKey(), restored);
+        }
+        refreshItemStocks();
+        refreshFluidStocks();
     }
 
     private static final class StockingItemList extends ExportOnlyAEItemList {
         private final MEStockingInputAssemblyPartMachine machine;
+        private ExtractionPlan committed = new ExtractionPlan();
 
         private StockingItemList(MEStockingInputAssemblyPartMachine machine, int slots) {
             super(machine, slots);
             this.machine = machine;
         }
 
+        private boolean ready() {
+            return machine.isWorkingEnabled() && machine.getOnlineField() &&
+                    machine.getMainNode().getGrid() != null;
+        }
+
         @Override
-        public boolean handleRecipeItem(
-                IO io,
-                GTRecipe recipe,
-                List<Content<ItemIngredient>> items,
-                boolean simulate) {
-            if (io != IO.IN || !machine.isWorkingEnabled() || !machine.getOnlineField()) {
-                return false;
-            }
+        public long available(AEKeyType type, KeyIngredient ingredient) {
+            if (!ready()) return 0;
             machine.refreshItemStocks();
+            return super.available(type, ingredient);
+        }
+
+        @Override
+        public long reserveInput(PlanScratch plan, int member, AEKeyType type, int entry,
+                                 KeyIngredient ingredient, long need, boolean consume) {
+            if (!ready()) return 0;
+            machine.refreshItemStocks();
+            return super.reserveInput(plan, member, type, entry, ingredient, need, consume);
+        }
+
+        @Override
+        public boolean commitInput(PlanScratch plan, int member, AEKeyType type) {
+            if (type != AEKeyType.items()) return true;
+            committed = new ExtractionPlan();
+            if (!ready()) return false;
+            var slots = getInventory();
+            for (int i = 0; i < plan.logSize(); i++) {
+                if (plan.logMember(i) != member || plan.logIsFluid(i) || !plan.logConsumes(i)) continue;
+                int slot = plan.logToken(i);
+                if (slot < 0 || slot >= slots.length || slots[slot].getConfig() == null ||
+                        !(slots[slot].getConfig().what() instanceof AEItemKey key)) return false;
+                committed.allocate(key, plan.logAmount(i));
+            }
+            if (committed.isEmpty()) return true;
             MEStorage network = machine.networkStorage();
-            if (network == null) {
-                return false;
-            }
-            items.removeIf(Content::isEmpty);
-            Map<AEItemKey, Long> available = new LinkedHashMap<>();
-            for (ExportOnlyAEItemSlot slot : getInventory()) {
-                GenericStack config = slot.getConfig();
-                if (config != null && config.what() instanceof AEItemKey key && !available.containsKey(key)) {
-                    available.put(key, network.extract(
-                            key, Long.MAX_VALUE, Actionable.SIMULATE, machine.getActionSourceField()));
-                }
-            }
-            ExtractionPlan plan = new ExtractionPlan();
-            for (Content<ItemIngredient> ingredient : items) {
-                long required = ingredient.amount;
-                for (Map.Entry<AEItemKey, Long> entry : available.entrySet()) {
-                    if (required <= 0) {
-                        break;
-                    }
-                    if (entry.getValue() <= 0 || !ingredient.inner.testAeKay(entry.getKey())) {
-                        continue;
-                    }
-                    long allocated = Math.min(required, entry.getValue());
-                    plan.allocate(entry.getKey(), ingredient, allocated);
-                    entry.setValue(entry.getValue() - allocated);
-                    required -= allocated;
-                }
-            }
-            if (simulate) {
-                plan.apply(items);
-            } else if (!plan.isEmpty()) {
-                if (!machine.extractPlan(network, plan)) {
-                    machine.refreshItemStocks();
-                    return false;
-                }
-                plan.apply(items);
+            if (network == null || !machine.extractPlan(network, committed)) {
+                committed = new ExtractionPlan();
                 machine.refreshItemStocks();
-                onContentsChanged();
-            }
-            return items.isEmpty();
-        }
-
-        @Override
-        public boolean forEachItems(ObjLongPredicate<ItemStack> function) {
-            if (!machine.isWorkingEnabled() || !machine.getOnlineField() ||
-                    machine.getMainNode().getGrid() == null) {
                 return false;
             }
             machine.refreshItemStocks();
-            return super.forEachItems(function);
+            onContentsChanged();
+            return true;
         }
 
         @Override
-        public void fastForEachItems(ObjLongConsumer<ItemStack> function) {
-            if (!machine.isWorkingEnabled() || !machine.getOnlineField() ||
-                    machine.getMainNode().getGrid() == null) {
-                return;
-            }
+        public void rollbackInput(PlanScratch plan, int member, AEKeyType type) {
+            if (type != AEKeyType.items()) return;
+            machine.restorePlan(committed);
+            committed = new ExtractionPlan();
+        }
+
+        @Override
+        public void onRecipeCommitted(GTRecipe recipe) {
+            committed = new ExtractionPlan();
+        }
+
+        @Override
+        public boolean forEachKey(AEKeyType type, KeyVisitor visitor) {
+            if (!ready()) return false;
             machine.refreshItemStocks();
-            super.fastForEachItems(function);
+            return super.forEachKey(type, visitor);
         }
 
         @Override
         public void fillSearchMap(GTRecipeType type, IntLongMap map) {
-            if (!machine.isWorkingEnabled() || !machine.getOnlineField() ||
-                    machine.getMainNode().getGrid() == null) {
-                return;
-            }
+            if (!ready()) return;
             machine.refreshItemStocks();
             super.fillSearchMap(type, map);
         }
@@ -569,91 +563,80 @@ public final class MEStockingInputAssemblyPartMachine extends MEInputAssemblyPar
 
     private static final class StockingFluidList extends ExportOnlyAEFluidList {
         private final MEStockingInputAssemblyPartMachine machine;
+        private ExtractionPlan committed = new ExtractionPlan();
 
         private StockingFluidList(MEStockingInputAssemblyPartMachine machine, int slots) {
             super(machine, slots);
             this.machine = machine;
         }
 
+        private boolean ready() {
+            return machine.isWorkingEnabled() && machine.getOnlineField() &&
+                    machine.getMainNode().getGrid() != null;
+        }
+
         @Override
-        public boolean handleRecipeFluid(
-                IO io,
-                GTRecipe recipe,
-                List<Content<FluidIngredient>> fluids,
-                boolean simulate) {
-            if (io != IO.IN || !machine.isWorkingEnabled() || !machine.getOnlineField()) {
-                return false;
-            }
+        public long available(AEKeyType type, KeyIngredient ingredient) {
+            if (!ready()) return 0;
             machine.refreshFluidStocks();
+            return super.available(type, ingredient);
+        }
+
+        @Override
+        public long reserveInput(PlanScratch plan, int member, AEKeyType type, int entry,
+                                 KeyIngredient ingredient, long need, boolean consume) {
+            if (!ready()) return 0;
+            machine.refreshFluidStocks();
+            return super.reserveInput(plan, member, type, entry, ingredient, need, consume);
+        }
+
+        @Override
+        public boolean commitInput(PlanScratch plan, int member, AEKeyType type) {
+            if (type != AEKeyType.fluids()) return true;
+            committed = new ExtractionPlan();
+            if (!ready()) return false;
+            var slots = getInventory();
+            for (int i = 0; i < plan.logSize(); i++) {
+                if (plan.logMember(i) != member || !plan.logIsFluid(i) || !plan.logConsumes(i)) continue;
+                int slot = plan.logToken(i);
+                if (slot < 0 || slot >= slots.length || slots[slot].getConfig() == null ||
+                        !(slots[slot].getConfig().what() instanceof AEFluidKey key)) return false;
+                committed.allocate(key, plan.logAmount(i));
+            }
+            if (committed.isEmpty()) return true;
             MEStorage network = machine.networkStorage();
-            if (network == null) {
-                return false;
-            }
-            fluids.removeIf(Content::isEmpty);
-            Map<AEFluidKey, Long> available = new LinkedHashMap<>();
-            for (ExportOnlyAEFluidSlot slot : getInventory()) {
-                GenericStack config = slot.getConfig();
-                if (config != null && config.what() instanceof AEFluidKey key && !available.containsKey(key)) {
-                    available.put(key, network.extract(
-                            key, Long.MAX_VALUE, Actionable.SIMULATE, machine.getActionSourceField()));
-                }
-            }
-            ExtractionPlan plan = new ExtractionPlan();
-            for (Content<FluidIngredient> ingredient : fluids) {
-                long required = ingredient.amount;
-                for (Map.Entry<AEFluidKey, Long> entry : available.entrySet()) {
-                    if (required <= 0) {
-                        break;
-                    }
-                    if (entry.getValue() <= 0 || !ingredient.inner.testAeKay(entry.getKey())) {
-                        continue;
-                    }
-                    long allocated = Math.min(required, entry.getValue());
-                    plan.allocate(entry.getKey(), ingredient, allocated);
-                    entry.setValue(entry.getValue() - allocated);
-                    required -= allocated;
-                }
-            }
-            if (simulate) {
-                plan.apply(fluids);
-            } else if (!plan.isEmpty()) {
-                if (!machine.extractPlan(network, plan)) {
-                    machine.refreshFluidStocks();
-                    return false;
-                }
-                plan.apply(fluids);
+            if (network == null || !machine.extractPlan(network, committed)) {
+                committed = new ExtractionPlan();
                 machine.refreshFluidStocks();
-                onContentsChanged();
-            }
-            return fluids.isEmpty();
-        }
-
-        @Override
-        public boolean forEachFluids(ObjLongPredicate<FluidStack> function) {
-            if (!machine.isWorkingEnabled() || !machine.getOnlineField() ||
-                    machine.getMainNode().getGrid() == null) {
                 return false;
             }
             machine.refreshFluidStocks();
-            return super.forEachFluids(function);
+            onContentsChanged();
+            return true;
         }
 
         @Override
-        public void fastForEachFluids(ObjLongConsumer<FluidStack> function) {
-            if (!machine.isWorkingEnabled() || !machine.getOnlineField() ||
-                    machine.getMainNode().getGrid() == null) {
-                return;
-            }
+        public void rollbackInput(PlanScratch plan, int member, AEKeyType type) {
+            if (type != AEKeyType.fluids()) return;
+            machine.restorePlan(committed);
+            committed = new ExtractionPlan();
+        }
+
+        @Override
+        public void onRecipeCommitted(GTRecipe recipe) {
+            committed = new ExtractionPlan();
+        }
+
+        @Override
+        public boolean forEachKey(AEKeyType type, KeyVisitor visitor) {
+            if (!ready()) return false;
             machine.refreshFluidStocks();
-            super.fastForEachFluids(function);
+            return super.forEachKey(type, visitor);
         }
 
         @Override
         public void fillSearchMap(GTRecipeType type, IntLongMap map) {
-            if (!machine.isWorkingEnabled() || !machine.getOnlineField() ||
-                    machine.getMainNode().getGrid() == null) {
-                return;
-            }
+            if (!ready()) return;
             machine.refreshFluidStocks();
             super.fillSearchMap(type, map);
         }

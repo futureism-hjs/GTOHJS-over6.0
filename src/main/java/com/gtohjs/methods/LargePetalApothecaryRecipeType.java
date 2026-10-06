@@ -204,7 +204,7 @@ public final class LargePetalApothecaryRecipeType extends com.gtolib.api.recipe.
                     (converted.itemInputs == null ? -1 : converted.itemInputs.size()));
         }
         if (converted.itemOutputs == null || converted.itemOutputs.size() != 1 ||
-                converted.itemOutputs.get(0).isEmpty()) {
+                converted.itemOutputs.amount(0) <= 0 || converted.itemOutputs.outputKey(0) == null) {
             throw new IllegalStateException("Missing converted item output: " + sourceId);
         }
         if ((converted.fluidInputs != null && !converted.fluidInputs.isEmpty()) ||

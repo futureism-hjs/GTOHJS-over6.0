@@ -16,7 +16,10 @@ public final class Fix2RegistrationMethods {
         "hyperdimensional_forge","hyperdimensional_steam_furnace","hyperdimensional_smelter",
         "hyperdimensional_chemical_factory","hyperdimensional_biochemical_factory","universal_steam_factory",
         "one_stop_rare_earth_processing_plant","advanced_generator_array","advanced_alchemy_cauldron",
-        "steam_array","advanced_steam_array","large_petal_apothecary","large_fragment_world_collection_machine"};
+        "steam_array","advanced_steam_array","large_petal_apothecary","large_fragment_world_collection_machine",
+        "neutron_control_factory","platinum_refining_matrix","dragon_field_proliferation_core",
+        "plasma_machine_tool","hadron_catalytic_refinery","quantum_mass_spectrum_array",
+        "superconducting_fusion_assembler"};
     private static boolean machinesRegistered;
     private static volatile boolean recipesFinished;
     private Fix2RegistrationMethods() {}
@@ -29,6 +32,7 @@ public final class Fix2RegistrationMethods {
         OneStopRareEarthRecipeTypeRegistration.register();
         HyperdimensionalBiochemicalRecipeTypeRegistration.register();
         LargePetalApothecaryRecipeTypeRegistration.register();
+        GtlPortedRecipeTypeRegistration.register();
     }
 
     public static void registerMachines() {
@@ -50,8 +54,15 @@ public final class Fix2RegistrationMethods {
         AdvancedSteamArrayRegistration.register();
         LargePetalApothecaryRegistration.register();
         FragmentWorldCollectionMachineRegistration.register();
+        NeutronControlFactoryRegistration.register();
+        PlatinumRefiningMatrixRegistration.register();
+        DragonFieldProliferationCoreRegistration.register();
+        PlasmaMachineToolRegistration.register();
+        HadronCatalyticRefineryRegistration.register();
+        QuantumMassSpectrumArrayRegistration.register();
+        SuperconductingFusionAssemblerRegistration.register();
         machinesRegistered = true;
-        ProofLog.record("fix2 13 multiblock definitions registered");
+        ProofLog.record("fix2 20 multiblock definitions registered");
     }
 
     public static void verifyLoaded() {
@@ -61,6 +72,7 @@ public final class Fix2RegistrationMethods {
         HyperdimensionalBiochemicalRecipeTypeRegistration.validateLoaded();
         LargePetalApothecaryRecipeTypeRegistration.validateLoaded();
         FragmentWorldCollectionRecipeTypeRegistration.validateLoaded();
+        GtlPortedRecipeTypeRegistration.validateLoaded();
         HyperdimensionalForgeRegistration.validateLoaded();
         HyperdimensionalSteamFurnaceRegistration.validateLoaded();
         HyperdimensionalSmelterRegistration.validateLoaded();
@@ -72,6 +84,14 @@ public final class Fix2RegistrationMethods {
         AdvancedAlchemyCauldronRegistration.validateLoaded();
         SteamArrayRegistration.validateLoaded(); AdvancedSteamArrayRegistration.validateLoaded();
         LargePetalApothecaryRegistration.validateLoaded(); FragmentWorldCollectionMachineRegistration.validateLoaded();
+        NeutronControlFactoryRegistration.validateLoaded();
+        PlatinumRefiningMatrixRegistration.validateLoaded();
+        DragonFieldProliferationCoreRegistration.validateLoaded();
+        PlasmaMachineToolRegistration.validateLoaded();
+        HadronCatalyticRefineryRegistration.validateLoaded();
+        QuantumMassSpectrumArrayRegistration.validateLoaded();
+        SuperconductingFusionAssemblerRegistration.validateLoaded();
+        PatternBufferPlacementMethods.verifyLoaded();
         for (String path : MACHINE_PATHS) {
             ResourceLocation id = new ResourceLocation("gtocore", path);
             MachineDefinition definition = GTRegistries.MACHINES.get(id);
@@ -79,7 +99,7 @@ public final class Fix2RegistrationMethods {
                     definition.asItem() != ForgeRegistries.ITEMS.getValue(id) || definition.getBlockEntityType() == null)
                 throw new IllegalStateException("Fix2 machine registry binding missing: " + id);
         }
-        ProofLog.record("fix2 13 multiblocks, native patterns and resource bindings: PASS");
+        ProofLog.record("fix2 20 multiblocks, native patterns and resource bindings: PASS");
     }
     public static void afterRecipeFinish() {
         RecipeRegistrationMethods.validateGTFinalized();

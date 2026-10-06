@@ -1,5 +1,10 @@
 # GTOHJS for GTO 6.0+
 
+> 当前适配版本：`gtohjs-dev1-for-gtocore-0.6.0-dev11-fix5.jar`。
+> 适用于 GTO 0.6.0-dev11（GTOCore 26.10.1、GTCEu 26.10.17、AE2 15.2610.4）。
+> 本版保留现有功能并加入七台 GTL 来源多方块；四台原订单机器在 X/Q 位允许放置物品和流体输出仓，I 位仍为坚固机械方块。
+> Java 21 联网清洁构建及 dev11 客户端启动、进世界验证通过。下文历史版本信息请以本段和 [英文说明](README_EN.md) 为准。
+
 > **当前目标：GTO 0.6.0-dev10。** 当前 JAR 为 `gtohjs-dev1-for-gtocore-0.6.0-dev10-fix4.jar`，Forge 模组版本为 `1.0.0-dev10-fix4`。Java 21 联网清洁构建、生成配方检查及原版 dev10 Core 静态注入检查已通过；按本次要求不进行客户端测试。下文涉及 dev9 的旧记录仅供历史参考。
 
 [中文](README.md) | [English](README_EN.md)

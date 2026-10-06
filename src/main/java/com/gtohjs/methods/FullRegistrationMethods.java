@@ -13,7 +13,10 @@ public final class FullRegistrationMethods {
     private static final String[] MULTIBLOCKS={"hyperdimensional_forge","hyperdimensional_steam_furnace","hyperdimensional_smelter",
         "hyperdimensional_chemical_factory","hyperdimensional_biochemical_factory","universal_steam_factory",
         "one_stop_rare_earth_processing_plant","advanced_generator_array","advanced_alchemy_cauldron","steam_array",
-        "advanced_steam_array","large_petal_apothecary","large_fragment_world_collection_machine"};
+        "advanced_steam_array","large_petal_apothecary","large_fragment_world_collection_machine",
+        "neutron_control_factory","platinum_refining_matrix","dragon_field_proliferation_core",
+        "plasma_machine_tool","hadron_catalytic_refinery","quantum_mass_spectrum_array",
+        "superconducting_fusion_assembler"};
     private static final String[] PARTS={"electromagnetic_thermal_control_hatch","electromagnetic_thermal_control_machine",
         "advanced_infinite_intake_hatch","ultimate_infinite_intake_hatch","me_input_assembly","me_stocking_input_assembly",
         "me_super_pattern_buffer","me_super_wildcard_pattern_buffer","me_super_pattern_buffer_proxy"};
@@ -39,8 +42,8 @@ public final class FullRegistrationMethods {
         ThermalAndIntakeHatchRegistration.validateLoaded(); MEInputAssemblyRegistration.validateLoaded();
         MESuperPatternBufferRegistration.validateLoaded(); MESuperWildcardPatternBufferRegistration.validateLoaded();
         VacuumCoverRegistration.validateLoaded();
-        if(OWNED.size()!=23) throw new IllegalStateException("Expected 23 HJS machine IDs");
+        if(OWNED.size()!=30) throw new IllegalStateException("Expected 30 HJS machine IDs");
         for(var id:OWNED) if(GTRegistries.MACHINES.get(id)==null) throw new IllegalStateException("HJS machine missing: "+id);
-        ProofLog.record("fix3 23 machine IDs and vacuum cover verified; added-by tooltip ownership ready");
+        ProofLog.record("fix3 30 machine IDs and vacuum cover verified; added-by tooltip ownership ready");
     }
 }
