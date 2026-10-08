@@ -1,5 +1,16 @@
 # GTO HJS Changelog
 
+## dev1-for-gtocore-0.6.0-dev11-fix7 - 2026-10-08 (development)
+
+- Set the infinite wireless energy unit's storage tier to `GTValues.MAX`,
+  matching `gtocore:max_wireless_energy_unit`. Reuse the native MAX texture.
+  Substations count the addon unit at every glass casing tier. Native units
+  retain their tier check; the over-tier warning remains for excluded native
+  units and ignores the accepted addon unit.
+- Keep the `2^126 - 1 EU` sentinel, 0.0% loss, display overrides and native
+  transfer limits. Java 21 online clean build, addon-only deployment and
+  user-confirmed crash-free single-player world entry passed.
+
 ## dev1-for-gtocore-0.6.0-dev11-fix6 - 2026-10-08 (development)
 
 - Added an LV infinite wireless energy unit with a `2^126 - 1 EU` capacity

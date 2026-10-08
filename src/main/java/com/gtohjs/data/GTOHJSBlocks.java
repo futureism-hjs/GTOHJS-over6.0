@@ -52,7 +52,7 @@ public final class GTOHJSBlocks {
         if (!expectedInfinite.equals(ForgeRegistries.BLOCKS.getKey(infinite)) ||
                 !expectedInfinite.equals(ForgeRegistries.ITEMS.getKey(infinite.asItem())) ||
                 !InfiniteWirelessEnergyUnitBlock.CAPACITY.equals(infinite.getCapacity()) ||
-                infinite.getLoss() != 0 || infinite.getTier() != GTValues.LV) {
+                infinite.getLoss() != 0 || infinite.getTier() != GTValues.MAX) {
             throw new IllegalStateException("Infinite wireless energy unit registry mismatch");
         }
     }

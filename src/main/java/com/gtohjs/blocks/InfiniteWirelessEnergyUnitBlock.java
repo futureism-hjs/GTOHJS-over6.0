@@ -18,7 +18,7 @@ public final class InfiniteWirelessEnergyUnitBlock extends WirelessEnergyUnitBlo
     public static final BigInteger CAPACITY = BigInteger.ONE.shiftLeft(126).subtract(BigInteger.ONE);
 
     public InfiniteWirelessEnergyUnitBlock(Properties properties) {
-        super(properties, GTValues.LV);
+        super(properties, GTValues.MAX);
     }
 
     @Override

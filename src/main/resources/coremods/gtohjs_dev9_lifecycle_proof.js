@@ -623,7 +623,38 @@ function dev11StationCapacityBridge(clazz) {
                 n.name==='cachedRef' && n.desc==='(Ljava/util/function/Supplier;Ljava/util/function/Function;)Ljava/util/function/Supplier;') {anchor=n;count++;}
     }
     requireOne(count,'station capacity supplier');
+    var register=uniqueMethod(clazz,'register','()V'),registerNodes=register.instructions.toArray();
+    var tierCall=null,tierLoad=null,tierJump=null,tierCount=0;
+    for(var j=0;j<registerNodes.length;j++) { var call=registerNodes[j];
+        if(call.getOpcode()!==Opcodes.INVOKEVIRTUAL || call.owner!=='com/gtocore/common/block/WirelessEnergyUnitBlock' ||
+                call.name!=='getTier' || call.desc!=='()I')continue;
+        var load=nextOpcode(call),jump=load===null?null:nextOpcode(load);
+        if(load!==null && load.getOpcode()===Opcodes.ILOAD && load.var===1 &&
+                jump!==null && jump.getOpcode()===Opcodes.IF_ICMPGT) {tierCall=call;tierLoad=load;tierJump=jump;tierCount++;}
+    }
+    requireOne(tierCount,'station unit versus glass tier guard');
+    var describe=uniqueMethod(clazz,'describeUnits','(I)V'),describeNodes=describe.instructions.toArray();
+    var warningTier=null,warningJump=null,warningCount=0;
+    for(var k=0;k<describeNodes.length;k++) { var first=describeNodes[k];
+        if(first.getOpcode()!==Opcodes.ILOAD || first.var!==6)continue;
+        var second=nextOpcode(first),branch=second===null?null:nextOpcode(second);
+        if(second!==null && second.getOpcode()===Opcodes.ILOAD && second.var===1 &&
+                branch!==null && branch.getOpcode()===Opcodes.IF_ICMPLE) {warningTier=first;warningJump=branch;warningCount++;}
+    }
+    requireOne(warningCount,'station over-tier warning guard');
     anchor.owner='com/gtohjs/methods/InfiniteEnergyPresentation';anchor.name='stationCapacitySupplier';
+    register.instructions.insertBefore(tierCall,new VarInsnNode(Opcodes.ILOAD,1));
+    tierCall.setOpcode(Opcodes.INVOKESTATIC);tierCall.owner='com/gtohjs/methods/InfiniteWirelessEnergyPredicate';
+    tierCall.name='countsAtCasingTier';tierCall.desc='(Lcom/gtocore/common/block/WirelessEnergyUnitBlock;I)Z';
+    register.instructions.remove(tierLoad);tierJump.setOpcode(Opcodes.IFEQ);
+    var warningPrefix=new InsnList();warningPrefix.add(new VarInsnNode(Opcodes.ALOAD,0));
+    warningPrefix.add(new InsnNode(Opcodes.DUP));
+    warningPrefix.add(new FieldInsnNode(Opcodes.GETFIELD,clazz.name,'wirelessEnergyUnitPositions','Lcom/google/common/collect/Multimap;'));
+    describe.instructions.insertBefore(warningTier,warningPrefix);
+    var warningCall=ASMAPI.buildMethodCall('com/gtohjs/methods/InfiniteWirelessEnergyPredicate','allUnitsEligible',
+        '(Lcom/gtocore/common/machine/multiblock/storage/WirelessEnergySubstationMachine;Lcom/google/common/collect/Multimap;II)Z',ASMAPI.MethodType.STATIC);
+    describe.instructions.insertBefore(warningJump,warningCall);warningJump.setOpcode(Opcodes.IFNE);
+    describe.maxStack+=3;
     recordMarker(clazz,marker);return clazz;
 }
 function dev11JadeBridge(clazz) {
