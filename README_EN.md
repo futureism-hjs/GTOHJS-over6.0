@@ -2,7 +2,7 @@
 
 [中文](README.md) | English
 
-Current version: `gtohjs-dev1-for-gtocore-0.6.0-dev11-fix5.jar`
+Current development version: `gtohjs-dev1-for-gtocore-0.6.0-dev11-fix6.jar`
 
 - [Changelog](CHANGELOG.md)
 - [Local build dependencies](libs/README.md)
@@ -11,6 +11,15 @@ GTO HJS expands the Minecraft 1.20.1 Forge edition of GregTech Odyssey
 0.6.0-dev11 with additional machines, recipes and development tools. It registers
 its content through GTO's native loading windows. The original GTOCore,
 GTOLib and GTOSeal files are read-only references.
+
+Fix6 adds `gtohjs:infinite_wireless_energy_unit`. It is an LV wireless energy
+unit with a real capacity limit of `2^126 - 1 EU` and no unit loss. In a formed
+wireless energy substation it shows the capacity as animated Infinite/无限 in
+Jade, the substation summary and the wireless energy monitor. Its item tooltip
+shows infinite capacity and 0.0% loss. Grid transfer and rate limits retain
+their dev11 behavior. Java 21 online clean build passed, and the deployed dev11
+client entered a single-player world without crashing. Under the project client
+test rule, that world entry passes acceptance; the client remains running.
 
 Fix5 preserves the current source changes and targets dev11's recipe content,
 AE Key inventory and ME recipe-handler APIs. It adds seven GTL-derived
@@ -22,9 +31,9 @@ the user confirmed testing passed.
 
 ## Complete content overview
 
-- 22 independent `gtohjs` items: Recipe Editor, Custom Multiblock Structure
+- 23 independent `gtohjs` items: Recipe Editor, Custom Multiblock Structure
   Exporter, Vacuum Cover, two preloaded AE Component Packs, Integral Bronze
-  Framework and sixteen world fragments.
+  Framework, Infinite Wireless Energy Unit and sixteen world fragments.
 - 30 `gtocore` machine or part definitions: twenty multiblocks plus the
   collector, thermal forms, intake hatches and ME assemblies/buffers.
 - One Vacuum Cover definition with vacuum levels 1-3.
@@ -75,8 +84,8 @@ Java 21 runtime configured, run:
 ```
 
 The artifact is written to
-`build/libs/gtohjs-dev1-for-gtocore-0.6.0-dev11-fix5.jar`.
-Its numeric Forge loader version is `1.0.0-dev11-fix5`.
+`build/libs/gtohjs-dev1-for-gtocore-0.6.0-dev11-fix6.jar`.
+Its numeric Forge loader version is `1.0.0-dev11-fix6`.
 
 ## Standalone items and block
 
@@ -88,6 +97,7 @@ Its numeric Forge loader version is `1.0.0-dev11-fix5`.
 | Normal AE Component Pack | `gtohjs:normal_ae_component_pack` | Preloads 129 normal component types. |
 | Super AE Component Pack | `gtohjs:super_ae_component_pack` | Preloads 17 super-buffer and assembler component types. |
 | Integral Bronze Framework | `gtohjs:integral_bronze_framework` | Structure block with its own model, texture, loot and crafting recipe. |
+| Infinite Wireless Energy Unit | `gtohjs:infinite_wireless_energy_unit` | LV wireless energy unit; `2^126 - 1 EU` capacity sentinel and 0.0% unit loss. |
 
 The sixteen `gtohjs:world_fragments_*` items represent Overworld, Nether, End,
 Ancient World (`reactor`), Moon, Mars, Venus, Mercury, Ceres, Io, Ganymede,

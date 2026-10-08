@@ -7,7 +7,7 @@ modId="${mod_id}"
 version="${mod_loader_version}"
 displayName="${mod_name}"
 authors="${mod_authors}"
-description='''GTOHJS dev10: multiblocks, recipes, hatches, ME assemblies, pattern buffers, tools, component packs and colored addon attribution.'''
+description='''GTOHJS dev11: multiblocks, recipes, hatches, ME assemblies, pattern buffers, tools, component packs and infinite wireless energy unit.'''
 
 [[dependencies.${mod_id}]]
 modId="minecraft"

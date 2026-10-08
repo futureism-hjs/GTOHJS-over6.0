@@ -61,6 +61,9 @@ public final class GTOHJSItems {
     public static final RegistryObject<BlockItem> INTEGRAL_BRONZE_FRAMEWORK = ITEMS.register(
             GTOHJSBlocks.INTEGRAL_BRONZE_FRAMEWORK_ID,
             () -> new BlockItem(GTOHJSBlocks.INTEGRAL_BRONZE_FRAMEWORK.get(), new Item.Properties()));
+    public static final RegistryObject<BlockItem> INFINITE_WIRELESS_ENERGY_UNIT = ITEMS.register(
+            GTOHJSBlocks.INFINITE_WIRELESS_ENERGY_UNIT_ID,
+            () -> new BlockItem(GTOHJSBlocks.INFINITE_WIRELESS_ENERGY_UNIT.get(), new Item.Properties()));
 
     public static final RegistryObject<Item> WORLD_FRAGMENTS_OVERWORLD = worldFragment("overworld");
     public static final RegistryObject<Item> WORLD_FRAGMENTS_NETHER = worldFragment("nether");
@@ -112,6 +115,7 @@ public final class GTOHJSItems {
     private static void addCreativeTabContents(BuildCreativeModeTabContentsEvent event) {
         if (CreativeModeTabs.BUILDING_BLOCKS.equals(event.getTabKey())) {
             event.accept(INTEGRAL_BRONZE_FRAMEWORK.get());
+            event.accept(INFINITE_WIRELESS_ENERGY_UNIT.get());
         }
         if (CreativeModeTabs.TOOLS_AND_UTILITIES.equals(event.getTabKey())) {
             event.accept(RECIPE_EDITOR.get());
@@ -127,7 +131,7 @@ public final class GTOHJSItems {
 
     public static void validateLoaded() {
         if (!NORMAL_AE_COMPONENT_PACK.isPresent() || !SUPER_AE_COMPONENT_PACK.isPresent()
-                || !VACUUM_COVER.isPresent()) {
+                || !VACUUM_COVER.isPresent() || !INFINITE_WIRELESS_ENERGY_UNIT.isPresent()) {
             throw new IllegalStateException("GTOHJS utility items were not all registered");
         }
         if (WORLD_FRAGMENTS.size() != 16 || WORLD_FRAGMENTS.stream().anyMatch(fragment -> !fragment.isPresent())) {

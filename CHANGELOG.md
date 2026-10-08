@@ -1,5 +1,20 @@
 # GTO HJS Changelog
 
+## dev1-for-gtocore-0.6.0-dev11-fix6 - 2026-10-08 (development)
+
+- Added an LV infinite wireless energy unit with a `2^126 - 1 EU` capacity
+  sentinel and 0.0% unit loss. The substation predicate accepts native units
+  and the addon unit together while preserving the native match context.
+- Added animated localized infinite storage text to the monitor, shared grid
+  summary, station capacity row and Jade progress bar. Finite storage and
+  transfer-rate paths retain their native implementations.
+- Verified the original dev11 Core bytecode anchors and corrected the wireless
+  predicate bridge to scan the generated structure lambda. Java 21 online
+  clean build, addon-only deployment and crash-free single-player world entry
+  passed; the client remains running under the project test rule.
+- Replaced two deprecated calls in `GTOHJS.java` with Forge 47.4.20-supported
+  constructor injection and `ResourceLocation.fromNamespaceAndPath`.
+
 ## dev1-for-gtocore-0.6.0-dev11-fix5 - 2026-10-06
 
 - Retargeted the preserved working tree to original GTO 0.6.0-dev11 Core

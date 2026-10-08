@@ -46,7 +46,7 @@ public final class RuntimeTooltipVerification {
             if(matches!=1) throw new IllegalStateException("HJS attribution tooltip missing/duplicated: "+id);
             count++;
         }
-        if(count!=45) throw new IllegalStateException("Expected 45 owned-item tooltips, found "+count);
-        ProofLog.record("actual Minecraft tooltip generation: 45/45 purple attribution and orange name PASS");
+        if(count!=46) throw new IllegalStateException("Expected 46 owned-item tooltips, found "+count);
+        ProofLog.record("actual Minecraft tooltip generation: 46/46 purple attribution and orange name PASS");
     }
 }

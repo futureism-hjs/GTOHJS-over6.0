@@ -20,6 +20,11 @@ and docs/READ_INDEX.md when available in the active development workspace.
   build, backing up any prior addon first.
 - Maintain English development documentation, feature matrix and read index.
   Static verification is not release-runtime acceptance.
+- Client acceptance for GTOHJS changes consists only of entering a world in the
+  target client and checking whether the game crashes. Successful world entry
+  without a crash passes the client test. Do not extend this gate to gameplay
+  checks of blocks, structures, interfaces, recipes or reload behavior. Leave
+  the game running after a successful client test.
 
 ## Documentation and publication
 

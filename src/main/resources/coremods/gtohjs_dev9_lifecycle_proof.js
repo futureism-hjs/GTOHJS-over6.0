@@ -566,9 +566,88 @@ function vacuumBridge(clazz) {
     method.instructions.insertBefore(method.instructions.getFirst(),prefix);method.maxStack=Math.max(method.maxStack,2);
     recordMarker(clazz,marker);return clazz;
 }
+function dev11WirelessUnitBridge(clazz) {
+    var marker='gtohjs$dev11$wirelessUnit';requireMarkerAbsent(clazz,marker);
+    var anchor=null,count=0;
+    for(var m=0;m<clazz.methods.size();m++) {
+        var nodes=clazz.methods.get(m).instructions.toArray();
+        for(var i=0;i<nodes.length;i++) { var n=nodes[i];
+            if(n.getOpcode()===Opcodes.INVOKESTATIC && n.owner==='com/gtocore/api/pattern/GTOPredicates' &&
+                    n.name==='wirelessEnergyUnit' && n.desc==='()Lcom/gregtechceu/gtceu/api/pattern/TraceabilityPredicate;') {anchor=n;count++;}
+        }
+    }
+    requireOne(count,'MultiBlockG wireless unit predicate');
+    anchor.owner='com/gtohjs/methods/InfiniteWirelessEnergyPredicate';
+    recordMarker(clazz,marker);return clazz;
+}
+function dev11MonitorStorageBridge(clazz) {
+    var marker='gtohjs$dev11$monitorStorage';requireMarkerAbsent(clazz,marker);
+    var method=uniqueMethod(clazz,'getComponentArray','()[Lnet/minecraft/network/chat/Component;');
+    var nodes=method.instructions.toArray(),anchor=null,count=0;
+    for(var i=0;i<nodes.length;i++) { var n=nodes[i];
+        if(n.getOpcode()===Opcodes.INVOKESTATIC && n.owner==='com/gtocore/common/wireless/energy/GridReadouts' &&
+                n.name==='storage' && n.desc==='(Lcom/gtocore/api/wireless/energy/EnergyAccount;)Lnet/minecraft/network/chat/Component;') {anchor=n;count++;}
+    }
+    requireOne(count,'MonitorEU storage readout');
+    anchor.owner='com/gtohjs/methods/InfiniteEnergyPresentation';anchor.name='monitorStorage';
+    recordMarker(clazz,marker);return clazz;
+}
+function dev11SummaryStorageBridge(clazz) {
+    var marker='gtohjs$dev11$summaryStorage';requireMarkerAbsent(clazz,marker);
+    var method=uniqueMethod(clazz,'refresh','()V'),nodes=method.instructions.toArray();
+    var stored=null,storedCount=0,early=null,earlyCount=0;
+    for(var i=0;i<nodes.length;i++) { var n=nodes[i];
+        if(n.getOpcode()===Opcodes.INVOKESTATIC && n.owner==='com/gtocore/common/wireless/energy/map/GridFormat' &&
+                n.name==='storedDetail' && n.desc==='(DD)Lnet/minecraft/network/chat/Component;') {stored=n;storedCount++;}
+        if(n.getOpcode()===Opcodes.IF_ICMPNE && nextOpcode(n).getOpcode()===Opcodes.RETURN) {early=n;earlyCount++;}
+    }
+    requireOne(storedCount,'GridSummaryPanel stored detail');
+    requireOne(earlyCount,'GridSummaryPanel unchanged-summary return');
+    var animate=new InsnList();animate.add(new VarInsnNode(Opcodes.ALOAD,1));
+    animate.add(ASMAPI.buildMethodCall('com/gtohjs/methods/InfiniteEnergyPresentation','isInfiniteSummary',
+        '(Lcom/gtocore/api/wireless/energy/GridView$Summary;)Z',ASMAPI.MethodType.STATIC));
+    animate.add(new JumpInsnNode(Opcodes.IFNE,early.label));
+    method.instructions.insertBefore(nextOpcode(early),animate);
+    var format=new InsnList();format.add(new VarInsnNode(Opcodes.DLOAD,2));format.add(new VarInsnNode(Opcodes.DLOAD,4));
+    format.add(ASMAPI.buildMethodCall('com/gtohjs/methods/InfiniteEnergyPresentation','summaryStorage',
+        '(Lnet/minecraft/network/chat/Component;DD)Lnet/minecraft/network/chat/Component;',ASMAPI.MethodType.STATIC));
+    method.instructions.insert(stored,format);method.maxStack+=4;
+    recordMarker(clazz,marker);return clazz;
+}
+function dev11StationCapacityBridge(clazz) {
+    var marker='gtohjs$dev11$stationCapacity';requireMarkerAbsent(clazz,marker);
+    var method=uniqueMethod(clazz,'stationPanel','()Lcom/gregtechceu/gtceu/uipro/UIElement;');
+    var nodes=method.instructions.toArray(),anchor=null,count=0;
+    for(var i=0;i<nodes.length;i++) { var n=nodes[i];
+        if(n.getOpcode()===Opcodes.INVOKESTATIC && n.owner==='com/gregtechceu/gtceu/uiwidgets/multiblock/MultiblockPage' &&
+                n.name==='cachedRef' && n.desc==='(Ljava/util/function/Supplier;Ljava/util/function/Function;)Ljava/util/function/Supplier;') {anchor=n;count++;}
+    }
+    requireOne(count,'station capacity supplier');
+    anchor.owner='com/gtohjs/methods/InfiniteEnergyPresentation';anchor.name='stationCapacitySupplier';
+    recordMarker(clazz,marker);return clazz;
+}
+function dev11JadeBridge(clazz) {
+    var marker='gtohjs$dev11$jade';requireMarkerAbsent(clazz,marker);
+    var entries=[['register','(Lsnownee/jade/api/IWailaCommonRegistration;)V','registerCommon'],
+        ['registerClient','(Lsnownee/jade/api/IWailaClientRegistration;)V','registerClientComponents']];
+    for(var i=0;i<entries.length;i++) { var entry=entries[i],method=uniqueMethod(clazz,entry[0],entry[1]);
+        var nodes=method.instructions.toArray(),tail=null,count=0;
+        for(var j=0;j<nodes.length;j++)if(nodes[j].getOpcode()===Opcodes.RETURN){tail=nodes[j];count++;}
+        requireOne(count,'GTOJadePlugin '+entry[0]+' return');
+        var call=new InsnList();call.add(new VarInsnNode(Opcodes.ALOAD,1));
+        call.add(ASMAPI.buildMethodCall('com/gtohjs/integration/jade/GTOHJSJadePlugin',entry[2],entry[1],ASMAPI.MethodType.STATIC));
+        method.instructions.insertBefore(tail,call);method.maxStack=Math.max(method.maxStack,1);
+    }
+    recordMarker(clazz,marker);return clazz;
+}
 function initializeCoreMod() {
     ASMAPI.log('ERROR', '[GTOHJS/PROOF] CoreMod JS initialized');
     return {
+        'gtohjs_dev11_wireless_unit': {'target':{'type':'CLASS','name':'com.gtocore.common.data.machines.MultiBlockG'},'transformer':dev11WirelessUnitBridge},
+        'gtohjs_dev11_monitor_storage': {'target':{'type':'CLASS','name':'com.gtocore.common.machine.monitor.MonitorEU'},'transformer':dev11MonitorStorageBridge},
+        'gtohjs_dev11_summary_storage': {'target':{'type':'CLASS','name':'com.gtocore.common.wireless.energy.map.GridSummaryPanel'},'transformer':dev11SummaryStorageBridge},
+        'gtohjs_dev11_station_capacity': {'target':{'type':'CLASS','name':'com.gtocore.common.machine.multiblock.storage.WirelessEnergySubstationMachine'},'transformer':dev11StationCapacityBridge},
+        'gtohjs_dev11_jade': {'target':{'type':'CLASS','name':'com.gtocore.integration.jade.GTOJadePlugin'},'transformer':dev11JadeBridge},
         'gtohjs_fix3_cover': {'target':{'type':'CLASS','name':'com.gtocore.common.data.GTOCovers'},'transformer':coverBridge},
         'gtohjs_fix3_proxy': {'target':{'type':'CLASS','name':'com.gtocore.common.machine.multiblock.part.ae.MEPatternBufferProxyPartMachine'},'transformer':proxyBridge},
         'gtohjs_fix3_layout': {'target':{'type':'CLASS','name':'com.gtocore.common.machine.multiblock.part.ae.MEPatternPartUI'},'transformer':patternLayoutBridge},

@@ -23,7 +23,11 @@ public final class InjectionVerifier {
             {"com.gtocore.common.data.GTOCovers", "gtohjs$fix3$cover"},
             {"com.gtocore.common.recipe.condition.VacuumCondition", "gtohjs$fix3$vacuum"},
             {"com.gtocore.common.machine.multiblock.part.ae.MEPatternBufferProxyPartMachine", "gtohjs$fix3$proxy"},
-            {"com.gtocore.common.machine.multiblock.part.ae.MEPatternPartUI", "gtohjs$fix3$layout"}
+            {"com.gtocore.common.machine.multiblock.part.ae.MEPatternPartUI", "gtohjs$fix3$layout"},
+            {"com.gtocore.common.data.machines.MultiBlockG", "gtohjs$dev11$wirelessUnit"},
+            {"com.gtocore.common.machine.monitor.MonitorEU", "gtohjs$dev11$monitorStorage"},
+            {"com.gtocore.common.wireless.energy.map.GridSummaryPanel", "gtohjs$dev11$summaryStorage"},
+            {"com.gtocore.common.machine.multiblock.storage.WirelessEnergySubstationMachine", "gtohjs$dev11$stationCapacity"}
     };
 
     private InjectionVerifier() {}
@@ -51,13 +55,24 @@ public final class InjectionVerifier {
                 throw new IllegalStateException("GTOHJS injection missing: " + target[0], exception);
             }
         }
+        if (ModList.get().isLoaded("jade")) {
+            try {
+                Class<?> jadePlugin = Class.forName("com.gtocore.integration.jade.GTOJadePlugin", false, loader);
+                Field marker = jadePlugin.getDeclaredField("gtohjs$dev11$jade");
+                if (marker.getType() != boolean.class || !Modifier.isStatic(marker.getModifiers()) || !marker.isSynthetic()) {
+                    throw new IllegalStateException("Invalid GTOHJS Jade injection marker");
+                }
+            } catch (ReflectiveOperationException exception) {
+                throw new IllegalStateException("GTOHJS Jade injection missing", exception);
+            }
+        }
         GTOHJSBootstrap.requireExecuted(GTOHJSBootstrap.MACHINE);
         GTOHJSBootstrap.requireExecuted(GTOHJSBootstrap.RECIPE_TYPE);
         GTOHJSBootstrap.requireExecuted(GTOHJSBootstrap.AE);
         ULVFragmentWorldCollectionMachine.verifyLoaded();
         FullRegistrationMethods.verifyLoaded();
         Fix2RegistrationMethods.verifyLoaded();
-        ProofLog.record("fix3 twelve class transformations verified: PASS");
+        ProofLog.record("dev11 sixteen required class transformations verified: PASS");
         // Client Data.commonInit is asynchronous; pending is not a missing transform.
         if (!GTOHJSBootstrap.allExecuted()) {
             ProofLog.record("recipe bridge pending asynchronous GTO data loading");

@@ -18,8 +18,8 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 public final class GTOHJS {
     public static final String MOD_ID = "gtohjs";
 
-    public GTOHJS() {
-        var modBus = FMLJavaModLoadingContext.get().getModEventBus();
+    public GTOHJS(FMLJavaModLoadingContext context) {
+        var modBus = context.getModEventBus();
         MEPatternBufferConfig.HOLDER.getConfigInstance();
         GTOHJSBlocks.register(modBus);
         GTOHJSItems.register(modBus);
@@ -38,5 +38,5 @@ public final class GTOHJS {
     }
 
     private void serverStarted(ServerStartedEvent event) { Fix2RegistrationMethods.verifyServerRecipes(event.getServer()); }
-    public static ResourceLocation id(String path) { return new ResourceLocation(MOD_ID, path); }
+    public static ResourceLocation id(String path) { return ResourceLocation.fromNamespaceAndPath(MOD_ID, path); }
 }
