@@ -49,7 +49,7 @@ public final class ImportedRecipeDirectoryRegistration {
     public static final ResourceLocation HYPERDIMENSIONAL_SMELTER_RAW_ID =
             GTOHJS.id("hyperdimensional_smelter");
 
-    private static final ResourceLocation DUMMY_RECIPE_ID = new ResourceLocation("gtceu", "default");
+    private static final ResourceLocation DUMMY_RECIPE_ID = ResourceLocation.fromNamespaceAndPath("gtceu", "default");
     private static final List<RecipeSpec> SPECS = List.of(
             new RecipeSpec(
                     LARGE_PETAL_APOTHECARY_RAW_ID,

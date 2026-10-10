@@ -30,7 +30,7 @@ public final class HyperdimensionalChemicalFactoryRegistration {
     public enum State { NOT_STARTED, REGISTERING, REGISTERED, FAILED }
 
     public static final ResourceLocation MACHINE_ID =
-            new ResourceLocation("gtocore", "hyperdimensional_chemical_factory");
+            ResourceLocation.fromNamespaceAndPath("gtocore", "hyperdimensional_chemical_factory");
     private static final GTRecipeType[] EXPECTED_RECIPE_TYPES = {
             GTORecipeTypes.LARGE_CHEMICAL_RECIPES,
             GTORecipeTypes.POLYMERIZATION_REACTOR_RECIPES

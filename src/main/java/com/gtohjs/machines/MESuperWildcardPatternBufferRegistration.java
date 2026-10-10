@@ -21,7 +21,7 @@ public final class MESuperWildcardPatternBufferRegistration {
     public enum State { NOT_STARTED, REGISTERING, REGISTERED, FAILED }
 
     public static final ResourceLocation BUFFER_ID =
-            new ResourceLocation("gtocore", "me_super_wildcard_pattern_buffer");
+            ResourceLocation.fromNamespaceAndPath("gtocore", "me_super_wildcard_pattern_buffer");
 
     private static volatile State state = State.NOT_STARTED;
     private static volatile MachineDefinition definition;
@@ -65,7 +65,7 @@ public final class MESuperWildcardPatternBufferRegistration {
                         MEPatternBufferConfig.wildcardPatternCount())))
                 .register();
         registered.setRenderer(new AmprosiumPatternBufferRenderer(GTValues.UHV,
-                new ResourceLocation("gtocore", "block/machine/part/me_pattern_buffer_red")));
+                ResourceLocation.fromNamespaceAndPath("gtocore", "block/machine/part/me_pattern_buffer_red")));
         return registered;
     }
 

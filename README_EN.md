@@ -2,7 +2,7 @@
 
 [中文](README.md) | English
 
-Current development version: `gtohjs-dev1-for-gtocore-0.6.0-dev11-fix7.jar`
+Current development version: `gtohjs-dev1-for-gtocore-0.6.0-dev11-fix8.jar`
 
 - [Changelog](CHANGELOG.md)
 - [Local build dependencies](libs/README.md)
@@ -11,6 +11,19 @@ GTO HJS expands the Minecraft 1.20.1 Forge edition of GregTech Odyssey
 0.6.0-dev11 with additional machines, recipes and development tools. It registers
 its content through GTO's native loading windows. The original GTOCore,
 GTOLib and GTOSeal files are read-only references.
+
+Fix8 adds an adaptive wireless grid: four energy and laser hatches, a terminal
+that fits the wireless energy substation, and a portable frequency flash item.
+The terminal holds up to 64 physical native wireless hatch templates in each
+of four slots; its positive frequency is unique across the server and remains
+reserved through unload, invalid structure and restart. Only mining the
+terminal or a successful frequency change releases its previous reservation.
+Adaptive hatches use the tower owner's native grid balance, voltage reach and
+relay topology. Their account rate is bypassed only for these hatches. The
+local buffer is capped at `Long.MAX_VALUE`; shrinking templates discards EU
+above the new capacity. The tower terminal and hatches show status in their
+interfaces and Jade, and `/gtohjs dumptemplates` exports the runtime template
+list to the world's `ADAPTIVE_NET_TEMPLATE_WHITELIST.md`.
 
 Fix7 sets `gtohjs:infinite_wireless_energy_unit` to the MAX storage-unit tier,
 matching `gtocore:max_wireless_energy_unit`, and uses its MAX-tier texture.
@@ -86,8 +99,8 @@ Java 21 runtime configured, run:
 ```
 
 The artifact is written to
-`build/libs/gtohjs-dev1-for-gtocore-0.6.0-dev11-fix7.jar`.
-Its numeric Forge loader version is `1.0.0-dev11-fix7`.
+`build/libs/gtohjs-dev1-for-gtocore-0.6.0-dev11-fix8.jar`.
+Its numeric Forge loader version is `1.0.0-dev11-fix8`.
 
 ## Standalone items and block
 

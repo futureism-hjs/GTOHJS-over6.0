@@ -28,6 +28,8 @@ public final class InjectionVerifier {
             {"com.gtocore.common.machine.monitor.MonitorEU", "gtohjs$dev11$monitorStorage"},
             {"com.gtocore.common.wireless.energy.map.GridSummaryPanel", "gtohjs$dev11$summaryStorage"},
             {"com.gtocore.common.machine.multiblock.storage.WirelessEnergySubstationMachine", "gtohjs$dev11$stationCapacity"}
+            ,{"com.gtocore.api.wireless.energy.EnergyPort", "gtohjs$adaptive$rate"}
+            ,{"com.gtocore.common.wireless.energy.map.GridNodeCard", "gtohjs$adaptive$nodeCard"}
     };
 
     private InjectionVerifier() {}
@@ -72,7 +74,7 @@ public final class InjectionVerifier {
         ULVFragmentWorldCollectionMachine.verifyLoaded();
         FullRegistrationMethods.verifyLoaded();
         Fix2RegistrationMethods.verifyLoaded();
-        ProofLog.record("dev11 sixteen required class transformations verified: PASS");
+        ProofLog.record("dev11 eighteen required class transformations verified: PASS");
         // Client Data.commonInit is asynchronous; pending is not a missing transform.
         if (!GTOHJSBootstrap.allExecuted()) {
             ProofLog.record("recipe bridge pending asynchronous GTO data loading");

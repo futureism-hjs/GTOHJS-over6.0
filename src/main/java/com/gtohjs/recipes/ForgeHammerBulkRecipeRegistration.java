@@ -39,7 +39,7 @@ public final class ForgeHammerBulkRecipeRegistration {
 
     public static final int AMOUNT = 64;
     public static final long EU_PER_TICK = 16L;
-    private static final ResourceLocation DUMMY_RECIPE_ID = new ResourceLocation("gtceu", "default");
+    private static final ResourceLocation DUMMY_RECIPE_ID = ResourceLocation.fromNamespaceAndPath("gtceu", "default");
     private static final Map<ResourceLocation, GTRecipeDefinition> DEFINITIONS = new LinkedHashMap<>();
     private static final Set<ResourceLocation> RAW_IDS = new HashSet<>();
     private static volatile State state = State.NOT_STARTED;
@@ -81,7 +81,7 @@ public final class ForgeHammerBulkRecipeRegistration {
         String name = material == null || material.getName() == null
                 ? "unknown"
                 : material.getName().toLowerCase(Locale.ROOT);
-        return new ResourceLocation(GTOHJS.MOD_ID, "ingot_to_dust_64_" + name);
+        return ResourceLocation.fromNamespaceAndPath(GTOHJS.MOD_ID, "ingot_to_dust_64_" + name);
     }
 
     /** Matches the duration convention used by GTO's generated cluster recipes. */

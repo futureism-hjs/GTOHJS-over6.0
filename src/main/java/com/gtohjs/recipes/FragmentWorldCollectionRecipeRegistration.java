@@ -26,15 +26,15 @@ public final class FragmentWorldCollectionRecipeRegistration {
         FAILED
     }
 
-    private static final ResourceLocation DUMMY_ID = new ResourceLocation("gtceu", "default");
+    private static final ResourceLocation DUMMY_ID = ResourceLocation.fromNamespaceAndPath("gtceu", "default");
     private static final ResourceLocation DAMASCUS_RAW_ID = GTOHJS.id("make_damascus_steel_dust");
     private static final Set<ResourceLocation> OMITTED_GTL_CRYSTALS = Set.of(
-            new ResourceLocation("gtlcore", "mining_crystal"),
-            new ResourceLocation("gtlcore", "treasures_crystal"),
-            new ResourceLocation("gtlcore", "miracle_crystal"),
-            new ResourceLocation("gtocore", "mining_crystal"),
-            new ResourceLocation("gtocore", "treasures_crystal"),
-            new ResourceLocation("gtocore", "miracle_crystal"));
+            ResourceLocation.fromNamespaceAndPath("gtlcore", "mining_crystal"),
+            ResourceLocation.fromNamespaceAndPath("gtlcore", "treasures_crystal"),
+            ResourceLocation.fromNamespaceAndPath("gtlcore", "miracle_crystal"),
+            ResourceLocation.fromNamespaceAndPath("gtocore", "mining_crystal"),
+            ResourceLocation.fromNamespaceAndPath("gtocore", "treasures_crystal"),
+            ResourceLocation.fromNamespaceAndPath("gtocore", "miracle_crystal"));
 
     private static final Map<ResourceLocation, GTRecipeDefinition> DEFINITIONS = new LinkedHashMap<>();
     private static volatile State state = State.NOT_STARTED;

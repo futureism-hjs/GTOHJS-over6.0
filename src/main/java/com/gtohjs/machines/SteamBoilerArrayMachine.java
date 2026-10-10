@@ -235,7 +235,7 @@ public final class SteamBoilerArrayMachine extends StorageMultiblockMachine
         private final boolean solar;
 
         BoilerKind(String path, FuelType fuelType, boolean highPressure, boolean solar) {
-            this.id = new ResourceLocation("gtceu", path);
+            this.id = ResourceLocation.fromNamespaceAndPath("gtceu", path);
             this.fuelType = fuelType;
             this.highPressure = highPressure;
             this.solar = solar;

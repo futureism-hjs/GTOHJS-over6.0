@@ -33,7 +33,7 @@ public final class LargePetalApothecaryRecipeTypeRegistration {
     public static final String PATH = "large_petal_apothecary";
     public static final ResourceLocation ID = GTCEu.id(PATH);
     public static final ResourceLocation BOTANIA_PROXY_ID =
-            new ResourceLocation("botania", "petal_apothecary");
+            ResourceLocation.fromNamespaceAndPath("botania", "petal_apothecary");
     public static final int ITEM_INPUTS = 17;
     public static final int ITEM_OUTPUTS = 1;
     public static final int FLUID_INPUTS = 0;

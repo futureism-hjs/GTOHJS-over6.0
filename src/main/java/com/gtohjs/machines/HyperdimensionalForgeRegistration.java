@@ -29,7 +29,7 @@ public final class HyperdimensionalForgeRegistration {
     public enum State { NOT_STARTED, REGISTERING, REGISTERED, FAILED }
 
     public static final ResourceLocation MACHINE_ID =
-            new ResourceLocation("gtocore", "hyperdimensional_forge");
+            ResourceLocation.fromNamespaceAndPath("gtocore", "hyperdimensional_forge");
     private static final GTRecipeType[] EXPECTED_RECIPE_TYPES = {
             GTORecipeTypes.PRIMITIVE_BLAST_FURNACE_RECIPES
     };

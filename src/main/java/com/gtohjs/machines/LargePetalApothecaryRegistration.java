@@ -36,7 +36,7 @@ public final class LargePetalApothecaryRegistration {
     }
 
     public static final ResourceLocation MACHINE_ID =
-            new ResourceLocation("gtocore", "large_petal_apothecary");
+            ResourceLocation.fromNamespaceAndPath("gtocore", "large_petal_apothecary");
 
     private static volatile State state = State.NOT_STARTED;
     private static volatile MultiblockMachineDefinition definition;

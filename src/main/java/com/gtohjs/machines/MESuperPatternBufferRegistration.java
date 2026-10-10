@@ -26,9 +26,9 @@ public final class MESuperPatternBufferRegistration {
     public enum State { NOT_STARTED, REGISTERING, REGISTERED, FAILED }
 
     public static final ResourceLocation BUFFER_ID =
-            new ResourceLocation("gtocore", "me_super_pattern_buffer");
+            ResourceLocation.fromNamespaceAndPath("gtocore", "me_super_pattern_buffer");
     public static final ResourceLocation PROXY_ID =
-            new ResourceLocation("gtocore", "me_super_pattern_buffer_proxy");
+            ResourceLocation.fromNamespaceAndPath("gtocore", "me_super_pattern_buffer_proxy");
 
     private static volatile State state = State.NOT_STARTED;
     private static volatile MachineDefinition bufferDefinition;

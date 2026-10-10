@@ -1,6 +1,7 @@
 package com.gtohjs.bootstrap;
 
 import com.gtohjs.coremod.ProofLog;
+import com.gtohjs.adaptivenet.AdaptiveNetRegistration;
 import com.gtohjs.machines.ULVFragmentWorldCollectionMachine;
 import com.gtohjs.methods.Fix2RegistrationMethods;
 import com.gtohjs.methods.FullRegistrationMethods;
@@ -19,7 +20,7 @@ public final class GTOHJSBootstrap {
 
     private GTOHJSBootstrap() {}
 
-    public static void machineBridge() { ULVFragmentWorldCollectionMachine.register(); Fix2RegistrationMethods.registerMachines(); FullRegistrationMethods.registerThermalAndIntake(); observe(MACHINE); }
+    public static void machineBridge() { ULVFragmentWorldCollectionMachine.register(); Fix2RegistrationMethods.registerMachines(); FullRegistrationMethods.registerThermalAndIntake(); AdaptiveNetRegistration.register(); observe(MACHINE); }
     public static void recipeTypeBridge() { ULVFragmentWorldCollectionMachine.registerInterfaceType(); Fix2RegistrationMethods.registerTypes(); observe(RECIPE_TYPE); }
     public static void recipeBridge() { observe(RECIPE); }
     public static void aeBridge() { FullRegistrationMethods.registerAE(); observe(AE); }

@@ -24,9 +24,9 @@ public final class MEInputAssemblyRegistration {
     }
 
     public static final ResourceLocation INPUT_ID =
-            new ResourceLocation("gtocore", "me_input_assembly");
+            ResourceLocation.fromNamespaceAndPath("gtocore", "me_input_assembly");
     public static final ResourceLocation STOCKING_INPUT_ID =
-            new ResourceLocation("gtocore", "me_stocking_input_assembly");
+            ResourceLocation.fromNamespaceAndPath("gtocore", "me_stocking_input_assembly");
 
     private static volatile State state = State.NOT_STARTED;
     private static volatile MachineDefinition inputDefinition;

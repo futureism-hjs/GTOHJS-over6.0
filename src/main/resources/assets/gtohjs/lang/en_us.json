@@ -289,5 +289,11 @@
   "gtohjs.direction.north": "North",
   "gtohjs.direction.south": "South",
   "gtohjs.direction.west": "West",
-  "gtohjs.direction.east": "East"
+  "gtohjs.direction.east": "East",
+  "block.gtocore.adaptive_net_energy_input_hatch": "Adaptive Grid Energy Input Hatch",
+  "block.gtocore.adaptive_net_energy_output_hatch": "Adaptive Grid Power Output Hatch",
+  "block.gtocore.adaptive_net_laser_target_hatch": "Adaptive Grid Laser Target Hatch",
+  "block.gtocore.adaptive_net_laser_source_hatch": "Adaptive Grid Laser Source Hatch",
+  "block.gtocore.adaptive_net_energy_terminal": "Adaptive Grid Terminal",
+  "item.gtocore.net_data_stick": "Network Configuration Flash"
 }

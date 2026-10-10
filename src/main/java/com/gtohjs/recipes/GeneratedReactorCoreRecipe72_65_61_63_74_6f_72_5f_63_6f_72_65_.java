@@ -15,7 +15,7 @@ import net.minecraft.resources.ResourceLocation;
 
 /** Generated method-mode shaped crafting recipe. */
 public final class GeneratedReactorCoreRecipe72_65_61_63_74_6f_72_5f_63_6f_72_65_ implements CraftingRecipeSource {
-    private static final ResourceLocation RAW_ID = new ResourceLocation("gtohjs", "reactor_core");
+    private static final ResourceLocation RAW_ID = ResourceLocation.fromNamespaceAndPath("gtohjs", "reactor_core");
 
     public GeneratedReactorCoreRecipe72_65_61_63_74_6f_72_5f_63_6f_72_65_() {}
 

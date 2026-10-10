@@ -43,7 +43,7 @@ public final class ImportedChemicalReactorRecipeRegistration {
     public static final ResourceLocation COOPERITE_RAW_ID =
             GTOHJS.id("platinum_group_sludge_from_cooperite");
 
-    private static final ResourceLocation DUMMY_RECIPE_ID = new ResourceLocation("gtceu", "default");
+    private static final ResourceLocation DUMMY_RECIPE_ID = ResourceLocation.fromNamespaceAndPath("gtceu", "default");
     private static final long EU_PER_TICK = 30L;
     private static final int NITRIC_ACID_AMOUNT = 1000;
     private static final List<RecipeSpec> SPECS = List.of(

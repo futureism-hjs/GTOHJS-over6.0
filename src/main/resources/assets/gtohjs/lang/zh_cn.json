@@ -329,5 +329,11 @@
   "gtohjs.direction.north": "北",
   "gtohjs.direction.south": "南",
   "gtohjs.direction.west": "西",
-  "gtohjs.direction.east": "东"
+  "gtohjs.direction.east": "东",
+  "block.gtocore.adaptive_net_energy_input_hatch": "自适配电网能源仓",
+  "block.gtocore.adaptive_net_energy_output_hatch": "自适配电网动力仓",
+  "block.gtocore.adaptive_net_laser_target_hatch": "自适配电网激光靶仓",
+  "block.gtocore.adaptive_net_laser_source_hatch": "自适配电网激光源仓",
+  "block.gtocore.adaptive_net_energy_terminal": "自适配电网系统终端",
+  "item.gtocore.net_data_stick": "网络配置闪存"
 }

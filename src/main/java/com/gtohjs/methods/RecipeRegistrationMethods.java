@@ -24,7 +24,7 @@ import net.minecraft.server.MinecraftServer;
  * {@link RecipeBuilder#save()}.</p>
  */
 public final class RecipeRegistrationMethods {
-    private static final ResourceLocation DUMMY_ID = new ResourceLocation("gtceu", "default");
+    private static final ResourceLocation DUMMY_ID = ResourceLocation.fromNamespaceAndPath("gtceu", "default");
     private static final List<GTRecipeBatchSource> GT_SOURCES =
             RecipeSourceDiscovery.discover(GTRecipeBatchSource.class);
     private static final List<CraftingRecipeSource> CRAFTING_SOURCES =

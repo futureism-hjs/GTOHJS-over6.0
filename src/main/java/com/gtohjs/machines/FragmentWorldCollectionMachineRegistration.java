@@ -36,9 +36,9 @@ public final class FragmentWorldCollectionMachineRegistration {
     }
 
     public static final ResourceLocation SINGLE_MACHINE_ID =
-            new ResourceLocation("gtocore", "ulv_fragment_world_collection_machine");
+            ResourceLocation.fromNamespaceAndPath("gtocore", "ulv_fragment_world_collection_machine");
     public static final ResourceLocation LARGE_MACHINE_ID =
-            new ResourceLocation("gtocore", "large_fragment_world_collection_machine");
+            ResourceLocation.fromNamespaceAndPath("gtocore", "large_fragment_world_collection_machine");
 
     private static volatile State state = State.NOT_STARTED;
     private static volatile MachineDefinition singleDefinition;

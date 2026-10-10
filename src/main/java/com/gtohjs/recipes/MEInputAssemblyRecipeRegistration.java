@@ -24,7 +24,7 @@ public final class MEInputAssemblyRecipeRegistration {
         FAILED
     }
 
-    private static final ResourceLocation DUMMY_RECIPE_ID = new ResourceLocation("gtceu", "default");
+    private static final ResourceLocation DUMMY_RECIPE_ID = ResourceLocation.fromNamespaceAndPath("gtceu", "default");
     private static final List<RecipeSpec> SPECS = List.of(
             new RecipeSpec(
                     GTOHJS.id("me_stocking_input_assembly"),
@@ -244,7 +244,7 @@ public final class MEInputAssemblyRecipeRegistration {
     }
 
     private static ResourceLocation id(String namespace, String path) {
-        return new ResourceLocation(namespace, path);
+        return ResourceLocation.fromNamespaceAndPath(namespace, path);
     }
 
     public static State state() {

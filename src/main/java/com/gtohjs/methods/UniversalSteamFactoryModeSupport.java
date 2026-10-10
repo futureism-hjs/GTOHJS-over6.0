@@ -29,7 +29,7 @@ import net.minecraft.resources.ResourceLocation;
  */
 public final class UniversalSteamFactoryModeSupport {
     private static final ResourceLocation MACHINE_ID =
-            new ResourceLocation("gtocore", "universal_steam_factory");
+            ResourceLocation.fromNamespaceAndPath("gtocore", "universal_steam_factory");
     private static final long MAX_RECIPE_EUT = GTValues.V[GTValues.MV];
 
     private UniversalSteamFactoryModeSupport() {

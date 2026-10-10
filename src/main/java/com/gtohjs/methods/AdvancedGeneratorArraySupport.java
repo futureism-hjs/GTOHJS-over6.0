@@ -13,7 +13,7 @@ public final class AdvancedGeneratorArraySupport {
     public static final int WIRELESS_LOSS = 0;
 
     private static final ResourceLocation MACHINE_ID =
-            new ResourceLocation("gtocore", "advanced_generator_array");
+            ResourceLocation.fromNamespaceAndPath("gtocore", "advanced_generator_array");
 
     private AdvancedGeneratorArraySupport() {
     }

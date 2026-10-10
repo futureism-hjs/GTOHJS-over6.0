@@ -1,5 +1,6 @@
 package com.gtohjs.data;
 import com.gtohjs.items.*;
+import com.gtohjs.adaptivenet.NetDataStickBehavior;
 
 import com.gregtechceu.gtceu.api.item.ComponentItem;
 import com.gregtechceu.gtceu.common.item.CoverPlaceBehavior;
@@ -20,6 +21,14 @@ import java.util.List;
 public final class GTOHJSItems {
     private static final DeferredRegister<Item> ITEMS =
             DeferredRegister.create(ForgeRegistries.ITEMS, GTOHJS.MOD_ID);
+    private static final DeferredRegister<Item> CORE_ITEMS =
+            DeferredRegister.create(ForgeRegistries.ITEMS, "gtocore");
+
+    public static final RegistryObject<ComponentItem> NET_DATA_STICK = CORE_ITEMS.register("net_data_stick", () -> {
+        ComponentItem item = ComponentItem.create(new Item.Properties().stacksTo(1));
+        item.attachComponents(NetDataStickBehavior.INSTANCE);
+        return item;
+    });
 
     public static final RegistryObject<ComponentItem> RECIPE_EDITOR = ITEMS.register("recipe_editor", () -> {
         ComponentItem item = ComponentItem.create(new Item.Properties().stacksTo(1));
@@ -109,6 +118,7 @@ public final class GTOHJSItems {
 
     public static void register(IEventBus modBus) {
         ITEMS.register(modBus);
+        CORE_ITEMS.register(modBus);
         modBus.addListener(GTOHJSItems::addCreativeTabContents);
     }
 
@@ -123,6 +133,7 @@ public final class GTOHJSItems {
             event.accept(VACUUM_COVER.get());
             event.accept(NORMAL_AE_COMPONENT_PACK.get().getDefaultInstance());
             event.accept(SUPER_AE_COMPONENT_PACK.get().getDefaultInstance());
+            event.accept(NET_DATA_STICK.get());
         }
         if (CreativeModeTabs.INGREDIENTS.equals(event.getTabKey())) {
             WORLD_FRAGMENTS.forEach(fragment -> event.accept(fragment.get()));
@@ -131,7 +142,7 @@ public final class GTOHJSItems {
 
     public static void validateLoaded() {
         if (!NORMAL_AE_COMPONENT_PACK.isPresent() || !SUPER_AE_COMPONENT_PACK.isPresent()
-                || !VACUUM_COVER.isPresent() || !INFINITE_WIRELESS_ENERGY_UNIT.isPresent()) {
+                || !VACUUM_COVER.isPresent() || !INFINITE_WIRELESS_ENERGY_UNIT.isPresent() || !NET_DATA_STICK.isPresent()) {
             throw new IllegalStateException("GTOHJS utility items were not all registered");
         }
         if (WORLD_FRAGMENTS.size() != 16 || WORLD_FRAGMENTS.stream().anyMatch(fragment -> !fragment.isPresent())) {

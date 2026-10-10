@@ -26,7 +26,7 @@ public final class Fix2RegistrationMethods {
 
     public static void registerTypes() {
         for (String path : new String[]{"one_stop_rare_earth_processing","hyperdimensional_biochemical_processing","large_petal_apothecary"}) {
-            ResourceLocation id = new ResourceLocation("gtceu", path);
+            ResourceLocation id = ResourceLocation.fromNamespaceAndPath("gtceu", path);
             if (GTRegistries.RECIPE_TYPES.get(id) != null) throw new IllegalStateException("GTOHJS recipe-type collision: " + id);
         }
         OneStopRareEarthRecipeTypeRegistration.register();
@@ -38,7 +38,7 @@ public final class Fix2RegistrationMethods {
     public static void registerMachines() {
         if (machinesRegistered) throw new IllegalStateException("Duplicate fix2 machine lifecycle");
         for (String path : MACHINE_PATHS) {
-            ResourceLocation id = new ResourceLocation("gtocore", path);
+            ResourceLocation id = ResourceLocation.fromNamespaceAndPath("gtocore", path);
             if (GTRegistries.MACHINES.get(id) != null) throw new IllegalStateException("GTOHJS machine collision: " + id);
         }
         HyperdimensionalForgeRegistration.register();
@@ -93,7 +93,7 @@ public final class Fix2RegistrationMethods {
         SuperconductingFusionAssemblerRegistration.validateLoaded();
         PatternBufferPlacementMethods.verifyLoaded();
         for (String path : MACHINE_PATHS) {
-            ResourceLocation id = new ResourceLocation("gtocore", path);
+            ResourceLocation id = ResourceLocation.fromNamespaceAndPath("gtocore", path);
             MachineDefinition definition = GTRegistries.MACHINES.get(id);
             if (definition == null || !ForgeRegistries.BLOCKS.containsKey(id) || !ForgeRegistries.ITEMS.containsKey(id) ||
                     definition.asItem() != ForgeRegistries.ITEMS.getValue(id) || definition.getBlockEntityType() == null)

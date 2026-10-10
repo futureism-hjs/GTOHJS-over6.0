@@ -20,7 +20,7 @@ import net.minecraft.resources.ResourceLocation;
 
 /** Concrete native builder data for the first machine-only adaptation node. */
 public final class ULVFragmentWorldCollectionMachine {
-    public static final ResourceLocation ID = new ResourceLocation("gtocore", "ulv_fragment_world_collection_machine");
+    public static final ResourceLocation ID = ResourceLocation.fromNamespaceAndPath("gtocore", "ulv_fragment_world_collection_machine");
     private static final ResourceLocation TYPE_ID = GTCEu.id("fragment_world_collection");
     private static RecipeType recipeType;
     private static MachineDefinition definition;
@@ -43,11 +43,11 @@ public final class ULVFragmentWorldCollectionMachine {
                 .tier(GTValues.ULV)
                 .langValue("Fragment World Collection Machine")
                 .editableUI(SimpleTieredMachine.EDITABLE_UI_CREATOR.apply(
-                        new ResourceLocation("gtohjs", "fragment_world_collection"), recipeType))
+                        ResourceLocation.fromNamespaceAndPath("gtohjs", "fragment_world_collection"), recipeType))
                 .nonYAxisRotation()
                 .recipeType(recipeType)
                 .recipeModifier(GTORecipeModifiers.UPGRADE_OVERCLOCK)
-                .workableTieredHullRenderer(new ResourceLocation("gtohjs", "block/machines/fragment_world_collection_machine"))
+                .workableTieredHullRenderer(ResourceLocation.fromNamespaceAndPath("gtohjs", "block/machines/fragment_world_collection_machine"))
                 .tooltips(Component.translatable("gtohjs.machine.fragment_world_collection.tooltip"))
                 .register());
         ProofLog.record("ULV collector uses native SimpleTieredMachine; native tank capacity=" +

@@ -28,7 +28,7 @@ import java.util.Arrays;
 
 /** Registers the low-pressure, sixteen-boiler steam array. */
 public final class SteamArrayRegistration {
-    public static final ResourceLocation MACHINE_ID = new ResourceLocation("gtocore", "steam_array");
+    public static final ResourceLocation MACHINE_ID = ResourceLocation.fromNamespaceAndPath("gtocore", "steam_array");
     public static final int STORAGE_LIMIT = 16;
 
     private static MultiblockMachineDefinition definition;

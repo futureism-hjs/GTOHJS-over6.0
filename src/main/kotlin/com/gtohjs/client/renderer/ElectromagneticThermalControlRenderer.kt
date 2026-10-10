@@ -10,11 +10,11 @@ import com.gregtechceu.gtceu.client.util.StaticFaceBakery
 import com.gtocore.client.renderer.machine.IHeaterRenderer
 import com.lowdragmc.lowdraglib.client.bakedpipeline.Quad
 import net.minecraft.client.renderer.block.model.BakedQuad
-import net.minecraft.client.renderer.texture.TextureAtlas
 import net.minecraft.client.resources.model.ModelState
 import net.minecraft.core.Direction
 import net.minecraft.resources.ResourceLocation
 import net.minecraft.util.RandomSource
+import net.minecraft.world.inventory.InventoryMenu
 import net.minecraftforge.api.distmarker.Dist
 import net.minecraftforge.api.distmarker.OnlyIn
 import java.util.function.Consumer
@@ -50,6 +50,6 @@ class ElectromagneticThermalControlRenderer(tier: Int, workableModel: ResourceLo
     @OnlyIn(Dist.CLIENT)
     override fun onPrepareTextureAtlas(atlasName: ResourceLocation, register: Consumer<ResourceLocation>) {
         super.onPrepareTextureAtlas(atlasName, register)
-        if (atlasName == TextureAtlas.LOCATION_BLOCKS) normalFrontOverlay.registerTextureAtlas(register)
+        if (atlasName == InventoryMenu.BLOCK_ATLAS) normalFrontOverlay.registerTextureAtlas(register)
     }
 }

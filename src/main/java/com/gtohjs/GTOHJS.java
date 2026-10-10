@@ -1,6 +1,8 @@
 package com.gtohjs;
 
 import com.gtohjs.coremod.InjectionVerifier;
+import com.gtohjs.adaptivenet.AdaptiveTemplateRegistry;
+import com.gtohjs.adaptivenet.AdaptiveTemplateCommand;
 import com.gtohjs.coremod.ProofLog;
 import com.gtohjs.data.GTOHJSBlocks;
 import com.gtohjs.data.GTOHJSItems;
@@ -26,11 +28,12 @@ public final class GTOHJS {
         modBus.addListener(this::loadComplete);
         MinecraftForge.EVENT_BUS.addListener(this::beforeServer);
         MinecraftForge.EVENT_BUS.addListener(this::serverStarted);
+        MinecraftForge.EVENT_BUS.addListener(AdaptiveTemplateCommand::register);
         ProofLog.record("addon constructed; fix3 complete feature adaptation");
     }
 
     private void loadComplete(FMLLoadCompleteEvent event) {
-        event.enqueueWork(InjectionVerifier::verifyLoading);
+        event.enqueueWork(() -> { AdaptiveTemplateRegistry.build(); InjectionVerifier.verifyLoading(); });
     }
 
     private void beforeServer(ServerAboutToStartEvent event) {

@@ -50,7 +50,7 @@ public final class UniversalSteamFactoryRegistration {
     }
 
     public static final ResourceLocation MACHINE_ID =
-            new ResourceLocation("gtocore", "universal_steam_factory");
+            ResourceLocation.fromNamespaceAndPath("gtocore", "universal_steam_factory");
     private static final GTRecipeType[] EXPECTED_RECIPE_TYPES = {
             GTORecipeTypes.BENDER_RECIPES,
             GTORecipeTypes.ROLLING_RECIPES,

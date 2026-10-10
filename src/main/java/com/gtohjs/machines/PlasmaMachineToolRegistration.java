@@ -72,7 +72,7 @@ public final class PlasmaMachineToolRegistration {
 
     public enum State { NOT_STARTED, REGISTERING, REGISTERED, FAILED }
 
-    public static final ResourceLocation MACHINE_ID = new ResourceLocation("gtocore", PATTERN_NAME);
+    public static final ResourceLocation MACHINE_ID = ResourceLocation.fromNamespaceAndPath("gtocore", PATTERN_NAME);
 
     private static volatile State state = State.NOT_STARTED;
     private static volatile MultiblockMachineDefinition definition;

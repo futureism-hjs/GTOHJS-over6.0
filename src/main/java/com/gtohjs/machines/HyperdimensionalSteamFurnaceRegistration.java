@@ -29,7 +29,7 @@ public final class HyperdimensionalSteamFurnaceRegistration {
     public enum State { NOT_STARTED, REGISTERING, REGISTERED, FAILED }
 
     public static final ResourceLocation MACHINE_ID =
-            new ResourceLocation("gtocore", "hyperdimensional_steam_furnace");
+            ResourceLocation.fromNamespaceAndPath("gtocore", "hyperdimensional_steam_furnace");
     private static final GTRecipeType[] EXPECTED_RECIPE_TYPES = {
             GTORecipeTypes.FURNACE_RECIPES
     };

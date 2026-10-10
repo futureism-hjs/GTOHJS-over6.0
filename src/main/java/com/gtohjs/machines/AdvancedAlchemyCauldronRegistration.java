@@ -42,7 +42,7 @@ public final class AdvancedAlchemyCauldronRegistration {
     }
 
     public static final ResourceLocation MACHINE_ID =
-            new ResourceLocation("gtocore", "advanced_alchemy_cauldron");
+            ResourceLocation.fromNamespaceAndPath("gtocore", "advanced_alchemy_cauldron");
 
     private static volatile State state = State.NOT_STARTED;
     private static volatile MultiblockMachineDefinition definition;

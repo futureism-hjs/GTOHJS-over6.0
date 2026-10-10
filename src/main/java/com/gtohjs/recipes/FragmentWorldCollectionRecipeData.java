@@ -507,7 +507,7 @@ final class FragmentWorldCollectionRecipeData {
     }
 
     private static ItemStack stack(String rawId, int amount) {
-        ResourceLocation id = new ResourceLocation(rawId);
+        ResourceLocation id = ResourceLocation.parse(rawId);
         Item item = ForgeRegistries.ITEMS.getValue(id);
         if (item == null || (item == Items.AIR && !id.equals(ForgeRegistries.ITEMS.getKey(Items.AIR)))) {
             throw new IllegalStateException("Missing fragment-world recipe item " + id);
@@ -516,7 +516,7 @@ final class FragmentWorldCollectionRecipeData {
     }
 
     private static FluidStack fluidStack(String rawId, int amount) {
-        ResourceLocation id = new ResourceLocation(rawId);
+        ResourceLocation id = ResourceLocation.parse(rawId);
         Fluid fluid = ForgeRegistries.FLUIDS.getValue(id);
         if (fluid == null || fluid == Fluids.EMPTY) {
             throw new IllegalStateException("Missing fragment-world recipe fluid " + id);

@@ -1,5 +1,20 @@
 # GTO HJS Changelog
 
+## dev1-for-gtocore-0.6.0-dev11-fix8 - 2026-10-09 (development)
+
+- Add the adaptive wireless grid's four hatches, tower-only terminal, portable
+  frequency flash and server-wide saved frequency reservations.
+- Derive physical template specifications from registered dev11 wireless hatch
+  abilities; retain native grid balance, voltage reach and relay routing while
+  lifting account rate only for adaptive ports.
+- Add terminal and hatch status interfaces, Jade details, a runtime template
+  export command and a star-map node-card frequency line.
+- Align the power hatch front with the adaptive input, align both laser fronts
+  with the native IV 256A wireless input, draw the approved frequency-tab icon,
+  and localize the terminal, hatch and configuration flash messages.
+- Replace deprecated resource-location constructors across the project and
+  update the two renderer atlas checks to the current block-atlas constant.
+
 ## dev1-for-gtocore-0.6.0-dev11-fix7 - 2026-10-08 (development)
 
 - Set the infinite wireless energy unit's storage tier to `GTValues.MAX`,

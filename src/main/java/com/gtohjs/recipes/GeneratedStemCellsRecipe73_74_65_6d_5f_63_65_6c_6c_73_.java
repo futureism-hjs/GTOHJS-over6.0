@@ -14,7 +14,7 @@ import net.minecraft.resources.ResourceLocation;
 
 /** Generated method-mode GT recipe. RecipeBuilder.save() is injected by the CoreMod. */
 public final class GeneratedStemCellsRecipe73_74_65_6d_5f_63_65_6c_6c_73_ implements GTRecipeSource {
-    private static final ResourceLocation RAW_ID = new ResourceLocation("gtohjs", "stem_cells");
+    private static final ResourceLocation RAW_ID = ResourceLocation.fromNamespaceAndPath("gtohjs", "stem_cells");
     private RecipeBuilder configuredBuilder;
     private com.gregtechceu.gtceu.api.recipe.GTRecipeDefinition accepted;
     private int normalizedDuration;

@@ -41,7 +41,7 @@ public final class OneStopRareEarthRecipeRegistration {
     public static final ResourceLocation OXIDES_RAW_ID =
             GTOHJS.id("lanthanum_oxide_dust");
 
-    private static final ResourceLocation DUMMY_RECIPE_ID = new ResourceLocation("gtceu", "default");
+    private static final ResourceLocation DUMMY_RECIPE_ID = ResourceLocation.fromNamespaceAndPath("gtceu", "default");
     private static final long EU_PER_TICK = 1920L;
     private static final List<RecipeSpec> SPECS = List.of(
             new RecipeSpec(

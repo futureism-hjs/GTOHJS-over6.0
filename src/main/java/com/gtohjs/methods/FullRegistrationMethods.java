@@ -19,16 +19,18 @@ public final class FullRegistrationMethods {
         "superconducting_fusion_assembler"};
     private static final String[] PARTS={"electromagnetic_thermal_control_hatch","electromagnetic_thermal_control_machine",
         "advanced_infinite_intake_hatch","ultimate_infinite_intake_hatch","me_input_assembly","me_stocking_input_assembly",
-        "me_super_pattern_buffer","me_super_wildcard_pattern_buffer","me_super_pattern_buffer_proxy"};
+        "me_super_pattern_buffer","me_super_wildcard_pattern_buffer","me_super_pattern_buffer_proxy",
+        "adaptive_net_energy_input_hatch","adaptive_net_energy_output_hatch","adaptive_net_laser_target_hatch",
+        "adaptive_net_laser_source_hatch","adaptive_net_energy_terminal"};
     static {
-        for(String name:MULTIBLOCKS) OWNED.add(new ResourceLocation("gtocore",name));
-        for(String name:PARTS) OWNED.add(new ResourceLocation("gtocore",name));
-        OWNED.add(new ResourceLocation("gtocore","ulv_fragment_world_collection_machine"));
+        for(String name:MULTIBLOCKS) OWNED.add(ResourceLocation.fromNamespaceAndPath("gtocore",name));
+        for(String name:PARTS) OWNED.add(ResourceLocation.fromNamespaceAndPath("gtocore",name));
+        OWNED.add(ResourceLocation.fromNamespaceAndPath("gtocore","ulv_fragment_world_collection_machine"));
     }
     private FullRegistrationMethods() {}
     public static boolean ownsMachine(ResourceLocation id) { return OWNED.contains(id); }
     private static void requireFree(String... names) {
-        for(String name:names) if(GTRegistries.MACHINES.get(new ResourceLocation("gtocore",name))!=null)
+        for(String name:names) if(GTRegistries.MACHINES.get(ResourceLocation.fromNamespaceAndPath("gtocore",name))!=null)
             throw new IllegalStateException("HJS machine collision: "+name);
     }
     public static void registerThermalAndIntake() {
@@ -42,8 +44,8 @@ public final class FullRegistrationMethods {
         ThermalAndIntakeHatchRegistration.validateLoaded(); MEInputAssemblyRegistration.validateLoaded();
         MESuperPatternBufferRegistration.validateLoaded(); MESuperWildcardPatternBufferRegistration.validateLoaded();
         VacuumCoverRegistration.validateLoaded();
-        if(OWNED.size()!=30) throw new IllegalStateException("Expected 30 HJS machine IDs");
+        if(OWNED.size()!=35) throw new IllegalStateException("Expected 35 HJS machine IDs");
         for(var id:OWNED) if(GTRegistries.MACHINES.get(id)==null) throw new IllegalStateException("HJS machine missing: "+id);
-        ProofLog.record("fix3 30 machine IDs and vacuum cover verified; added-by tooltip ownership ready");
+        ProofLog.record("35 machine IDs and vacuum cover verified; added-by tooltip ownership ready");
     }
 }

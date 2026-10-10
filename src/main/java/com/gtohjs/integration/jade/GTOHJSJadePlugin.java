@@ -21,10 +21,12 @@ public final class GTOHJSJadePlugin implements IWailaPlugin {
     @Override
     public void register(IWailaCommonRegistration registration) {
         registration.registerBlockDataProvider(InfiniteEnergyJadeProvider.INSTANCE, MetaMachineBlockEntity.class);
+        registration.registerBlockDataProvider(AdaptiveNetJadeProvider.INSTANCE, MetaMachineBlockEntity.class);
     }
 
     @Override
     public void registerClient(IWailaClientRegistration registration) {
         registration.registerBlockComponent(InfiniteEnergyJadeProvider.INSTANCE, MetaMachineBlock.class);
+        registration.registerBlockComponent(AdaptiveNetJadeProvider.INSTANCE, MetaMachineBlock.class);
     }
 }

@@ -29,7 +29,7 @@ import java.util.Arrays;
 
 /** Registers the sixty-four-boiler array with high-pressure and solar boiler support. */
 public final class AdvancedSteamArrayRegistration {
-    public static final ResourceLocation MACHINE_ID = new ResourceLocation("gtocore", "advanced_steam_array");
+    public static final ResourceLocation MACHINE_ID = ResourceLocation.fromNamespaceAndPath("gtocore", "advanced_steam_array");
     public static final int STORAGE_LIMIT = 64;
 
     private static MultiblockMachineDefinition definition;

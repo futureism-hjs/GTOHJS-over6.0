@@ -29,7 +29,7 @@ public final class OneStopRareEarthProcessingPlantRegistration {
     }
 
     public static final ResourceLocation MACHINE_ID =
-            new ResourceLocation("gtocore", "one_stop_rare_earth_processing_plant");
+            ResourceLocation.fromNamespaceAndPath("gtocore", "one_stop_rare_earth_processing_plant");
 
     private static volatile State state = State.NOT_STARTED;
     private static volatile MultiblockMachineDefinition definition;

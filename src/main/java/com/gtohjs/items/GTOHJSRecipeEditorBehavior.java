@@ -89,9 +89,9 @@ public final class GTOHJSRecipeEditorBehavior implements IItemUIFactory {
     private static final int MIDDLE_MOUSE_BUTTON = 2;
     private static final int MAX_ITEM_AMOUNT = Byte.MAX_VALUE;
     private static final ResourceLocation CRAFTING_TABLE_ID =
-            new ResourceLocation("minecraft", "crafting_table");
+            ResourceLocation.fromNamespaceAndPath("minecraft", "crafting_table");
     private static final ResourceLocation CRAFTING_RECIPE_TYPE_ID =
-            new ResourceLocation("minecraft", "crafting");
+            ResourceLocation.fromNamespaceAndPath("minecraft", "crafting");
 
     private final Map<UUID, EditorSession> sessions = new ConcurrentHashMap<>();
 

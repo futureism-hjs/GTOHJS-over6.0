@@ -22,17 +22,17 @@ public final class ThermalAndIntakeHatchRegistration {
     public enum State { NOT_STARTED, REGISTERING, REGISTERED, FAILED }
 
     public static final ResourceLocation THERMAL_ID =
-            new ResourceLocation("gtocore", "electromagnetic_thermal_control_hatch");
+            ResourceLocation.fromNamespaceAndPath("gtocore", "electromagnetic_thermal_control_hatch");
     public static final ResourceLocation THERMAL_MACHINE_ID =
-            new ResourceLocation("gtocore", "electromagnetic_thermal_control_machine");
+            ResourceLocation.fromNamespaceAndPath("gtocore", "electromagnetic_thermal_control_machine");
     public static final ResourceLocation INTAKE_ID =
-            new ResourceLocation("gtocore", "advanced_infinite_intake_hatch");
+            ResourceLocation.fromNamespaceAndPath("gtocore", "advanced_infinite_intake_hatch");
     public static final ResourceLocation ULTIMATE_INTAKE_ID =
-            new ResourceLocation("gtocore", "ultimate_infinite_intake_hatch");
+            ResourceLocation.fromNamespaceAndPath("gtocore", "ultimate_infinite_intake_hatch");
     private static final ResourceLocation THERMAL_OVERLAY =
             GTOHJS.id("block/machines/electromagnetic_thermal_control_hatch");
     private static final ResourceLocation INTAKE_OVERLAY =
-            new ResourceLocation("gtocore", "block/machine/part/intake_hatch");
+            ResourceLocation.fromNamespaceAndPath("gtocore", "block/machine/part/intake_hatch");
 
     private static volatile State state = State.NOT_STARTED;
     private static volatile MachineDefinition thermalDefinition;

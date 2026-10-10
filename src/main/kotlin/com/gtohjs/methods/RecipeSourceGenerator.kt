@@ -74,7 +74,7 @@ import net.minecraftforge.fluids.FluidStack;
 
 /** Generated GT data; save() executes only in the trusted original GTO lifecycle. */
 public final class $name implements GTRecipeSource {
-    private static final ResourceLocation RAW_ID = new ResourceLocation("gtohjs", "${escapeJava(recipeId)}");
+    private static final ResourceLocation RAW_ID = ResourceLocation.fromNamespaceAndPath("gtohjs", "${escapeJava(recipeId)}");
     private RecipeBuilder configuredBuilder;
     private GTRecipeDefinition accepted;
     private int normalizedDuration;
@@ -147,7 +147,7 @@ import net.minecraft.world.item.ItemStack;
 
 /** Generated shaped data; compiled providers are discovered after rebuilding. */
 public final class $name implements CraftingRecipeSource {
-    private static final ResourceLocation RAW_ID = new ResourceLocation("gtohjs", "${escapeJava(recipeId)}");
+    private static final ResourceLocation RAW_ID = ResourceLocation.fromNamespaceAndPath("gtohjs", "${escapeJava(recipeId)}");
     public $name() {}
     @Override public Collection<ResourceLocation> rawIds() { return List.of(RAW_ID); }
     @Override public void register() {
@@ -162,4 +162,3 @@ public final class $name implements CraftingRecipeSource {
 """.trimStart()
     }
 }
-

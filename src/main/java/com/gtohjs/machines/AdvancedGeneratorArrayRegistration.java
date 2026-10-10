@@ -33,7 +33,7 @@ public final class AdvancedGeneratorArrayRegistration {
     }
 
     public static final ResourceLocation MACHINE_ID =
-            new ResourceLocation("gtocore", "advanced_generator_array");
+            ResourceLocation.fromNamespaceAndPath("gtocore", "advanced_generator_array");
 
     private static volatile State state = State.NOT_STARTED;
     private static volatile MultiblockMachineDefinition definition;

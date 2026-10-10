@@ -19,7 +19,7 @@ public final class PatternBufferPlacementMethods {
             "gtocore:me_super_wildcard_pattern_buffer"
     };
     private static final ResourceLocation OPTIONAL_SIMPLE =
-            new ResourceLocation("gtocore", "me_simple_pattern_buffer");
+            ResourceLocation.fromNamespaceAndPath("gtocore", "me_simple_pattern_buffer");
 
     private PatternBufferPlacementMethods() {}
 
@@ -27,7 +27,7 @@ public final class PatternBufferPlacementMethods {
     public static TraceabilityPredicate patternBuffersOnly() {
         List<Block> blocks = new ArrayList<>();
         for (String id : REQUIRED) {
-            blocks.add(requiredBlock(new ResourceLocation(id)));
+            blocks.add(requiredBlock(ResourceLocation.parse(id)));
         }
         var simple = GTRegistries.MACHINES.get(OPTIONAL_SIMPLE);
         if (simple != null) blocks.add(simple.get());
@@ -42,6 +42,6 @@ public final class PatternBufferPlacementMethods {
     }
 
     public static void verifyLoaded() {
-        for (String id : REQUIRED) requiredBlock(new ResourceLocation(id));
+        for (String id : REQUIRED) requiredBlock(ResourceLocation.parse(id));
     }
 }

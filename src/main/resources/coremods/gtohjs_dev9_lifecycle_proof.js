@@ -578,6 +578,61 @@ function dev11WirelessUnitBridge(clazz) {
     }
     requireOne(count,'MultiBlockG wireless unit predicate');
     anchor.owner='com/gtohjs/methods/InfiniteWirelessEnergyPredicate';
+    var towerMethod=null;
+    for(var m2=0;m2<clazz.methods.size();m2++) {
+        var current=clazz.methods.get(m2), currentNodes=current.instructions.toArray();
+        for(var j2=0;j2<currentNodes.length;j2++) if(currentNodes[j2]===anchor) towerMethod=current;
+    }
+    if(towerMethod===null) throw new Error('MultiBlockG tower structure method missing');
+    var towerNodes=towerMethod.instructions.toArray(), casingCall=null,casingCount=0;
+    for(var t=0;t<towerNodes.length;t++) {
+        var call=towerNodes[t];
+        if(call.name!=='wherePart' || call.owner!=='com/gregtechceu/gtceu/api/machine/multiblockpro/Symbols') continue;
+        for(var back=t-1;back>=Math.max(0,t-12);back--) {
+            var prior=towerNodes[back];
+            if(prior.getOpcode()===Opcodes.BIPUSH && prior.operand===65) {casingCall=call;casingCount++;break;}
+        }
+    }
+    requireOne(casingCount,'wireless tower A casing predicate');
+    towerMethod.instructions.insertBefore(casingCall,ASMAPI.buildMethodCall('com/gtohjs/adaptivenet/AdaptiveNetStructurePredicate',
+        'towerCasing','(Lcom/gregtechceu/gtceu/api/pattern/TraceabilityPredicate;)Lcom/gregtechceu/gtceu/api/pattern/TraceabilityPredicate;',ASMAPI.MethodType.STATIC));
+    recordMarker(clazz,marker);return clazz;
+}
+function adaptiveEnergyPortBridge(clazz) {
+    var marker='gtohjs$adaptive$rate';requireMarkerAbsent(clazz,marker);
+    var allowed=uniqueMethod(clazz,'allowed','(JI)J'),nodes=allowed.instructions.toArray(),bucket=null,count=0;
+    for(var i=0;i<nodes.length;i++) if(nodes[i].getOpcode()===Opcodes.GETFIELD && nodes[i].name==='rateBucket') {bucket=nodes[i];count++;}
+    requireOne(count,'EnergyPort.allowed bucket');
+    var label=new LabelNode(),branch=new InsnList();
+    branch.add(new VarInsnNode(Opcodes.ALOAD,0));
+    branch.add(ASMAPI.buildMethodCall('com/gtohjs/adaptivenet/AdaptiveGridRatePolicy','bypass',
+        '(Lcom/gtocore/api/wireless/energy/EnergyPort;)Z',ASMAPI.MethodType.STATIC));
+    branch.add(new JumpInsnNode(Opcodes.IFEQ,label));
+    branch.add(new VarInsnNode(Opcodes.LLOAD,1));branch.add(new InsnNode(Opcodes.LRETURN));branch.add(label);
+    allowed.instructions.insertBefore(bucket.getPrevious(),branch);
+    var names=[['shortfall','(JJ)J'],['serveTick','()V']];
+    for(var n=0;n<names.length;n++) {
+        var method=uniqueMethod(clazz,names[n][0],names[n][1]),ins=method.instructions.toArray(),rate=null,rateCount=0;
+        for(var k=0;k<ins.length;k++) if(ins[k].getOpcode()===Opcodes.GETFIELD &&
+                ins[k].owner==='com/gtocore/api/wireless/energy/EnergyAccount' && ins[k].name==='rate' && ins[k].desc==='J') {rate=ins[k];rateCount++;}
+        requireOne(rateCount,'EnergyPort.'+names[n][0]+' rate');
+        var suffix=new InsnList();suffix.add(new VarInsnNode(Opcodes.ALOAD,0));
+        suffix.add(ASMAPI.buildMethodCall('com/gtohjs/adaptivenet/AdaptiveGridRatePolicy','effectiveRate',
+            '(JLcom/gtocore/api/wireless/energy/EnergyPort;)J',ASMAPI.MethodType.STATIC));
+        method.instructions.insert(rate,suffix);method.maxStack=Math.max(method.maxStack,4);
+    }
+    recordMarker(clazz,marker);return clazz;
+}
+function adaptiveNodeCardBridge(clazz) {
+    var marker='gtohjs$adaptive$nodeCard';requireMarkerAbsent(clazz,marker);
+    var method=uniqueMethod(clazz,'build','(Lcom/gregtechceu/gtceu/uipro/UIElement;Lcom/gtocore/common/wireless/energy/map/GridCardData;)V');
+    var nodes=method.instructions.toArray(),tail=null,count=0;
+    for(var i=0;i<nodes.length;i++) if(nodes[i].getOpcode()===Opcodes.RETURN) {tail=nodes[i];count++;}
+    requireOne(count,'GridNodeCard.build return');
+    var call=new InsnList();call.add(new VarInsnNode(Opcodes.ALOAD,0));call.add(new VarInsnNode(Opcodes.ALOAD,1));
+    call.add(ASMAPI.buildMethodCall('com/gtohjs/adaptivenet/AdaptiveNetMapPanel','append',
+        '(Lcom/gregtechceu/gtceu/uipro/UIElement;Ljava/lang/Object;)V',ASMAPI.MethodType.STATIC));
+    method.instructions.insertBefore(tail,call);method.maxStack=Math.max(method.maxStack,2);
     recordMarker(clazz,marker);return clazz;
 }
 function dev11MonitorStorageBridge(clazz) {
@@ -674,6 +729,8 @@ function dev11JadeBridge(clazz) {
 function initializeCoreMod() {
     ASMAPI.log('ERROR', '[GTOHJS/PROOF] CoreMod JS initialized');
     return {
+        'gtohjs_adaptive_rate': {'target':{'type':'CLASS','name':'com.gtocore.api.wireless.energy.EnergyPort'},'transformer':adaptiveEnergyPortBridge},
+        'gtohjs_adaptive_node_card': {'target':{'type':'CLASS','name':'com.gtocore.common.wireless.energy.map.GridNodeCard'},'transformer':adaptiveNodeCardBridge},
         'gtohjs_dev11_wireless_unit': {'target':{'type':'CLASS','name':'com.gtocore.common.data.machines.MultiBlockG'},'transformer':dev11WirelessUnitBridge},
         'gtohjs_dev11_monitor_storage': {'target':{'type':'CLASS','name':'com.gtocore.common.machine.monitor.MonitorEU'},'transformer':dev11MonitorStorageBridge},
         'gtohjs_dev11_summary_storage': {'target':{'type':'CLASS','name':'com.gtocore.common.wireless.energy.map.GridSummaryPanel'},'transformer':dev11SummaryStorageBridge},

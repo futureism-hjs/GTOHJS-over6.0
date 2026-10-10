@@ -33,7 +33,7 @@ public final class HyperdimensionalSmelterRegistration {
     public enum State { NOT_STARTED, REGISTERING, REGISTERED, FAILED }
 
     public static final ResourceLocation MACHINE_ID =
-            new ResourceLocation("gtocore", "hyperdimensional_smelter");
+            ResourceLocation.fromNamespaceAndPath("gtocore", "hyperdimensional_smelter");
     private static final GTRecipeType[] EXPECTED_RECIPE_TYPES = {
             GTORecipeTypes.BLAST_RECIPES,
             GTORecipeTypes.ALLOY_BLAST_RECIPES

@@ -19,9 +19,9 @@ public final class PlatinumGroupSludgeRecipeRegistration {
         FAILED
     }
 
-    private static final ResourceLocation DUMMY_RECIPE_ID = new ResourceLocation("gtceu", "default");
+    private static final ResourceLocation DUMMY_RECIPE_ID = ResourceLocation.fromNamespaceAndPath("gtceu", "default");
     private static final ResourceLocation RECIPE_ID =
-            new ResourceLocation("gtohjs", "electrolyzer/platinum_group_sludge_electrolysis");
+            ResourceLocation.fromNamespaceAndPath("gtohjs", "electrolyzer/platinum_group_sludge_electrolysis");
     private static final Map<ResourceLocation, Integer> EXPECTED_INPUTS = Map.of(
             id("platinum_group_sludge_dust"), 36);
     private static final Map<ResourceLocation, Integer> EXPECTED_OUTPUTS = Map.of(
@@ -116,7 +116,7 @@ public final class PlatinumGroupSludgeRecipeRegistration {
     }
 
     private static ResourceLocation id(String path) {
-        return new ResourceLocation("gtceu", path);
+        return ResourceLocation.fromNamespaceAndPath("gtceu", path);
     }
 
     public static State state() {

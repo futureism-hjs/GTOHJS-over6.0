@@ -448,7 +448,7 @@ public final class MultiblockStructureGeneratorBehavior implements IItemUIFactor
         }
         try {
             StructureDraftWriter.DraftIdentity identity = StructureDraftWriter.createIdentity(
-                    new ResourceLocation("gtocore", "universal_steam_factory"));
+                    ResourceLocation.fromNamespaceAndPath("gtocore", "universal_steam_factory"));
             String source = buildSource(snapshot, identity.className());
             java.nio.file.Path output = StructureDraftWriter.write(
                     identity,
