@@ -3,6 +3,7 @@ package com.gtohjs.adaptivenet;
 import com.gregtechceu.gtceu.api.item.component.IAddInformation;
 import com.gregtechceu.gtceu.api.item.component.IInteractionItem;
 import com.gregtechceu.gtceu.api.machine.MetaMachine;
+import com.gtohjs.methods.AdaptiveNetLanguage;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -31,22 +32,22 @@ public final class NetDataStickBehavior implements IInteractionItem, IAddInforma
         MetaMachine machine = MetaMachine.getMachine(level, context.getClickedPos());
         if (machine instanceof AdaptiveNetTerminalPartMachine terminal && !player.isShiftKeyDown()) {
             if (!terminal.canConfigure(player)) {
-                player.displayClientMessage(Component.translatable("gtocore.adaptive_net.permission_denied"), true);
+                player.displayClientMessage(AdaptiveNetLanguage.component("gtocore.adaptive_net.permission_denied"), true);
                 return InteractionResult.FAIL;
             }
             long frequency = terminal.frequency();
             if (frequency <= 0) {
-                player.displayClientMessage(Component.translatable("gtocore.adaptive_net.no_frequency"), true);
+                player.displayClientMessage(AdaptiveNetLanguage.component("gtocore.adaptive_net.no_frequency"), true);
                 return InteractionResult.FAIL;
             }
             stack.getOrCreateTag().putLong(FREQUENCY, frequency);
-            player.displayClientMessage(Component.translatable("gtocore.adaptive_net.frequency_copied", frequency), true);
+            player.displayClientMessage(AdaptiveNetLanguage.component("gtocore.adaptive_net.frequency_copied", frequency), true);
             return InteractionResult.CONSUME;
         }
         if (machine instanceof AdaptiveNetHatchPartMachine hatch && player.isShiftKeyDown()) {
             long frequency = stack.getOrCreateTag().getLong(FREQUENCY);
             hatch.setFrequency(player, frequency);
-            player.displayClientMessage(Component.translatable("gtocore.adaptive_net.frequency", hatch.frequency()), true);
+            player.displayClientMessage(AdaptiveNetLanguage.component("gtocore.adaptive_net.frequency", hatch.frequency()), true);
             return InteractionResult.CONSUME;
         }
         return InteractionResult.PASS;
@@ -57,7 +58,7 @@ public final class NetDataStickBehavior implements IInteractionItem, IAddInforma
         if (player.isShiftKeyDown()) {
             if (!level.isClientSide) {
                 stack.getOrCreateTag().remove(FREQUENCY);
-                player.displayClientMessage(Component.translatable("gtocore.adaptive_net.frequency_cleared"), true);
+                player.displayClientMessage(AdaptiveNetLanguage.component("gtocore.adaptive_net.frequency_cleared"), true);
             }
             return InteractionResultHolder.sidedSuccess(stack, level.isClientSide);
         }
@@ -65,6 +66,6 @@ public final class NetDataStickBehavior implements IInteractionItem, IAddInforma
     }
 
     @Override public void appendTooltips(ItemStack stack, @Nullable Level level, List<Component> lines, TooltipFlag flag) {
-        lines.add(Component.translatable("gtocore.adaptive_net.frequency", stack.getOrCreateTag().getLong(FREQUENCY)));
+        lines.add(AdaptiveNetLanguage.component("gtocore.adaptive_net.frequency", stack.getOrCreateTag().getLong(FREQUENCY)));
     }
 }

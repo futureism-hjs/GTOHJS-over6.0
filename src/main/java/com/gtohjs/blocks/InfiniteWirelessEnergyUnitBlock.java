@@ -4,6 +4,7 @@ import com.gtocore.common.block.WirelessEnergyUnitBlock;
 import com.gtocore.common.data.machines.MultiBlockG;
 import com.gregtechceu.gtceu.api.GTValues;
 import com.gtohjs.methods.InfiniteEnergyPresentation;
+import com.gtohjs.methods.InfiniteWirelessEnergyMethods;
 import java.math.BigInteger;
 import java.util.List;
 import net.minecraft.ChatFormatting;
@@ -15,20 +16,20 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public final class InfiniteWirelessEnergyUnitBlock extends WirelessEnergyUnitBlock {
-    public static final BigInteger CAPACITY = BigInteger.ONE.shiftLeft(126).subtract(BigInteger.ONE);
+    public static final BigInteger CAPACITY = InfiniteWirelessEnergyMethods.CAPACITY;
 
     public InfiniteWirelessEnergyUnitBlock(Properties properties) {
-        super(properties, GTValues.MAX);
+        super(properties, InfiniteWirelessEnergyMethods.tier());
     }
 
     @Override
     public BigInteger getCapacity() {
-        return CAPACITY;
+        return InfiniteWirelessEnergyMethods.capacity();
     }
 
     @Override
     public int getLoss() {
-        return 0;
+        return InfiniteWirelessEnergyMethods.loss();
     }
 
     @Override

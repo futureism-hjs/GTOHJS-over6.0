@@ -19,7 +19,7 @@ public final class InfiniteWirelessEnergyPredicate {
     private InfiniteWirelessEnergyPredicate() {}
 
     public static boolean countsAtCasingTier(WirelessEnergyUnitBlock block, int casingTier) {
-        return block instanceof InfiniteWirelessEnergyUnitBlock || block.getTier() <= casingTier;
+        return InfiniteWirelessEnergyMethods.isInfiniteUnit(block) || block.getTier() <= casingTier;
     }
 
     public static boolean allUnitsEligible(WirelessEnergySubstationMachine machine,
@@ -29,7 +29,7 @@ public final class InfiniteWirelessEnergyPredicate {
         var level = machine.getLevel();
         if (level == null || positions.get(unitTier).isEmpty()) return false;
         for (BlockPos pos : positions.get(unitTier)) {
-            if (!(level.getBlockState(pos).getBlock() instanceof InfiniteWirelessEnergyUnitBlock)) return false;
+            if (!InfiniteWirelessEnergyMethods.isInfiniteUnit(level.getBlockState(pos).getBlock())) return false;
         }
         return true;
     }

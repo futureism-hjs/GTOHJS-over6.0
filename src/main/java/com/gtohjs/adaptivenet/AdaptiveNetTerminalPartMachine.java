@@ -16,8 +16,9 @@ import com.gregtechceu.gtceu.uipro.elements.NumberField;
 import com.gregtechceu.gtceu.uipro.elements.IconToggle;
 import com.gregtechceu.gtceu.uipro.data.SyncValue;
 import com.gregtechceu.gtceu.uiwidgets.icon.WidgetIcons;
-import com.gtocore.api.wireless.energy.WirelessGrid;
 import com.gtohjs.client.renderer.AdaptiveNetFrequencyIcon;
+import com.gtohjs.methods.AdaptiveNetMethods;
+import com.gtohjs.methods.AdaptiveNetLanguage;
 import com.gregtechceu.gtceu.uiwidgets.display.MachineDisplay;
 import com.gtocore.common.machine.multiblock.storage.WirelessEnergySubstationMachine;
 import com.gto.datasynclib.annotations.SaveToDisk;
@@ -140,7 +141,7 @@ public final class AdaptiveNetTerminalPartMachine extends MultiblockPartMachine 
         if (position == null) return false;
         if (!FrequencyRegistry.get(level.getServer()).rebind(frequency, next,
                 new FrequencyRegistry.Entry(position, towerOwner()))) {
-            if (player != null) player.displayClientMessage(Component.translatable("gtocore.adaptive_net.frequency_taken"), true);
+            if (player != null) player.displayClientMessage(AdaptiveNetLanguage.component("gtocore.adaptive_net.frequency_taken"), true);
             return false;
         }
         frequency = next;
@@ -176,7 +177,7 @@ public final class AdaptiveNetTerminalPartMachine extends MultiblockPartMachine 
         AEItemKey key = inventory.storage.keyAt(0);
         long count = inventory.storage.amountAt(0);
         if (key == null || count <= 0) return new Power(0, 0, 0, 0);
-        var spec = AdaptiveTemplateRegistry.of(key.toStack(), family);
+        var spec = AdaptiveNetMethods.templateSpec(key.toStack(), family);
         if (spec == null) return new Power(0, 0, 0, 0);
         long amps = Math.multiplyExact(spec.amperage(), count);
         return new Power(spec.tier(), spec.voltage(), amps, Math.multiplyExact(spec.voltage(), amps));
@@ -187,14 +188,15 @@ public final class AdaptiveNetTerminalPartMachine extends MultiblockPartMachine 
     }
 
     private void display(List<Component> lines) {
-        lines.add(Component.translatable("gtocore.adaptive_net.frequency", frequency));
-        lines.add(Component.translatable(tower() == null ? "gtocore.adaptive_net.no_tower" : "gtocore.adaptive_net.connected"));
-        UUID owner = towerOwner();
-        lines.add(Component.translatable("gtocore.adaptive_net.tower_rate", WirelessGrid.accountIfPresent(owner).rate()));
+        var status = AdaptiveNetMethods.terminalParameters(this);
+        lines.add(AdaptiveNetLanguage.component("gtocore.adaptive_net.frequency", status.frequency()));
+        lines.add(AdaptiveNetLanguage.component(status.towerOnline() ?
+                "gtocore.adaptive_net.connected" : "gtocore.adaptive_net.no_tower"));
+        lines.add(AdaptiveNetLanguage.component("gtocore.adaptive_net.tower_rate", status.accountRate()));
         for (var family : AdaptiveTemplateRegistry.Family.values()) {
-            var spec = power(family);
-            lines.add(Component.translatable("gtocore.adaptive_net.template_power",
-                    Component.translatable("gtocore.adaptive_net.family." + family.name().toLowerCase(java.util.Locale.ROOT)),
+            var spec = status.power(family);
+            lines.add(AdaptiveNetLanguage.component("gtocore.adaptive_net.template_power",
+                    AdaptiveNetLanguage.component("gtocore.adaptive_net.family." + family.name().toLowerCase(java.util.Locale.ROOT)),
                     spec.amperage(), spec.euPerTick()));
         }
     }

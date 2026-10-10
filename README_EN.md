@@ -2,7 +2,7 @@
 
 [中文](README.md) | English
 
-Current development version: `gtohjs-dev1-for-gtocore-0.6.0-dev11-fix8.jar`
+Current development version: `gtohjs-dev1-for-gtocore-0.6.0-dev11-fix9.jar`
 
 - [Changelog](CHANGELOG.md)
 - [Local build dependencies](libs/README.md)
@@ -200,6 +200,11 @@ Shared methods belong in `com.gtohjs.methods`; concrete machine definitions
 belong in `com.gtohjs.machines`; concrete recipe data belongs in
 `com.gtohjs.recipes`. Keep native GTO builder data, including `.where`, visible
 in concrete definitions. Reuse existing GTO parameter and registration methods.
+
+Fix9 exposes read-only wireless-grid account, infinite-unit and adaptive-net
+terminal/hatch parameters through `WirelessGridMethods`,
+`InfiniteWirelessEnergyMethods` and `AdaptiveNetMethods`. The adaptive client
+language overlay now resolves the terminal's status keys in English and Chinese.
 
 Fix4 uses Kotlin for corresponding tooltip, UI/render and general helper
 responsibilities while retaining Java machine runtime, Java recipe data and

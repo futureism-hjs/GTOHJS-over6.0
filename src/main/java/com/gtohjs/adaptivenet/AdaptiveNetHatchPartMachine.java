@@ -14,6 +14,8 @@ import com.gregtechceu.gtceu.uipro.elements.NumberField;
 import com.gregtechceu.gtceu.uiwidgets.display.MachineDisplay;
 import com.gtocore.api.wireless.energy.EnergyPort;
 import com.gtocore.api.wireless.energy.PortKind;
+import com.gtohjs.methods.AdaptiveNetMethods;
+import com.gtohjs.methods.AdaptiveNetLanguage;
 import com.gto.datasynclib.annotations.SaveToDisk;
 import com.gto.datasynclib.annotations.SyncToClient;
 import com.hepdd.gtmthings.utils.TeamUtil;
@@ -61,6 +63,10 @@ public final class AdaptiveNetHatchPartMachine extends WorkableTieredIOPartMachi
     public long frequency() { return frequency; }
     public boolean connected() { return connected; }
     public AdaptiveTemplateRegistry.Family family() { return family; }
+    public AdaptiveNetTerminalPartMachine.Power appliedPower() { return applied; }
+    public long bufferedEnergy() { return container.getEnergyStored(); }
+    public long bufferCapacity() { return container.getEnergyCapacity(); }
+    public int priority() { return priority; }
 
     @Override public boolean shouldOpenUI(Player player, InteractionHand hand, BlockHitResult hit) {
         return placedOwner == null || placedOwner.equals(player.getUUID()) || sameTeam(player.getUUID());
@@ -125,7 +131,7 @@ public final class AdaptiveNetHatchPartMachine extends WorkableTieredIOPartMachi
 
     private void tickNetwork() {
         if (!(getLevel() instanceof ServerLevel level)) return;
-        var terminal = FrequencyRegistry.get(level.getServer()).active(frequency, level.getServer());
+        var terminal = AdaptiveNetMethods.activeTerminal(level.getServer(), frequency);
         if (terminal == null || !sameTeam(terminal.towerOwner())) { disconnect(); return; }
         UUID owner = terminal.towerOwner();
         if (owner == null) { disconnect(); return; }
@@ -198,10 +204,12 @@ public final class AdaptiveNetHatchPartMachine extends WorkableTieredIOPartMachi
 
     @Override public Widget createUIWidget() {
         UIElement page = MachineDisplay.page(this, lines -> {
-            lines.add(Component.translatable("gtocore.adaptive_net.frequency", frequency));
-            lines.add(Component.translatable(connected ? "gtocore.adaptive_net.connected" : "gtocore.adaptive_net.disconnected"));
-            lines.add(Component.translatable("gtocore.adaptive_net.capacity", container.getEnergyCapacity()));
-            lines.add(Component.translatable("gtocore.adaptive_net.throughput", applied.euPerTick()));
+            var status = AdaptiveNetMethods.hatchParameters(this);
+            lines.add(AdaptiveNetLanguage.component("gtocore.adaptive_net.frequency", status.frequency()));
+            lines.add(AdaptiveNetLanguage.component(status.connected() ?
+                    "gtocore.adaptive_net.connected" : "gtocore.adaptive_net.disconnected"));
+            lines.add(AdaptiveNetLanguage.component("gtocore.adaptive_net.capacity", status.capacity()));
+            lines.add(AdaptiveNetLanguage.component("gtocore.adaptive_net.throughput", status.power().euPerTick()));
         });
         page.addChild(NumberField.ofLong(LayoutStyle.AUTO, this::frequency, this::changeFrequency, 0, Long.MAX_VALUE));
         page.addChild(NumberField.ofInt(LayoutStyle.AUTO, () -> priority, this::setPriority, 0, 4));

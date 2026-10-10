@@ -4,7 +4,6 @@ import com.gtocore.api.wireless.energy.EnergyAccount;
 import com.gtocore.api.wireless.energy.GridView;
 import com.gtocore.common.wireless.energy.GridReadouts;
 import com.gregtechceu.gtceu.uiwidgets.multiblock.MultiblockPage;
-import com.gtohjs.blocks.InfiniteWirelessEnergyUnitBlock;
 import com.gtolib.utils.StringUtils;
 import com.hepdd.gtmthings.utils.FormatUtil;
 import java.math.BigInteger;
@@ -16,12 +15,12 @@ import java.util.function.Supplier;
 public final class InfiniteEnergyPresentation {
     private static final String STORED_KEY = "gtohjs.wireless_energy.stored_infinite";
     private static final String MONITOR_VALUE_KEY = "gtohjs.wireless_energy.monitor_value";
-    private static final double INFINITE_DOUBLE = InfiniteWirelessEnergyUnitBlock.CAPACITY.doubleValue();
+    private static final double INFINITE_DOUBLE = InfiniteWirelessEnergyMethods.capacity().doubleValue();
 
     private InfiniteEnergyPresentation() {}
 
     public static boolean isInfinite(BigInteger capacity) {
-        return capacity.compareTo(InfiniteWirelessEnergyUnitBlock.CAPACITY) >= 0;
+        return InfiniteWirelessEnergyMethods.isInfiniteCapacity(capacity);
     }
 
     public static boolean isInfiniteSummary(GridView.Summary summary) {

@@ -1,5 +1,12 @@
 # GTO HJS Changelog
 
+## dev1-for-gtocore-0.6.0-dev11-fix9 - 2026-10-10 (development)
+
+- Inject the adaptive-net locale entries through the established Kotlin client
+  language overlay and provide a readable fallback for its status components.
+- Expose reusable read-only methods for infinite wireless energy unit
+  parameters, native grid account data, and adaptive terminal/hatch state.
+
 ## dev1-for-gtocore-0.6.0-dev11-fix8 - 2026-10-09 (development)
 
 - Add the adaptive wireless grid's four hatches, tower-only terminal, portable

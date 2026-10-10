@@ -4,6 +4,8 @@ import com.gregtechceu.gtceu.uipro.LayoutStyle;
 import com.gregtechceu.gtceu.uipro.UIElement;
 import com.gregtechceu.gtceu.uipro.elements.StatusPanel;
 import com.gtocore.common.wireless.energy.map.GridMapContext;
+import com.gtohjs.methods.AdaptiveNetLanguage;
+import com.gtohjs.methods.AdaptiveNetMethods;
 import com.hepdd.gtmthings.utils.TeamUtil;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
@@ -35,14 +37,14 @@ public final class AdaptiveNetMapPanel {
             resolve.setAccessible(true);
             resolve.invoke(card);
             if (!(contextField.get(card) instanceof GridMapContext ctx) ||
-                    !(ctx.player() instanceof ServerPlayer player)) return Component.translatable("gtocore.adaptive_net.map", "-");
+                    !(ctx.player() instanceof ServerPlayer player)) return AdaptiveNetLanguage.component("gtocore.adaptive_net.map", "-");
             @SuppressWarnings("unchecked")
             ResourceKey<Level> dimension = (ResourceKey<Level>) dimensionField.get(card);
-            if (dimension == null) return Component.translatable("gtocore.adaptive_net.map", "-");
+            if (dimension == null) return AdaptiveNetLanguage.component("gtocore.adaptive_net.map", "-");
             var team = TeamUtil.getTeamUUID(player.getUUID());
             if (team == null) team = player.getUUID();
-            List<Long> frequencies = FrequencyRegistry.get(player.getServer()).frequenciesOf(team, dimension);
-            return Component.translatable("gtocore.adaptive_net.map", frequencies.isEmpty() ? "-" :
+            List<Long> frequencies = AdaptiveNetMethods.frequenciesOf(player.getServer(), team, dimension);
+            return AdaptiveNetLanguage.component("gtocore.adaptive_net.map", frequencies.isEmpty() ? "-" :
                     String.join(", ", frequencies.stream().map(String::valueOf).toList()));
         } catch (ReflectiveOperationException | ClassCastException error) {
             throw new IllegalStateException("Adaptive network node card ABI changed", error);
