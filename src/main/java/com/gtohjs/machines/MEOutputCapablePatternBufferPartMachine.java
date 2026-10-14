@@ -151,12 +151,9 @@ public abstract class MEOutputCapablePatternBufferPartMachine extends MEPatternB
         if (key == null || amount < 1) {
             return;
         }
-        overflow.lock.lock();
-        try {
+        synchronized (overflow) {
             overflow.storage.insert(key, amount);
             overflow.onChanged();
-        } finally {
-            overflow.lock.unlock();
         }
         // KeyStorage tracks its own sync state, but the block entity must also
         // be marked dirty so pending output is written to the world save.
@@ -178,8 +175,7 @@ public abstract class MEOutputCapablePatternBufferPartMachine extends MEPatternB
 
     private void gtohjsFlushStorage(IGrid grid, KeyStorage storage) {
         boolean changed = false;
-        storage.lock.lock();
-        try {
+        synchronized (storage) {
             for (var iterator = storage.iterator(); iterator.hasNext();) {
                 var entry = iterator.next();
                 AEKey key = entry.getKey();
@@ -207,8 +203,6 @@ public abstract class MEOutputCapablePatternBufferPartMachine extends MEPatternB
             if (changed) {
                 storage.onChanged();
             }
-        } finally {
-            storage.lock.unlock();
         }
         if (changed) {
             onChanged();
@@ -238,8 +232,7 @@ public abstract class MEOutputCapablePatternBufferPartMachine extends MEPatternB
 
     private static ListTag gtohjsWriteStorage(KeyStorage storage) {
         ListTag result = new ListTag();
-        storage.lock.lock();
-        try {
+        synchronized (storage) {
             for (var entry : storage) {
                 if (entry.getKey() == null || entry.getLongValue() < 1) {
                     continue;
@@ -249,15 +242,12 @@ public abstract class MEOutputCapablePatternBufferPartMachine extends MEPatternB
                 value.putLong("amount", entry.getLongValue());
                 result.add(value);
             }
-        } finally {
-            storage.lock.unlock();
         }
         return result;
     }
 
     private static void gtohjsReadStorage(ListTag values, KeyStorage storage, Class<? extends AEKey> keyType) {
-        storage.lock.lock();
-        try {
+        synchronized (storage) {
             storage.storage.clear();
             for (Tag value : values) {
                 if (!(value instanceof CompoundTag entry)) {
@@ -270,8 +260,6 @@ public abstract class MEOutputCapablePatternBufferPartMachine extends MEPatternB
                 }
             }
             storage.onChanged();
-        } finally {
-            storage.lock.unlock();
         }
     }
 

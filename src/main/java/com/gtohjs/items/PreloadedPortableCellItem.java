@@ -4,7 +4,7 @@ import com.gtohjs.methods.StructureDraftWriter;
 
 import appeng.api.stacks.AEItemKey;
 import appeng.api.stacks.AEKey;
-import appeng.api.stacks.AEKeyMap;
+import appeng.api.stacks.AEKeyLongMap;
 import appeng.api.stacks.AEKeyType;
 import appeng.api.storage.StorageCells;
 import appeng.api.storage.cells.StorageCell;
@@ -201,7 +201,7 @@ public final class PreloadedPortableCellItem extends PortableCellItem {
                 return false;
             }
 
-            AEKeyMap<AEKey> map = new AEKeyMap<>(contentIds.size());
+            AEKeyLongMap<AEKey> map = new AEKeyLongMap<>(contentIds.size());
             double totalBytes = 0.0d;
             int amountPerByte = AEKeyType.items().getAmountPerByte();
             for (Item item : items) {
@@ -290,8 +290,8 @@ public final class PreloadedPortableCellItem extends PortableCellItem {
                 return false;
             }
 
-            AEKeyMap<AEKey> originalMap = new AEKeyMap<>(storage.getStoredMap());
-            AEKeyMap<AEKey> mergedMap = new AEKeyMap<>(originalMap);
+            AEKeyLongMap<AEKey> originalMap = new AEKeyLongMap<>(storage.getStoredMap());
+            AEKeyLongMap<AEKey> mergedMap = new AEKeyLongMap<>(originalMap);
             double originalBytes = storage.getBytes();
             long originalSummaryBytes = tag.getLong(USED_BYTES);
             int originalSummaryTypes = tag.getInt(USED_TYPES);
@@ -337,7 +337,7 @@ public final class PreloadedPortableCellItem extends PortableCellItem {
                             "GTO did not recalculate the migrated byte/type summary");
                 }
 
-                AEKeyMap<AEKey> authoritativeMap = storage.getStoredMap();
+                AEKeyLongMap<AEKey> authoritativeMap = storage.getStoredMap();
                 if (authoritativeMap == null || authoritativeMap.size() != mergedMap.size()) {
                     throw new IllegalStateException("The authoritative migrated key set changed");
                 }
@@ -398,7 +398,7 @@ public final class PreloadedPortableCellItem extends PortableCellItem {
         }
     }
 
-    private double calculateStoredBytes(AEKeyMap<AEKey> map) {
+    private double calculateStoredBytes(AEKeyLongMap<AEKey> map) {
         double totalBytes = 0.0d;
         int amountPerByte = AEKeyType.items().getAmountPerByte();
         for (AEKey key : map.keySet()) {
@@ -407,7 +407,7 @@ public final class PreloadedPortableCellItem extends PortableCellItem {
         return totalBytes;
     }
 
-    private void restoreMigratedStorage(CellDataStorage storage, AEKeyMap<AEKey> originalMap,
+    private void restoreMigratedStorage(CellDataStorage storage, AEKeyLongMap<AEKey> originalMap,
                                         double originalBytes, CompoundTag tag,
                                         int originalSummaryTypes, long originalSummaryBytes) {
         storage.setStoredMap(originalMap);

@@ -63,7 +63,7 @@ public final class HyperdimensionalSteamFurnaceRegistration {
                     .nonYAxisRotation()
                     .recipeTypes(EXPECTED_RECIPE_TYPES)
                     .steamOverclock(0)
-                    .tooltips(HyperdimensionalTooltips.introduction())
+                    .tips(HyperdimensionalTooltips.introduction())
                     .multipleRecipesTooltips()
                     .block(() -> HyperdimensionalPatternResources.block("gtceu:bronze_machine_casing"))
                     
@@ -96,9 +96,9 @@ public final class HyperdimensionalSteamFurnaceRegistration {
                             .where(' ', Predicates.any())
                             )
                             .build())
-                    .workableCasingRenderer(
+                    .renderer(() -> new com.gtohjs.client.renderer.ReliableWorkableCasingRenderer(
                             GTCEu.id("block/casings/solid/machine_casing_bronze_plated_bricks"),
-                            GTCEu.id("block/multiblock/steam_oven"))
+                            GTCEu.id("block/multiblock/steam_oven")))
                     .renderMultiblockXEIPreview(true)
                     .register();
 

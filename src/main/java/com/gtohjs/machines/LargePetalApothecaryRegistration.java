@@ -96,11 +96,15 @@ public final class LargePetalApothecaryRegistration {
                                 .where(' ', Predicates.air())
                                 )
                             .build())
-                        .workableCasingRenderer(
+                        .renderer(() -> new com.gtohjs.client.renderer.ReliableWorkableCasingRenderer(
                                 RLUtils.bot("block/livingrock"),
-                                GTCEu.id("block/multiblock/gcym/large_centrifuge"))
+                                GTCEu.id("block/multiblock/gcym/large_centrifuge")))
                         .renderMultiblockXEIPreview(true)
                     .register();
+            }
+
+            if (LargePetalApothecaryRecipeTypeRegistration.definition().getIconSupplier() == null) {
+                LargePetalApothecaryRecipeTypeRegistration.definition().setIconSupplier(definition::asStack);
             }
 
             if (GTRegistries.MACHINES.get(MACHINE_ID) != definition) {

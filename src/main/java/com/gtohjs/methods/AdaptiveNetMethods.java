@@ -19,7 +19,6 @@ import java.util.UUID;
 /** Read-only adaptive-net parameters; reservation and active state are distinct. */
 public final class AdaptiveNetMethods {
     public record TerminalParameters(long frequency, boolean towerOnline, @Nullable UUID owner,
-                                     long accountRate,
                                      Map<AdaptiveTemplateRegistry.Family, AdaptiveNetTerminalPartMachine.Power> power) {
         public AdaptiveNetTerminalPartMachine.Power power(AdaptiveTemplateRegistry.Family family) {
             return power.get(family);
@@ -37,8 +36,7 @@ public final class AdaptiveNetMethods {
         UUID owner = tower == null ? null : tower.getOwnerUUID();
         var powers = new EnumMap<AdaptiveTemplateRegistry.Family, AdaptiveNetTerminalPartMachine.Power>(AdaptiveTemplateRegistry.Family.class);
         for (var family : AdaptiveTemplateRegistry.Family.values()) powers.put(family, terminal.power(family));
-        return new TerminalParameters(terminal.frequency(), tower != null, owner,
-                WirelessGridMethods.rate(owner), Map.copyOf(powers));
+        return new TerminalParameters(terminal.frequency(), tower != null, owner, Map.copyOf(powers));
     }
 
     public static HatchParameters hatchParameters(AdaptiveNetHatchPartMachine hatch) {

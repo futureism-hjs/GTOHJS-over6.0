@@ -12,6 +12,7 @@ import com.gregtechceu.gtceu.common.data.GTSoundEntries;
 import com.gtohjs.methods.LargePetalApothecaryRecipeType;
 import com.gtohjs.methods.ModLog;
 import com.gtolib.utils.register.RecipeTypeRegisterUtils;
+import com.gtolib.api.recipe.RecipeType;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
@@ -40,7 +41,8 @@ public final class LargePetalApothecaryRecipeTypeRegistration {
     public static final int FLUID_OUTPUTS = 0;
 
     private static volatile State state = State.NOT_STARTED;
-    private static volatile LargePetalApothecaryRecipeType definition;
+    private static volatile RecipeType definition;
+    private static volatile LargePetalApothecaryRecipeType proxyLogic;
 
     private LargePetalApothecaryRecipeTypeRegistration() {
     }
@@ -56,27 +58,28 @@ public final class LargePetalApothecaryRecipeTypeRegistration {
             net.minecraft.world.item.crafting.RecipeType<?> proxy = resolvePetalProxy();
             GTRecipeType existing = GTRegistries.RECIPE_TYPES.get(ID);
             if (existing != null) {
-                if (!(existing instanceof LargePetalApothecaryRecipeType recipeType)) {
+                if (!(existing instanceof RecipeType recipeType)) {
                     throw new IllegalStateException(
                             "Existing recipe type has the wrong class: " + ID + " -> " +
                                     existing.getClass().getName());
                 }
                 definition = recipeType;
             } else {
-                LargePetalApothecaryRecipeType created =
-                        new LargePetalApothecaryRecipeType(
-                                ID, RecipeTypeRegisterUtils.MAGIC, proxy);
+                RecipeType created = RecipeTypeRegisterUtils.register(
+                        PATH, RecipeTypeRegisterUtils.MAGIC);
                 created.setEUIO(IO.IN)
                         .setMaxIOSize(ITEM_INPUTS, ITEM_OUTPUTS,
                                 FLUID_INPUTS, FLUID_OUTPUTS)
                         .setProgressBar(GuiTextures.PROGRESS_BAR_BATH, LEFT_TO_RIGHT)
                         .setSound(GTSoundEntries.ARC);
 
-                GTRegistries.RECIPE_TYPES.register(ID, created);
                 definition = created;
             }
 
-            validate(definition, proxy);
+            proxyLogic = new LargePetalApothecaryRecipeType(definition, proxy);
+            definition.addCustomRecipeLogic(proxyLogic);
+
+            validate(definition, proxyLogic, proxy);
             state = State.REGISTERED;
             ModLog.info("Registered recipe type {}; proxy={}; itemIO={}/{}; fluidIO={}/{}",
                     ID, BOTANIA_PROXY_ID, ITEM_INPUTS, ITEM_OUTPUTS,
@@ -84,6 +87,7 @@ public final class LargePetalApothecaryRecipeTypeRegistration {
         } catch (Throwable error) {
             state = State.FAILED;
             definition = null;
+            proxyLogic = null;
             ModLog.error("Large petal apothecary recipe type registration failed", error);
             if (error instanceof RuntimeException runtimeException) {
                 throw runtimeException;
@@ -98,19 +102,27 @@ public final class LargePetalApothecaryRecipeTypeRegistration {
             throw new IllegalStateException(
                     "Large petal apothecary recipe type was not registered; state=" + state);
         }
-        validate(definition, resolvePetalProxy());
+        validate(definition, proxyLogic, resolvePetalProxy());
     }
 
     public static synchronized int validateProxyRecipes(MinecraftServer server) {
         validateLoaded();
-        return definition.validateProxyRecipes(server);
+        return proxyLogic.validateProxyRecipes(server);
     }
 
-    public static LargePetalApothecaryRecipeType definition() {
-        LargePetalApothecaryRecipeType current = definition;
+    public static RecipeType definition() {
+        RecipeType current = definition;
         if (current == null) {
             throw new IllegalStateException(
                     "Large petal apothecary recipe type is not registered; state=" + state);
+        }
+        return current;
+    }
+
+    public static LargePetalApothecaryRecipeType proxyLogic() {
+        LargePetalApothecaryRecipeType current = proxyLogic;
+        if (current == null) {
+            throw new IllegalStateException("Large petal apothecary proxy logic is not registered; state=" + state);
         }
         return current;
     }
@@ -120,7 +132,8 @@ public final class LargePetalApothecaryRecipeTypeRegistration {
     }
 
     private static void validate(
-            LargePetalApothecaryRecipeType candidate,
+            RecipeType candidate,
+            LargePetalApothecaryRecipeType logic,
             net.minecraft.world.item.crafting.RecipeType<?> proxy) {
         if (candidate == null || !ID.equals(candidate.registryName)) {
             throw new IllegalStateException("Unexpected recipe type: " + candidate);
@@ -128,8 +141,9 @@ public final class LargePetalApothecaryRecipeTypeRegistration {
         if (!RecipeTypeRegisterUtils.MAGIC.equals(candidate.group)) {
             throw new IllegalStateException("Unexpected recipe group: " + candidate.group);
         }
-        if (candidate.proxyType() != proxy || candidate.getProxyRecipes().size() != 1 ||
-                !candidate.getProxyRecipes().contains(proxy)) {
+        if (logic == null || logic.proxyType() != proxy ||
+                !candidate.getProxyRecipes().isEmpty() ||
+                !candidate.getCustomRecipeLogicRunners().contains(logic)) {
             throw new IllegalStateException("Unexpected Botania proxy recipe type");
         }
         if (candidate.getMaxInputs(ItemRecipeInfo.INSTANCE) != ITEM_INPUTS ||

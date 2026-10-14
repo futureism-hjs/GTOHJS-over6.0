@@ -35,7 +35,7 @@ import java.util.UUID;
 
 /** One shared dev11 container/port implementation; the four registrations select direction and capability. */
 public final class AdaptiveNetHatchPartMachine extends WorkableTieredIOPartMachine
-        implements IAdaptiveGridBypass, IMachineLife {
+        implements IMachineLife {
     private final AdaptiveTemplateRegistry.Family family;
     @SaveToDisk private final NotifiableEnergyContainer container;
     @SaveToDisk @SyncToClient private long frequency;

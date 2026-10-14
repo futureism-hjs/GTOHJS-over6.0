@@ -14,6 +14,8 @@ import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.machine.MachineDefinition;
 import com.gregtechceu.gtceu.api.machine.multiblock.PartAbility;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
+import com.gregtechceu.gtceu.api.tooltip.TipRole;
+import com.gregtechceu.gtceu.api.tooltip.TipSpec;
 import com.gtohjs.methods.ModLog;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
@@ -70,8 +72,9 @@ public final class MESuperPatternBufferRegistration {
                 .slots(MEPatternBufferConfig::patternCount)
                 .tier(9)
                 .machine(MESuperPatternBufferPartMachine::new)
-                .tooltips(() -> java.util.List.of(Component.translatable(
-                        "gtohjs.machine.me_super_pattern_buffer.capacity", MEPatternBufferConfig.patternCount())))
+                .tips(TipSpec.builder().lines(lines -> lines.dynamic(TipRole.PLAIN, () ->
+                        Component.translatable("gtohjs.machine.me_super_pattern_buffer.capacity",
+                                MEPatternBufferConfig.patternCount()))).build())
                 .register();
         registered.setRenderer(new AmprosiumPatternBufferRenderer(GTValues.UHV,
                 GTCEu.id("block/machine/part/me_pattern_buffer")));
@@ -118,7 +121,7 @@ public final class MESuperPatternBufferRegistration {
                         GTOPartAbility.DUAL_INPUT, GTOPartAbility.DUAL_OUTPUT)
                 .renderer(() -> new AmprosiumPatternBufferRenderer(GTValues.UHV,
                         GTCEu.id("block/machine/part/me_pattern_buffer_proxy")))
-                .tooltips(GTOMachineTooltips.AutoConnectMETooltips)
+                .tips(GTOMachineTooltips.AutoConnectMETooltips)
                 .register();
     }
 

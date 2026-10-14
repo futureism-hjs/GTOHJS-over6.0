@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:block/cube_all",
   "textures": {
-    "all": "gtocore:block/casings/wireless_energy_unit/max"
+    "all": "gtohjs:block/infinite_wireless_energy_storage_unit"
   }
 }

@@ -11,7 +11,6 @@
   "gtocore.adaptive_net.no_tower": "Tower offline",
   "gtocore.adaptive_net.connected": "Tower connected",
   "gtocore.adaptive_net.disconnected": "Disconnected",
-  "gtocore.adaptive_net.tower_rate": "Tower rate: %s EU/t",
   "gtocore.adaptive_net.capacity": "Capacity: %s EU",
   "gtocore.adaptive_net.throughput": "Throughput: %s EU/t",
   "gtocore.adaptive_net.template_power": "%s: %s A, %s EU/t max",

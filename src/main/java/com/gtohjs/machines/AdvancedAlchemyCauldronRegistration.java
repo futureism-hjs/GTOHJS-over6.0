@@ -13,7 +13,7 @@ import com.gregtechceu.gtceu.api.pattern.TraceabilityPredicate;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.common.data.GTBlocks;
 import com.gtocore.api.machine.part.GTOPartAbility;
-import com.gtocore.client.renderer.machine.ArrayMachineRenderer;
+import com.gtohjs.client.renderer.ReliableArrayMachineRenderer;
 import com.gtocore.common.data.GTORecipeTypes;
 import com.gtocore.common.data.GTOMachines;
 import com.gtocore.utils.register.MachineRegisterUtils;
@@ -71,7 +71,7 @@ public final class AdvancedAlchemyCauldronRegistration {
                         .langValue("Advanced Alchemy Cauldron")
                         .nonYAxisRotation()
                         .parallelizableTooltips()
-                        .tooltips(
+                        .tips(
                                 Component.translatable(
                                         "gtohjs.machine.advanced_alchemy_cauldron.chance_inputs"),
                                 Component.translatable(
@@ -107,7 +107,7 @@ public final class AdvancedAlchemyCauldronRegistration {
                                 .where(' ', Predicates.any())
                                 )
                             .build())
-                        .renderer(() -> new ArrayMachineRenderer(
+                        .renderer(() -> new ReliableArrayMachineRenderer(
                                 GTCEu.id("block/casings/solid/machine_casing_solid_steel"),
                                 GTCEu.id("block/multiblock/processing_array")))
                         .renderMultiblockXEIPreview(true)

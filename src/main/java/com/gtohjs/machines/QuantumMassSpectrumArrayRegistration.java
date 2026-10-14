@@ -103,14 +103,14 @@ public final class QuantumMassSpectrumArrayRegistration {
                     .langValue(GtlPortedMachineText.machineNameEn(PATTERN_NAME))
                     .nonYAxisRotation()
                     .recipeTypes(EXPECTED_RECIPE_TYPES)
-                    .tooltips(GtlPortedMachineText.quantum(EXPECTED_RECIPE_TYPES))
+                    .tips(GtlPortedMachineText.quantum(EXPECTED_RECIPE_TYPES))
                     .parallelizableTooltips()
                     .multipleRecipesTooltips()
                     .block(() -> HyperdimensionalPatternResources.block(CASING_ID))
                     .structure(QuantumMassSpectrumArrayRegistration::buildStructure)
-                    .workableCasingRenderer(
+                    .renderer(() -> new com.gtohjs.client.renderer.ReliableWorkableCasingRenderer(
                             GTCEu.id("block/casings/solid/machine_casing_robust_tungstensteel"),
-                            GTCEu.id("block/multiblock/large_miner"))
+                            GTCEu.id("block/multiblock/large_miner")))
                     .renderMultiblockXEIPreview(true)
                     .register();
 

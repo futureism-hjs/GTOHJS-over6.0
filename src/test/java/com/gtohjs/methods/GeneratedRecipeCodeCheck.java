@@ -147,7 +147,8 @@ public final class GeneratedRecipeCodeCheck {
         }
         for (String type : List.of("client/AddedByTooltip", "client/GTOHJSConfigScreenTheme",
                 "client/GTOHJSItemColorRegistration", "client/renderer/AmprosiumPatternBufferRenderer",
-                "client/renderer/ElectromagneticThermalControlRenderer", "machines/ElectromagneticThermalControlUI",
+                "client/renderer/ElectromagneticThermalControlRenderer", "client/renderer/AdaptiveNetRenderer",
+                "client/renderer/AdaptiveNetFrequencyIcon", "machines/ElectromagneticThermalControlUI",
                 "methods/HyperdimensionalPatternResources", "methods/HyperdimensionalTooltips",
                 "methods/PatternLayoutMethods", "methods/RecipeDraftWriter", "methods/StructureDraftWriter",
                 "methods/RecipeSourceSupport")) {
@@ -164,8 +165,8 @@ public final class GeneratedRecipeCodeCheck {
                 "Chinese attribution segmentation lost");
         require(Files.readString(resources.resolve("assets/gtohjs/lang/en_us.json")).contains("\"Added by %s\""),
                 "English attribution segmentation lost");
-        System.out.println("PASS five actual generator samples compiled against dev11/JVM21, production directory/JAR discovery 3 GT + 2 crafting");
+        System.out.println("PASS five actual generator samples compiled against dev15/JVM21, production directory/JAR discovery 3 GT + 2 crafting");
         System.out.println("PASS control-character Java/SNBT round-trip, quantities/NBT/blank-grid source, invalid data and collision controls");
-        System.out.println("PASS twelve Kotlin class targets and static Forge tooltip event ABI; no game/runtime acceptance claimed");
+        System.out.println("PASS fourteen Kotlin class targets and static Forge tooltip event ABI; no game/runtime acceptance claimed");
     }
 }

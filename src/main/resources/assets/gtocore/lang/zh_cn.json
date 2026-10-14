@@ -11,7 +11,6 @@
   "gtocore.adaptive_net.no_tower": "能源塔未连接",
   "gtocore.adaptive_net.connected": "能源塔已连接",
   "gtocore.adaptive_net.disconnected": "未连接",
-  "gtocore.adaptive_net.tower_rate": "能源塔速率：%s EU/t",
   "gtocore.adaptive_net.capacity": "容量：%s EU",
   "gtocore.adaptive_net.throughput": "吞吐量：%s EU/t",
   "gtocore.adaptive_net.template_power": "%s：%s A，最大 %s EU/t",

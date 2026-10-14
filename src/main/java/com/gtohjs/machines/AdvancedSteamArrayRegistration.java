@@ -13,7 +13,7 @@ import com.gregtechceu.gtceu.api.pattern.TraceabilityPredicate;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.common.data.GTBlocks;
 import com.gregtechceu.gtceu.common.data.GTRecipeTypes;
-import com.gtocore.client.renderer.machine.ArrayMachineRenderer;
+import com.gtohjs.client.renderer.ReliableArrayMachineRenderer;
 import com.gtocore.common.data.GTOBlocks;
 import com.gtocore.common.data.GTOMachines;
 import com.gtocore.utils.register.MachineRegisterUtils;
@@ -59,10 +59,10 @@ public final class AdvancedSteamArrayRegistration {
                     .langValue("Advanced Steam Array")
                     .nonYAxisRotation()
                     .recipeTypes(GTRecipeTypes.DUMMY_RECIPES)
-                    .tooltips(Component.translatable("gtohjs.machine.advanced_steam_array.limit", STORAGE_LIMIT))
-                    .tooltips(Component.translatable("gtohjs.machine.steam_array.output_bonus"))
-                    .tooltips(Component.translatable("gtohjs.machine.advanced_steam_array.allowed_boilers"))
-                    .tooltips(Component.translatable("gtohjs.machine.advanced_steam_array.solar_condition"))
+                    .tips(Component.translatable("gtohjs.machine.advanced_steam_array.limit", STORAGE_LIMIT))
+                    .tips(Component.translatable("gtohjs.machine.steam_array.output_bonus"))
+                    .tips(Component.translatable("gtohjs.machine.advanced_steam_array.allowed_boilers"))
+                    .tips(Component.translatable("gtohjs.machine.advanced_steam_array.solar_condition"))
                     .block(GTBlocks.FIREBOX_STEEL)
                     .blockProp(properties -> properties.noOcclusion()
                             .isViewBlocking((state, level, pos) -> false))
@@ -88,7 +88,7 @@ public final class AdvancedSteamArrayRegistration {
                             .where('#', Predicates.air())
                             )
                             .build())
-                    .renderer(() -> new ArrayMachineRenderer(
+                    .renderer(() -> new ReliableArrayMachineRenderer(
                             GTCEu.id("block/casings/solid/machine_casing_solid_steel"),
                             GTCEu.id("block/multiblock/generator/large_steel_boiler")))
                     .renderMultiblockXEIPreview(true)
@@ -117,8 +117,8 @@ public final class AdvancedSteamArrayRegistration {
         if (buildPattern && candidate.getStructure() == null) {
             throw new IllegalStateException("Advanced steam array pattern could not be built");
         }
-        if (GTCEu.isClientSide() && !(candidate.getRenderer() instanceof ArrayMachineRenderer)) {
-            throw new IllegalStateException("Advanced steam array renderer is not ArrayMachineRenderer");
+        if (GTCEu.isClientSide() && !(candidate.getRenderer() instanceof ReliableArrayMachineRenderer)) {
+            throw new IllegalStateException("Advanced steam array renderer is not ReliableArrayMachineRenderer");
         }
     }
 

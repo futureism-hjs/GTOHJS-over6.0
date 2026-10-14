@@ -1,6 +1,7 @@
 package com.gtohjs.client
 
 import com.gtohjs.GTOHJS
+import com.gtohjs.data.GTOHJSItems
 import com.gtohjs.methods.FullRegistrationMethods
 import com.gtohjs.methods.GtlPortedMachineText
 import net.minecraft.client.Minecraft
@@ -31,7 +32,8 @@ object AddedByTooltip {
         if (id.namespace == "gtocore") {
             GtlPortedMachineText.localizeHoverText(event.toolTip, id.path, Minecraft.getInstance().options.languageCode)
         }
-        if (id.namespace == GTOHJS.MOD_ID || FullRegistrationMethods.ownsMachine(id)) {
+        if (id.namespace == GTOHJS.MOD_ID || FullRegistrationMethods.ownsMachine(id) ||
+            id == GTOHJSItems.NET_DATA_STICK.id) {
             event.toolTip.add(attribution())
             if (id.namespace == "gtocore" && GtlPortedMachineText.isGtlMachine(id.path)) {
                 event.toolTip.add(GtlPortedMachineText.structureSource())

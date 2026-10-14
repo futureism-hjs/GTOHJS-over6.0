@@ -4,9 +4,9 @@ import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.machine.MachineDefinition;
 import com.gregtechceu.gtceu.api.machine.multiblock.PartAbility;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
-import com.gregtechceu.gtceu.client.renderer.machine.WorkableCasingMachineRenderer;
 import com.gtocore.utils.register.MachineRegisterUtils;
 import com.gtohjs.client.renderer.AdaptiveNetRenderer;
+import com.gtohjs.client.renderer.ReliableWorkableCasingRenderer;
 import net.minecraft.resources.ResourceLocation;
 
 /** Definitions are inserted in the native GTO machine registration window. */
@@ -41,8 +41,8 @@ public final class AdaptiveNetRegistration {
                 .renderer(() -> new AdaptiveNetRenderer(ResourceLocation.fromNamespaceAndPath(overlayNamespace, overlayPath))).register();
     }
 
-    private static WorkableCasingMachineRenderer renderer(String namespace, String overlay) {
-        return new WorkableCasingMachineRenderer(ResourceLocation.fromNamespaceAndPath("gtocore", "block/manipulator"),
+    private static ReliableWorkableCasingRenderer renderer(String namespace, String overlay) {
+        return new ReliableWorkableCasingRenderer(ResourceLocation.fromNamespaceAndPath("gtocore", "block/manipulator"),
                 ResourceLocation.fromNamespaceAndPath(namespace, overlay));
     }
 }

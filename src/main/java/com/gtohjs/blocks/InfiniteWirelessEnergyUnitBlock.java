@@ -33,6 +33,11 @@ public final class InfiniteWirelessEnergyUnitBlock extends WirelessEnergyUnitBlo
     }
 
     @Override
+    public long getThroughput() {
+        return InfiniteWirelessEnergyMethods.throughput();
+    }
+
+    @Override
     public void appendHoverText(@NotNull ItemStack stack, @Nullable BlockGetter level,
                                 @NotNull List<Component> tooltip, @NotNull TooltipFlag flag) {
         tooltip.add(Component.translatable("gtocore.machine.tooltip.upgrade_action",
@@ -40,6 +45,8 @@ public final class InfiniteWirelessEnergyUnitBlock extends WirelessEnergyUnitBlo
                 Component.translatable("gtocore.adv_terminal.block_map.wireless_energy_unit"))
                 .withStyle(ChatFormatting.GRAY));
         tooltip.add(Component.translatable("gtohjs.wireless_energy.capacity", InfiniteEnergyPresentation.infiniteText()));
+        tooltip.add(Component.translatable("gtohjs.wireless_energy.throughput", InfiniteEnergyPresentation.infiniteText()));
         tooltip.add(Component.translatable("gtohjs.wireless_energy.loss"));
+        tooltip.add(Component.translatable("gtohjs.wireless_energy.any_glass"));
     }
 }

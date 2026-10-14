@@ -20,7 +20,7 @@ import net.minecraftforge.api.distmarker.OnlyIn
 import java.util.function.Consumer
 
 /** Existing ordinary front animation and native GTO side thermometers. */
-class ElectromagneticThermalControlRenderer(tier: Int, workableModel: ResourceLocation) :
+class ElectromagneticThermalControlRenderer(tier: Int, private val workableModel: ResourceLocation) :
     TieredHullMachineRenderer(tier, GTCEu.id("block/machine/hull_machine")), IHeaterRenderer {
     private val normalFrontOverlay = WorkableOverlayModel(workableModel)
 
@@ -50,6 +50,9 @@ class ElectromagneticThermalControlRenderer(tier: Int, workableModel: ResourceLo
     @OnlyIn(Dist.CLIENT)
     override fun onPrepareTextureAtlas(atlasName: ResourceLocation, register: Consumer<ResourceLocation>) {
         super.onPrepareTextureAtlas(atlasName, register)
-        if (atlasName == InventoryMenu.BLOCK_ATLAS) normalFrontOverlay.registerTextureAtlas(register)
+        if (atlasName == InventoryMenu.BLOCK_ATLAS) {
+            normalFrontOverlay.registerTextureAtlas(register)
+            registerMissingOverlaySprites(normalFrontOverlay, workableModel, register)
+        }
     }
 }

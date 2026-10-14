@@ -67,8 +67,8 @@ public final class HyperdimensionalSmelterRegistration {
                     .langValue("Hyperdimensional Smelter")
                     .nonYAxisRotation()
                     .recipeTypes(EXPECTED_RECIPE_TYPES)
-                    .tooltips(HyperdimensionalTooltips.introduction())
-                    .tooltips(HyperdimensionalTooltips.customMultithreading())
+                    .tips(HyperdimensionalTooltips.introduction())
+                    .tips(HyperdimensionalTooltips.customMultithreading())
                     .laserTooltips()
                     .block(() -> HyperdimensionalPatternResources.block(
                             "gtocore:naquadah_alloy_casing"))
@@ -127,9 +127,9 @@ public final class HyperdimensionalSmelterRegistration {
                             .where(' ', Predicates.any())
                             )
                             .build())
-                    .workableCasingRenderer(
+                    .renderer(() -> new com.gtohjs.client.renderer.ReliableWorkableCasingRenderer(
                             GTOCore.id("block/casings/hyper_mechanical_casing"),
-                            GTCEu.id("block/multiblock/gcym/blast_alloy_smelter"))
+                            GTCEu.id("block/multiblock/gcym/blast_alloy_smelter")))
                     .renderMultiblockXEIPreview(true)
                     .register();
 

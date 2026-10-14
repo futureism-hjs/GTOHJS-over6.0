@@ -4,6 +4,7 @@ import com.gtocore.api.wireless.energy.EnergyAccount;
 import com.gtocore.api.wireless.energy.GridView;
 import com.gtocore.common.wireless.energy.GridReadouts;
 import com.gregtechceu.gtceu.uiwidgets.multiblock.MultiblockPage;
+import com.gregtechceu.gtceu.utils.FormattingUtil;
 import com.gtolib.utils.StringUtils;
 import com.hepdd.gtmthings.utils.FormatUtil;
 import java.math.BigInteger;
@@ -31,6 +32,11 @@ public final class InfiniteEnergyPresentation {
         return Component.translatable("gtohjs.wireless_energy.infinite_animated",
                 Component.literal(StringUtils.full_color("Infinite")),
                 Component.literal(StringUtils.full_color("无限")));
+    }
+
+    public static Component limitText(long value) {
+        return value == Long.MAX_VALUE ? infiniteText()
+                : Component.literal(FormattingUtil.formatNumbers(value));
     }
 
     public static Component monitorStorage(EnergyAccount account) {

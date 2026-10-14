@@ -12,21 +12,17 @@ import java.util.UUID;
 
 /** Read-only native grid parameters. Query on the server thread for current values. */
 public final class WirelessGridMethods {
-    public record AccountParameters(boolean present, @Nullable UUID team, long rate,
+    public record AccountParameters(boolean present, @Nullable UUID team,
                                     BigInteger stored, BigInteger capacity, double averageLossPercent) {}
     public record NodeParameters(boolean present, @Nullable ResourceKey<Level> dimension,
                                  int tier, int reachTier, BigInteger stored, BigInteger capacity) {}
 
     private WirelessGridMethods() {}
 
-    public static long rate(@Nullable UUID owner) {
-        return WirelessGrid.accountIfPresent(owner).rate();
-    }
-
     public static AccountParameters accountParameters(@Nullable UUID owner) {
         EnergyAccount account = WirelessGrid.accountIfPresent(owner);
         return new AccountParameters(!account.isNone(), account.isNone() ? null : account.team,
-                account.rate(), account.totalStorage(), account.totalCapacity(), account.averageLossPercent());
+                account.totalStorage(), account.totalCapacity(), account.averageLossPercent());
     }
 
     /** Native GridBody mapping also resolves an orbit dimension to its planet node. */

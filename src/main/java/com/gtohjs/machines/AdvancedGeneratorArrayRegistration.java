@@ -8,17 +8,19 @@ import com.gregtechceu.gtceu.api.machine.multiblockpro.Symbols;
 import com.gregtechceu.gtceu.api.machine.MachineDefinition;
 import com.gregtechceu.gtceu.api.machine.MultiblockMachineDefinition;
 import com.gregtechceu.gtceu.api.machine.multiblock.PartAbility;
+import com.gregtechceu.gtceu.api.tooltip.StatKind;
+import com.gregtechceu.gtceu.api.tooltip.Tips;
 import com.gregtechceu.gtceu.api.pattern.Predicates;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.common.data.GTBlocks;
 import com.gregtechceu.gtceu.common.data.GTMachines;
 import com.gregtechceu.gtceu.common.data.GTRecipeTypes;
-import com.gtocore.client.renderer.machine.ArrayMachineRenderer;
+import com.gtohjs.client.renderer.ReliableArrayMachineRenderer;
 import com.gtocore.common.machine.multiblock.generator.GeneratorArrayMachine;
 import com.gtocore.utils.register.MachineRegisterUtils;
 import com.gtohjs.methods.AdvancedGeneratorArraySupport;
 import com.gtohjs.methods.ModLog;
-import com.gtolib.api.annotation.NewDataAttributes;
+import com.gtolib.api.lang.GTOAttributes;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.phys.shapes.Shapes;
@@ -68,14 +70,14 @@ public final class AdvancedGeneratorArrayRegistration {
                     .nonYAxisRotation()
                     .recipeTypes(GTRecipeTypes.DUMMY_RECIPES)
                     .generator()
-                    .tooltips(Component.translatable(
+                    .tips(Component.translatable(
                             "gtohjs.machine.advanced_generator_array.generation_multiplier"))
-                    .tooltips(Component.translatable(
+                    .tips(Component.translatable(
                             "gtohjs.machine.advanced_generator_array.wireless_loss"))
-                    .tooltips(Component.translatable(
+                    .tips(Component.translatable(
                             "gtohjs.machine.advanced_generator_array.limit",
                             AdvancedGeneratorArraySupport.INTERNAL_GENERATOR_LIMIT))
-                    .tooltips(NewDataAttributes.RECIPES_TYPE.create(
+                    .attribute(GTOAttributes.ORDER_RECIPE_TYPES, Tips.stat(StatKind.RECIPE_TYPE,
                             Component.empty().append(Component.translatable("gtceu.steam_turbine"))
                                     .append(", ").append(Component.translatable("gtceu.combustion_generator"))
                                     .append(", ").append(Component.translatable("gtceu.gas_turbine"))
@@ -107,7 +109,7 @@ public final class AdvancedGeneratorArrayRegistration {
                             .where('#', Predicates.air())
                             )
                             .build())
-                    .renderer(() -> new ArrayMachineRenderer(
+                    .renderer(() -> new ReliableArrayMachineRenderer(
                             GTCEu.id("block/casings/solid/machine_casing_solid_steel"),
                             GTCEu.id("block/multiblock/processing_array")))
                     .renderMultiblockXEIPreview(true)
@@ -141,7 +143,7 @@ public final class AdvancedGeneratorArrayRegistration {
         if (buildPattern && candidate.getStructure() == null) {
             throw new IllegalStateException("Advanced generator array pattern could not be built");
         }
-        if (GTCEu.isClientSide() && !(candidate.getRenderer() instanceof ArrayMachineRenderer)) {
+        if (GTCEu.isClientSide() && !(candidate.getRenderer() instanceof ReliableArrayMachineRenderer)) {
             throw new IllegalStateException("Advanced generator array renderer does not match the stock array");
         }
     }

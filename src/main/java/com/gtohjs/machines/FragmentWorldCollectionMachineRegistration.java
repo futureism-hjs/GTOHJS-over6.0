@@ -12,13 +12,15 @@ import com.gregtechceu.gtceu.api.machine.SimpleTieredMachine;
 import com.gregtechceu.gtceu.api.machine.multiblock.PartAbility;
 import com.gregtechceu.gtceu.api.pattern.Predicates;
 import com.gregtechceu.gtceu.api.recipe.modifier.RecipeModifier;
+import com.gregtechceu.gtceu.api.tooltip.StatKind;
+import com.gregtechceu.gtceu.api.tooltip.Tips;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.common.data.GTBlocks;
 import com.gregtechceu.gtceu.common.data.machines.GTMachineUtils;
 import com.gtocore.utils.register.MachineRegisterUtils;
 import com.gtohjs.GTOHJS;
 import com.gtohjs.methods.ModLog;
-import com.gtolib.api.annotation.NewDataAttributes;
+import com.gtolib.api.lang.GTOAttributes;
 import com.gtolib.api.machine.MultiblockDefinition;
 import com.gtolib.api.machine.feature.multiblock.IParallelMachine;
 import com.gtolib.api.machine.multiblock.CustomParallelMultiblockMachine;
@@ -98,13 +100,13 @@ public final class FragmentWorldCollectionMachineRegistration {
                         RecipeModifier.multiplier(256.0, 0.25),
                         GTORecipeModifiers.PARALLEL)
                 .specialParallelizableTooltips()
-                .tooltips(NewDataAttributes.ALLOW_PARALLEL_NUMBER.create(
+                .attribute(GTOAttributes.ORDER_PARALLEL_NUMBER, Tips.stat(StatKind.PARALLEL,
                         IParallelMachine.MAX_PARALLEL))
-                .tooltips(Component.translatable(
+                .tips(Component.translatable(
                         "gtohjs.machine.large_fragment_world_collection.energy_multiplier"))
-                .tooltips(Component.translatable(
+                .tips(Component.translatable(
                         "gtohjs.machine.large_fragment_world_collection.duration_multiplier"))
-                .tooltips(Component.translatable(
+                .tips(Component.translatable(
                         "gtohjs.machine.large_fragment_world_collection.custom_parallel_control"))
                 .block(GTBlocks.CASING_TITANIUM_STABLE)
                 
@@ -126,9 +128,9 @@ public final class FragmentWorldCollectionMachineRegistration {
                         .where('A', Predicates.any())
                         )
                             .build())
-                .workableCasingRenderer(
+                .renderer(() -> new com.gtohjs.client.renderer.ReliableWorkableCasingRenderer(
                         GTCEu.id("block/casings/solid/machine_casing_stable_titanium"),
-                        GTCEu.id("block/multiblock/gcym/large_extractor"))
+                        GTCEu.id("block/multiblock/gcym/large_extractor")))
                 .renderMultiblockXEIPreview(true)
                     .register();
     }

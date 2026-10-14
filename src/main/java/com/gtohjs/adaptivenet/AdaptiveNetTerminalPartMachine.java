@@ -192,7 +192,6 @@ public final class AdaptiveNetTerminalPartMachine extends MultiblockPartMachine 
         lines.add(AdaptiveNetLanguage.component("gtocore.adaptive_net.frequency", status.frequency()));
         lines.add(AdaptiveNetLanguage.component(status.towerOnline() ?
                 "gtocore.adaptive_net.connected" : "gtocore.adaptive_net.no_tower"));
-        lines.add(AdaptiveNetLanguage.component("gtocore.adaptive_net.tower_rate", status.accountRate()));
         for (var family : AdaptiveTemplateRegistry.Family.values()) {
             var spec = status.power(family);
             lines.add(AdaptiveNetLanguage.component("gtocore.adaptive_net.template_power",

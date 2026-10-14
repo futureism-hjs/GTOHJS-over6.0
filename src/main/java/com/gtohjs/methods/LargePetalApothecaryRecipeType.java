@@ -2,9 +2,13 @@ package com.gtohjs.methods;
 
 import com.gregtechceu.gtceu.GTCEu;
 import com.gregtechceu.gtceu.api.recipe.GTRecipeDefinition;
+import com.gregtechceu.gtceu.api.recipe.GTRecipeType;
+import com.gregtechceu.gtceu.api.recipe.handler.IRecipeHandlerHolder;
+import com.gregtechceu.gtceu.api.recipe.handler.RecipeHandlerUnit;
 import com.gtohjs.GTOHJS;
 import com.gtohjs.methods.ModLog;
 import com.gtolib.api.recipe.RecipeBuilder;
+import com.gtolib.api.recipe.RecipeType;
 import com.gtolib.api.recipe.extension.MANARecipeExtension;
 import com.gtolib.api.recipe.extension.MANATRecipeExtension;
 import net.minecraft.client.Minecraft;
@@ -19,8 +23,6 @@ import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraftforge.fml.loading.FMLEnvironment;
 import org.jetbrains.annotations.Nullable;
 
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.HashSet;
@@ -31,28 +33,28 @@ import java.util.Objects;
 import java.util.Set;
 
 /** Converts Botania petal-apothecary recipes without a compile-time Botania dependency. */
-public final class LargePetalApothecaryRecipeType extends com.gtolib.api.recipe.RecipeType {
+public final class LargePetalApothecaryRecipeType implements GTRecipeType.ICustomRecipeLogic {
     public static final long EU_PER_TICK = 16L;
     public static final int DURATION_TICKS = 100;
 
     private final net.minecraft.world.item.crafting.RecipeType<?> proxyType;
+    private final RecipeType recipeType;
+    private volatile List<GTRecipeDefinition> convertedRecipes = List.of();
     private volatile int representativeRecipeCount;
     private volatile int validatedProxyRecipeCount;
 
     public LargePetalApothecaryRecipeType(
-            ResourceLocation id,
-            String group,
+            RecipeType recipeType,
             net.minecraft.world.item.crafting.RecipeType<?> proxyType) {
-        super(id, group, Objects.requireNonNull(proxyType, "proxyType"));
-        this.proxyType = proxyType;
+        this.recipeType = Objects.requireNonNull(recipeType, "recipeType");
+        this.proxyType = Objects.requireNonNull(proxyType, "proxyType");
     }
 
-    @Override
-    protected GTRecipeDefinition toGTrecipe(ResourceLocation id, Recipe<?> recipe) {
+    private GTRecipeDefinition toGTrecipe(ResourceLocation id, Recipe<?> recipe) {
         Objects.requireNonNull(id, "id");
         Objects.requireNonNull(recipe, "recipe");
 
-        var builder = recipeBuilder(rawRecipeId(id));
+        var builder = recipeType.recipeBuilder(rawRecipeId(id));
         for (Ingredient ingredient : recipe.getIngredients()) {
             builder.inputItems(ingredient);
         }
@@ -84,8 +86,7 @@ public final class LargePetalApothecaryRecipeType extends com.gtolib.api.recipe.
 
     public synchronized List<GTRecipeDefinition> synchronizeClientRecipes(RecipeManager manager) {
         rebuildRepresentativeRecipes(Objects.requireNonNull(manager, "manager"));
-        var synchronizedRecipes = new ArrayList<>(getRecipesInCategory(category));
-        synchronizedRecipes.removeIf(recipe -> recipe.recipeType != this);
+        var synchronizedRecipes = new ArrayList<>(convertedRecipes);
         synchronizedRecipes.sort(Comparator.comparing(recipe -> recipe.id.toString()));
         if (synchronizedRecipes.isEmpty()) {
             throw new IllegalStateException("No synchronized petal-apothecary recipes were found");
@@ -94,32 +95,39 @@ public final class LargePetalApothecaryRecipeType extends com.gtolib.api.recipe.
     }
 
     private void rebuildRepresentativeRecipes(@Nullable RecipeManager manager) {
-        removeMainCategoryEntry();
+        Set<GTRecipeDefinition> categoryRecipes = recipeType.getRecipesInCategory(recipeType.getCategory());
+        if (!categoryRecipes.isEmpty()) categoryRecipes.clear();
         Set<ResourceLocation> addedIds = new HashSet<>();
 
-        var registeredRecipes = new ArrayList<>(recipes.values());
+        var registeredRecipes = new ArrayList<>(recipeType.recipes.values());
         registeredRecipes.sort(Comparator.comparing(recipe -> recipe.id.toString()));
         for (GTRecipeDefinition recipe : registeredRecipes) {
             addRepresentativeRecipe(recipe, addedIds);
         }
 
+        List<GTRecipeDefinition> converted = new ArrayList<>();
         if (manager != null) {
             var proxyEntries = new ArrayList<>(getProxyRecipes(manager).entrySet());
             proxyEntries.sort(Map.Entry.comparingByKey(
                     Comparator.comparing(ResourceLocation::toString)));
             for (var entry : proxyEntries) {
-                addRepresentativeRecipe(toGTrecipe(entry.getKey(), entry.getValue()), addedIds);
+                GTRecipeDefinition recipe = toGTrecipe(entry.getKey(), entry.getValue());
+                converted.add(recipe);
+                addRepresentativeRecipe(recipe, addedIds);
             }
         }
 
+        convertedRecipes = List.copyOf(converted);
         representativeRecipeCount = addedIds.size();
-        super.buildRepresentativeRecipes();
     }
 
     @Override
-    public synchronized void clear() {
-        super.clear();
-        db = null;
+    public @Nullable GTRecipeDefinition createCustomRecipe(
+            IRecipeHandlerHolder holder, RecipeHandlerUnit unit) {
+        for (GTRecipeDefinition recipe : convertedRecipes) {
+            if (holder.matchRecipeInput(unit, recipe.toRuntime())) return recipe;
+        }
+        return null;
     }
 
     public synchronized int validateProxyRecipes(MinecraftServer server) {
@@ -131,26 +139,27 @@ public final class LargePetalApothecaryRecipeType extends com.gtolib.api.recipe.
             throw new IllegalStateException("No Botania petal-apothecary recipes were found");
         }
 
-        int validated = 0;
+        List<GTRecipeDefinition> convertedRecipes = new ArrayList<>();
         for (var entry : proxyEntries) {
             Recipe<?> source = entry.getValue();
             GTRecipeDefinition converted = toGTrecipe(entry.getKey(), source);
             validateConvertedRecipe(entry.getKey(), source, converted);
-            validated++;
+            convertedRecipes.add(converted);
         }
 
+        int validated = convertedRecipes.size();
         validatedProxyRecipeCount = validated;
         rebuildRepresentativeRecipes(server.getRecipeManager());
-        int categoryCount = getRecipesInCategory(category).size();
+        int categoryCount = recipeType.getRecipesInCategory(recipeType.getCategory()).size();
         if (representativeRecipeCount < validated || categoryCount < validated) {
             throw new IllegalStateException("Incomplete petal-apothecary representatives for " +
-                    registryName + ": proxy=" + validated + ", tracked=" +
+                    recipeType.registryName + ": proxy=" + validated + ", tracked=" +
                     representativeRecipeCount + ", category=" + categoryCount);
         }
 
         ModLog.info("Validated {} Botania petal-apothecary proxy recipes for {}; " +
                         "representatives={}, categoryRecipes={}",
-                validated, registryName, representativeRecipeCount, categoryCount);
+                validated, recipeType.registryName, representativeRecipeCount, categoryCount);
         return validated;
     }
 
@@ -173,17 +182,15 @@ public final class LargePetalApothecaryRecipeType extends com.gtolib.api.recipe.
             throw new IllegalStateException("Null representative petal-apothecary recipe");
         }
         if (addedIds.add(recipe.id)) {
-            addToMainCategory(recipe);
+            recipeType.addToMainCategory(recipe);
         }
     }
-
-    private void removeMainCategoryEntry() { categoryMap.remove(category); }
 
     private void validateConvertedRecipe(
             ResourceLocation sourceId,
             Recipe<?> source,
             GTRecipeDefinition converted) {
-        if (converted == null || converted.recipeType != this) {
+        if (converted == null || converted.recipeType != recipeType) {
             throw new IllegalStateException("Invalid converted petal-apothecary recipe: " + sourceId);
         }
         ResourceLocation expectedId = convertedRecipeId(sourceId);
@@ -224,7 +231,7 @@ public final class LargePetalApothecaryRecipeType extends com.gtolib.api.recipe.
     }
 
     private ResourceLocation convertedRecipeId(ResourceLocation sourceId) {
-        return RecipeBuilder.getTypeID(rawRecipeId(sourceId), this);
+        return RecipeBuilder.getTypeID(rawRecipeId(sourceId), recipeType);
     }
 
     private static ResourceLocation rawRecipeId(ResourceLocation sourceId) {

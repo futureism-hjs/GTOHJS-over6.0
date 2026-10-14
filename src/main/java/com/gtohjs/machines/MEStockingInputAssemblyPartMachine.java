@@ -33,7 +33,7 @@ import appeng.api.stacks.AEFluidKey;
 import appeng.api.stacks.AEItemKey;
 import appeng.api.stacks.AEKey;
 import appeng.api.stacks.AEKeyType;
-import appeng.api.stacks.AEKeyMap;
+import appeng.api.stacks.AEKeyLongMap;
 import appeng.api.stacks.GenericStack;
 import appeng.api.storage.MEStorage;
 
@@ -136,7 +136,7 @@ public final class MEStockingInputAssemblyPartMachine extends MEInputAssemblyPar
         MEStorage storage = grid.getStorageService().getInventory();
         if (isItemAutoPull()) {
             try {
-                AEKeyMap<AEKey> network = grid.getStorageService().getCachedInventory().getMap();
+                AEKeyLongMap<AEKey> network = grid.getStorageService().getCachedInventory().getMap();
                 refreshAutoItems(network, storage);
             } catch (RuntimeException error) {
                 clearItemStocks(true);
@@ -157,7 +157,7 @@ public final class MEStockingInputAssemblyPartMachine extends MEInputAssemblyPar
         MEStorage storage = grid.getStorageService().getInventory();
         if (isFluidAutoPull()) {
             try {
-                AEKeyMap<AEKey> network = grid.getStorageService().getCachedInventory().getMap();
+                AEKeyLongMap<AEKey> network = grid.getStorageService().getCachedInventory().getMap();
                 refreshAutoFluids(network, storage);
             } catch (RuntimeException error) {
                 clearFluidStocks(true);
@@ -195,7 +195,7 @@ public final class MEStockingInputAssemblyPartMachine extends MEInputAssemblyPar
         }
     }
 
-    private void refreshAutoItems(AEKeyMap<AEKey> network, MEStorage storage) {
+    private void refreshAutoItems(AEKeyLongMap<AEKey> network, MEStorage storage) {
         PriorityQueue<GenericStack> largest = new PriorityQueue<>(
                 CONFIG_SIZE, Comparator.comparingLong(GenericStack::amount));
         for (var entry : network) {
@@ -210,7 +210,7 @@ public final class MEStockingInputAssemblyPartMachine extends MEInputAssemblyPar
         writeAutoItems(largest, storage);
     }
 
-    private void refreshAutoFluids(AEKeyMap<AEKey> network, MEStorage storage) {
+    private void refreshAutoFluids(AEKeyLongMap<AEKey> network, MEStorage storage) {
         PriorityQueue<GenericStack> largest = new PriorityQueue<>(
                 CONFIG_SIZE, Comparator.comparingLong(GenericStack::amount));
         for (var entry : network) {

@@ -118,9 +118,9 @@ public final class HyperdimensionalBiochemicalFactoryRegistration {
                             .where(' ', Predicates.any())
                             )
                             .build())
-                    .workableCasingRenderer(
+                    .renderer(() -> new com.gtohjs.client.renderer.ReliableWorkableCasingRenderer(
                             GTCEu.id("block/casings/solid/machine_casing_clean_stainless_steel"),
-                            GTOCore.id("block/multiblock/general0"))
+                            GTOCore.id("block/multiblock/general0")))
                     .renderMultiblockXEIPreview(true)
                     .register();
 

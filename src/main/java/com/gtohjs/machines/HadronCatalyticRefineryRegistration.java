@@ -104,14 +104,14 @@ public final class HadronCatalyticRefineryRegistration {
                     .langValue(GtlPortedMachineText.machineNameEn(PATTERN_NAME))
                     .nonYAxisRotation()
                     .recipeTypes(EXPECTED_RECIPE_TYPES)
-                    .tooltips(GtlPortedMachineText.hadron(EXPECTED_RECIPE_TYPES))
+                    .tips(GtlPortedMachineText.hadron(EXPECTED_RECIPE_TYPES))
                     .parallelizableTooltips()
                     .multipleRecipesTooltips()
                     .block(() -> HyperdimensionalPatternResources.block(CASING_ID))
                     .structure(HadronCatalyticRefineryRegistration::buildStructure)
-                    .workableCasingRenderer(
+                    .renderer(() -> new com.gtohjs.client.renderer.ReliableWorkableCasingRenderer(
                             GTCEu.id("block/casings/solid/machine_casing_robust_tungstensteel"),
-                            GTCEu.id("block/multiblock/distillation_tower"))
+                            GTCEu.id("block/multiblock/distillation_tower")))
                     .renderMultiblockXEIPreview(true)
                     .register();
 

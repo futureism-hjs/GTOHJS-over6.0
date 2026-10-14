@@ -94,14 +94,14 @@ public final class NeutronControlFactoryRegistration {
                     .langValue(GtlPortedMachineText.machineNameEn(PATTERN_NAME))
                     .nonYAxisRotation()
                     .recipeTypes(EXPECTED_RECIPE_TYPES)
-                    .tooltips(GtlPortedMachineText.neutron(EXPECTED_RECIPE_TYPES))
+                    .tips(GtlPortedMachineText.neutron(EXPECTED_RECIPE_TYPES))
                     .specialParallelizableTooltips()
                     .recipeModifier(NeutronFactoryRecipeSupport.NEUTRON_FACTORY)
                     .block(() -> HyperdimensionalPatternResources.block(CASING_ID))
                     .structure(NeutronControlFactoryRegistration::buildStructure)
-                    .workableCasingRenderer(
+                    .renderer(() -> new com.gtohjs.client.renderer.ReliableWorkableCasingRenderer(
                             GTCEu.id("block/casings/solid/machine_casing_solid_steel"),
-                            GTCEu.id("block/multiblock/fusion_reactor"))
+                            GTCEu.id("block/multiblock/fusion_reactor")))
                     .renderMultiblockXEIPreview(true)
                     .register();
 

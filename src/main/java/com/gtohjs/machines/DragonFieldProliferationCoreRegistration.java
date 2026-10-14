@@ -98,15 +98,15 @@ public final class DragonFieldProliferationCoreRegistration {
                     .langValue(GtlPortedMachineText.machineNameEn(PATTERN_NAME))
                     .nonYAxisRotation()
                     .recipeTypes(EXPECTED_RECIPE_TYPES)
-                    .tooltips(GtlPortedMachineText.dragon(EXPECTED_RECIPE_TYPES))
+                    .tips(GtlPortedMachineText.dragon(EXPECTED_RECIPE_TYPES))
                     .parallelizableTooltips()
                     .laserTooltips()
                     .recipeModifier(GTORecipeModifiers.PARALLEL)
                     .block(() -> HyperdimensionalPatternResources.block(CASING_ID))
                     .structure(DragonFieldProliferationCoreRegistration::buildStructure)
-                    .workableCasingRenderer(
+                    .renderer(() -> new com.gtohjs.client.renderer.ReliableWorkableCasingRenderer(
                             GTCEu.id("block/casings/voltage/uhv/side"),
-                            GTCEu.id("block/multiblock/fusion_reactor"))
+                            GTCEu.id("block/multiblock/fusion_reactor")))
                     .renderMultiblockXEIPreview(true)
                     .register();
 

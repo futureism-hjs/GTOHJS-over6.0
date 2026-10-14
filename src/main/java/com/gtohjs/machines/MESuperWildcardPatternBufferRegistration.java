@@ -13,6 +13,8 @@ import com.gregtechceu.gtceu.api.GTValues;
 import com.gregtechceu.gtceu.api.machine.MachineDefinition;
 import com.gregtechceu.gtceu.api.machine.multiblock.PartAbility;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
+import com.gregtechceu.gtceu.api.tooltip.TipRole;
+import com.gregtechceu.gtceu.api.tooltip.TipSpec;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 
@@ -59,10 +61,10 @@ public final class MESuperWildcardPatternBufferRegistration {
                 .slots(MEPatternBufferConfig::wildcardPatternCount)
                 .tier(GTValues.UHV)
                 .machine(MESuperWildcardPatternBufferPartMachine::new)
-                .tooltips(GTOMachineTooltips.MeWildcardPatternBufferTooltips)
-                .tooltips(() -> java.util.List.of(Component.translatable(
-                        "gtohjs.machine.me_super_wildcard_pattern_buffer.capacity",
-                        MEPatternBufferConfig.wildcardPatternCount())))
+                .tips(GTOMachineTooltips.MeWildcardPatternBufferTooltips)
+                .tips(TipSpec.builder().lines(lines -> lines.dynamic(TipRole.PLAIN, () ->
+                        Component.translatable("gtohjs.machine.me_super_wildcard_pattern_buffer.capacity",
+                                MEPatternBufferConfig.wildcardPatternCount()))).build())
                 .register();
         registered.setRenderer(new AmprosiumPatternBufferRenderer(GTValues.UHV,
                 ResourceLocation.fromNamespaceAndPath("gtocore", "block/machine/part/me_pattern_buffer_red")));

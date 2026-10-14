@@ -64,8 +64,8 @@ public final class HyperdimensionalChemicalFactoryRegistration {
                     .langValue("Hyperdimensional Chemical Factory")
                     .allRotation()
                     .recipeTypes(EXPECTED_RECIPE_TYPES)
-                    .tooltips(HyperdimensionalTooltips.introduction())
-                    .tooltips(HyperdimensionalTooltips.customMultithreading())
+                    .tips(HyperdimensionalTooltips.introduction())
+                    .tips(HyperdimensionalTooltips.customMultithreading())
                     .laserTooltips()
                     .block(() -> HyperdimensionalPatternResources.block("gtceu:inert_machine_casing"))
                     
@@ -121,9 +121,9 @@ public final class HyperdimensionalChemicalFactoryRegistration {
                             .where(' ', Predicates.any())
                             )
                             .build())
-                    .workableCasingRenderer(
+                    .renderer(() -> new com.gtohjs.client.renderer.ReliableWorkableCasingRenderer(
                             GTCEu.id("block/casings/solid/machine_casing_inert_ptfe"),
-                            GTCEu.id("block/machines/chemical_reactor"))
+                            GTCEu.id("block/machines/chemical_reactor")))
                     .renderMultiblockXEIPreview(true)
                     .register();
 

@@ -1,5 +1,80 @@
 # GTO HJS Changelog
 
+## dev1-for-gtocore-0.6.0-dev15-fix3 vs 5.0per2-for-gtocore-0.5.6-beta (2026-10-14)
+
+对比基准 / Comparison baseline: local 0.5.6-beta build
+`gtohjs-5.0per2-for-gtocore-0.5.6-beta.jar` → current dev15 addon
+`gtohjs-dev1-for-gtocore-0.6.0-dev15-fix3.jar`.
+
+### 中文
+
+- **适配新版 GTO：** 将 0.5.6per2 的机器、多方块、配方、ME 样板组件、工具与
+  AE 元件包迁移到 GTO 0.6.0-dev15，适配 GTOCore 26.10.5、GTCEu 26.10.41
+  和 AE2 15.2610.8 的接口。
+- **新增自适配电网：** 加入四类能源/激光仓、自适配电网终端和便携网络配置闪存，
+  使用 dev15 原生电网余额与路由。终端可替换无线能源塔的
+  `gtocore:wireless_energy_tower_frame`；网络配置闪存显示“由 GTO HJS 添加”。
+- **新增无限无线能源塔存储单元：** 容量为 `2^126−1 EU`，每方向吞吐为
+  `Long.MAX_VALUE EU/t`，零损耗，支持任意玻璃等级。六面共用 A→B→C→D
+  四帧动画，每帧 10 tick；指定吞吐显示位置将最大值显示为“无限”。
+- **贴图与界面资源：** 调整控制器、热控仓及自适配电网终端正面 overlay 的
+  图集注册；为新增存储单元使用新的资源索引文件名，避免沿用旧方块 ID 的缓存。
+- **版本兼容：** 0.5.6per2 的 JAR 不适用于 dev15。无限存储单元采用独立的
+  `gtohjs:infinite_wireless_energy_storage_unit` ID；0.5.6per2 中没有该物品。
+
+### English
+
+- **New GTO target:** Ported the 0.5.6per2 machines, multiblocks, recipes,
+  ME pattern components, tools and AE component packs to GTO 0.6.0-dev15,
+  adapting to GTOCore 26.10.5, GTCEu 26.10.41 and AE2 15.2610.8.
+- **Adaptive wireless grid:** Added four energy/laser hatch types, an adaptive
+  grid terminal and a portable network configuration flash using dev15's
+  native grid balance and routing. The terminal replaces a
+  `gtocore:wireless_energy_tower_frame` block. The flash shows the existing
+  "Added by GTO HJS" attribution.
+- **Infinite wireless tower storage unit:** Added `2^126−1 EU` capacity,
+  `Long.MAX_VALUE EU/t` throughput in each direction, zero loss and support
+  for any glass tier. All six faces use the A→B→C→D animation at 10 ticks per
+  frame; selected throughput values display Infinite at the maximum value.
+- **Models and overlays:** Updated front-sprite registration for the
+  controller, thermal hatch and adaptive grid terminal. A new resource-index
+  filename avoids reusing a cache containing the previous block ID.
+- **Version compatibility:** The 0.5.6per2 JAR does not target dev15. The new
+  storage unit has its own `gtohjs:infinite_wireless_energy_storage_unit` ID;
+  this item was absent from 0.5.6per2.
+
+---
+
+## Intermediate 0.6 development history
+
+## dev1-for-gtocore-0.6.0-dev15 - 2026-10-14 (development)
+
+- Rename the addon block and item registry ID to
+  `gtohjs:infinite_wireless_energy_storage_unit`; the old ID has no migration.
+- Use the approved A-B-C-D four-frame texture on all six faces at 10 ticks per
+  frame. Set input and output throughput to `Long.MAX_VALUE EU/t`, retain the
+  `2^126 - 1 EU` capacity, zero loss and any-glass behavior, and add tooltip
+  lines for throughput and glass compatibility.
+- Format the station throughput row and bank input/output limit values as
+  Infinite/无限 at `Long.MAX_VALUE`; finite values retain native formatting.
+  Java 21 online IDEA MCP clean build and package checks passed. Client
+  acceptance remains pending; the local development record has the evidence.
+
+## dev1-for-gtocore-0.6.0-dev15 - 2026-10-12 (development)
+
+- Retarget GTOCore 26.10.5, GTCEu 26.10.41, AE2 15.2610.8 and DataSyncLib
+  26.10.9 directly; no compatibility branch for earlier baselines.
+- Migrate machine tips, AE key maps, recipe keys and Botania proxy recipe type
+  to the dev15 APIs. Keep the existing recipe conversion and validation logic.
+- Move the wireless tower structure and capacity injections to the dev15
+  dynamic structure and provider registration. Preserve native storage and
+  transfer units alongside the addon infinite unit. Remove the obsolete
+  account-rate bridge because the native account-rate field was removed.
+- Migrate the two remaining adaptive-net render files to Kotlin while keeping
+  their Java call sites. Java 21 online clean build and crash-free dev15 world
+  entry pass. Register missing controller and electromagnetic thermal fronts
+  explicitly during atlas preparation; visual confirmation is pending.
+
 ## dev1-for-gtocore-0.6.0-dev11-fix9 - 2026-10-10 (development)
 
 - Inject the adaptive-net locale entries through the established Kotlin client

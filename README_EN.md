@@ -2,39 +2,53 @@
 
 [中文](README.md) | English
 
-Current development version: `gtohjs-dev1-for-gtocore-0.6.0-dev11-fix9.jar`
+Current development version: `gtohjs-dev1-for-gtocore-0.6.0-dev15-fix3.jar`
 
 - [Changelog](CHANGELOG.md)
 - [Local build dependencies](libs/README.md)
 
 GTO HJS expands the Minecraft 1.20.1 Forge edition of GregTech Odyssey
-0.6.0-dev11 with additional machines, recipes and development tools. It registers
+0.6.0-dev15 with additional machines, recipes and development tools. It registers
 its content through GTO's native loading windows. The original GTOCore,
 GTOLib and GTOSeal files are read-only references.
 
-Fix8 adds an adaptive wireless grid: four energy and laser hatches, a terminal
+The dev15 adaptation keeps the adaptive wireless grid: four energy and laser hatches, a terminal
 that fits the wireless energy substation, and a portable frequency flash item.
+The flash tooltip includes the same GTO HJS attribution as the addon's other items.
 The terminal holds up to 64 physical native wireless hatch templates in each
 of four slots; its positive frequency is unique across the server and remains
 reserved through unload, invalid structure and restart. Only mining the
 terminal or a successful frequency change releases its previous reservation.
+In the dev15 tower pattern, the terminal replaces one
+`gtocore:wireless_energy_tower_frame` block. Glass positions still require glass.
 Adaptive hatches use the tower owner's native grid balance, voltage reach and
-relay topology. Their account rate is bypassed only for these hatches. The
+relay topology. Dev15 no longer has the native account-rate limit, so the
+former rate-bypass injection has been removed. The
 local buffer is capped at `Long.MAX_VALUE`; shrinking templates discards EU
 above the new capacity. The tower terminal and hatches show status in their
 interfaces and Jade, and `/gtohjs dumptemplates` exports the runtime template
 list to the world's `ADAPTIVE_NET_TEMPLATE_WHITELIST.md`.
 
-Fix7 sets `gtohjs:infinite_wireless_energy_unit` to the MAX storage-unit tier,
-matching `gtocore:max_wireless_energy_unit`, and uses its MAX-tier texture.
-The unit retains the real `2^126 - 1 EU` capacity limit and 0.0% loss. A
-wireless energy substation counts this addon unit at every glass casing tier;
-native wireless energy units still require a casing tier at least as high as
-their own. The over-tier warning follows that same rule. The addon unit shows
-animated Infinite/无限 in Jade, the substation summary and the wireless energy
-monitor. Grid transfer and rate limits retain their dev11 behavior. Java 21
-online clean build and user-confirmed crash-free single-player world entry
-passed for the completed fix7 change.
+The Infinite Wireless Energy Tower Storage Unit is registered as
+`gtohjs:infinite_wireless_energy_storage_unit`. Its six faces share a four-frame
+texture cycling through colorways A, B, C and D, one frame per 10 ticks. It has
+`2^126 - 1 EU` capacity, `Long.MAX_VALUE EU/t` throughput for each direction,
+and 0.0% loss. A wireless energy substation counts this addon unit at every
+glass casing tier; native wireless energy units keep their own glass-tier
+restriction. The addon shows animated Infinite/无限 for its capacity in Jade,
+the substation summary and the wireless energy monitor. The station throughput
+row and bank input/output limits show Infinite/无限 at `Long.MAX_VALUE`; finite
+values keep native formatting. The old registry ID has no migration mapping.
+The Java 21 online clean build and package checks passed. The user's first
+dev15 client run exposed a stale filename-keyed GTO resource cache that hid
+the new block and item models. The fix1 artifact uses a fresh filename so the
+models are indexed on the next launch. The adaptive grid terminal also uses
+the shared front-sprite registration fix. This addon-only deployment was not
+followed by a client launch; visual confirmation remains pending.
+An earlier dev15 adaptation passed a Java 21 online clean build and entered the
+target world without a crash. A reported missing-front-overlay issue has a
+built and deployed correction awaiting visual confirmation. The fix7 acceptance below belongs to
+the earlier dev11 snapshot.
 
 Fix5 preserves the current source changes and targets dev11's recipe content,
 AE Key inventory and ME recipe-handler APIs. It adds seven GTL-derived
@@ -48,7 +62,7 @@ the user confirmed testing passed.
 
 - 23 independent `gtohjs` items: Recipe Editor, Custom Multiblock Structure
   Exporter, Vacuum Cover, two preloaded AE Component Packs, Integral Bronze
-  Framework, Infinite Wireless Energy Unit and sixteen world fragments.
+  Framework, Infinite Wireless Energy Tower Storage Unit and sixteen world fragments.
 - 30 `gtocore` machine or part definitions: twenty multiblocks plus the
   collector, thermal forms, intake hatches and ME assemblies/buffers.
 - One Vacuum Cover definition with vacuum levels 1-3.
@@ -75,19 +89,19 @@ the user confirmed testing passed.
 | Minecraft | 1.20.1 |
 | Forge | 47.4.20 |
 | Java | Java 21; Java and Kotlin bytecode target JVM 21 |
-| GTOCore | dev11, original artifact version 26.10.1 |
-| GTM / GTCEu | 26.10.17 |
-| AE2 | 15.2610.4 |
+| GTOCore | dev15, original artifact version 26.10.5 |
+| GTM / GTCEu | 26.10.41 |
+| AE2 | 15.2610.8 |
 | Configuration | 3.1.0 |
 | Kotlin | Compiler/stdlib API 2.3.20; runtime supplied by the existing pack |
 
 Botania, AppBot, LDLib, DataSyncLib and related integrations use the versions
-already supplied by the target dev11 pack. Third-party Mod JARs are not embedded
+already supplied by the target dev15 pack. Third-party Mod JARs are not embedded
 in GTOHJS. The separately published ME Placement Tool for gto is not a dependency.
 
 ## Install and build
 
-Close Minecraft, place the current GTOHJS JAR in the dev11 instance's `mods`
+Close Minecraft, place the current GTOHJS JAR in the dev15 instance's `mods`
 directory, and keep only one GTOHJS version there. Keep the original GTOCore and
 GTOSeal artifacts supplied by the pack.
 
@@ -99,8 +113,8 @@ Java 21 runtime configured, run:
 ```
 
 The artifact is written to
-`build/libs/gtohjs-dev1-for-gtocore-0.6.0-dev11-fix8.jar`.
-Its numeric Forge loader version is `1.0.0-dev11-fix8`.
+`build/libs/gtohjs-dev1-for-gtocore-0.6.0-dev15-fix3.jar`.
+Its numeric Forge loader version is `1.0.0-dev15`.
 
 ## Standalone items and block
 
@@ -112,7 +126,7 @@ Its numeric Forge loader version is `1.0.0-dev11-fix8`.
 | Normal AE Component Pack | `gtohjs:normal_ae_component_pack` | Preloads 129 normal component types. |
 | Super AE Component Pack | `gtohjs:super_ae_component_pack` | Preloads 17 super-buffer and assembler component types. |
 | Integral Bronze Framework | `gtohjs:integral_bronze_framework` | Structure block with its own model, texture, loot and crafting recipe. |
-| Infinite Wireless Energy Unit | `gtohjs:infinite_wireless_energy_unit` | MAX wireless energy unit; `2^126 - 1 EU` capacity sentinel and 0.0% unit loss. |
+| Infinite Wireless Energy Tower Storage Unit | `gtohjs:infinite_wireless_energy_storage_unit` | `2^126 - 1 EU` capacity, `Long.MAX_VALUE EU/t` input and output throughput, zero loss, any glass tier, and a four-frame six-face texture. |
 
 The sixteen `gtohjs:world_fragments_*` items represent Overworld, Nether, End,
 Ancient World (`reactor`), Moon, Mars, Venus, Mercury, Ceres, Io, Ganymede,

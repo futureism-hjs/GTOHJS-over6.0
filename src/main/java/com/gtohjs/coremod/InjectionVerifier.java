@@ -24,11 +24,12 @@ public final class InjectionVerifier {
             {"com.gtocore.common.recipe.condition.VacuumCondition", "gtohjs$fix3$vacuum"},
             {"com.gtocore.common.machine.multiblock.part.ae.MEPatternBufferProxyPartMachine", "gtohjs$fix3$proxy"},
             {"com.gtocore.common.machine.multiblock.part.ae.MEPatternPartUI", "gtohjs$fix3$layout"},
-            {"com.gtocore.common.data.machines.MultiBlockG", "gtohjs$dev11$wirelessUnit"},
+            {"com.gtocore.common.machine.multiblock.storage.WirelessEnergySubstationMachine", "gtohjs$dev11$wirelessUnit"},
             {"com.gtocore.common.machine.monitor.MonitorEU", "gtohjs$dev11$monitorStorage"},
             {"com.gtocore.common.wireless.energy.map.GridSummaryPanel", "gtohjs$dev11$summaryStorage"},
-            {"com.gtocore.common.machine.multiblock.storage.WirelessEnergySubstationMachine", "gtohjs$dev11$stationCapacity"}
-            ,{"com.gtocore.api.wireless.energy.EnergyPort", "gtohjs$adaptive$rate"}
+            {"com.gtocore.common.machine.multiblock.storage.WirelessEnergySubstationMachine", "gtohjs$dev11$stationCapacity"},
+            {"com.gtocore.common.machine.multiblock.storage.WirelessEnergySubstationMachine", "gtohjs$dev15$stationThroughput"},
+            {"com.gtocore.common.machine.multiblock.storage.WirelessEnergySubstationMachine", "gtohjs$dev15$bankLimit"}
             ,{"com.gtocore.common.wireless.energy.map.GridNodeCard", "gtohjs$adaptive$nodeCard"}
     };
 
@@ -42,7 +43,7 @@ public final class InjectionVerifier {
             throw new IllegalStateException("GTOHJS requires GTOCore pack_version metadata");
         }
         ProofLog.record("GTOCore=" + core.getModInfo().getVersion() +
-                " pack=" + packVersion + " profile=dev11 semantic anchors");
+                " pack=" + packVersion + " profile=dev15 semantic anchors");
         ClassLoader loader = InjectionVerifier.class.getClassLoader();
         for (String[] target : TARGETS) {
             try {
@@ -74,7 +75,7 @@ public final class InjectionVerifier {
         ULVFragmentWorldCollectionMachine.verifyLoaded();
         FullRegistrationMethods.verifyLoaded();
         Fix2RegistrationMethods.verifyLoaded();
-        ProofLog.record("dev11 eighteen required class transformations verified: PASS");
+        ProofLog.record("dev15 twenty required class transformations verified: PASS");
         // Client Data.commonInit is asynchronous; pending is not a missing transform.
         if (!GTOHJSBootstrap.allExecuted()) {
             ProofLog.record("recipe bridge pending asynchronous GTO data loading");

@@ -62,7 +62,7 @@ public final class HyperdimensionalForgeRegistration {
                     .nonYAxisRotation()
                     .recipeTypes(EXPECTED_RECIPE_TYPES)
                     .recipeModifier(HyperdimensionalRecipeSupport.ONE_TICK)
-                    .tooltips(HyperdimensionalTooltips.introduction())
+                    .tips(HyperdimensionalTooltips.introduction())
                     .parallelizableTooltips()
                     .block(() -> HyperdimensionalPatternResources.block("gtceu:steel_machine_casing"))
                     
@@ -91,9 +91,9 @@ public final class HyperdimensionalForgeRegistration {
                             .where(' ', Predicates.any())
                             )
                             .build())
-                    .workableCasingRenderer(
+                    .renderer(() -> new com.gtohjs.client.renderer.ReliableWorkableCasingRenderer(
                             GTCEu.id("block/casings/solid/machine_casing_solid_steel"),
-                            GTCEu.id("block/multiblock/primitive_blast_furnace"))
+                            GTCEu.id("block/multiblock/primitive_blast_furnace")))
                     .renderMultiblockXEIPreview(true)
                     .register();
 

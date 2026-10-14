@@ -151,9 +151,9 @@ public final class UniversalSteamFactoryRegistration {
                             .where(' ', Predicates.any())
                             )
                             .build())
-                    .workableCasingRenderer(
+                    .renderer(() -> new com.gtohjs.client.renderer.ReliableWorkableCasingRenderer(
                             GTCEu.id("block/casings/solid/machine_casing_bronze_plated_bricks"),
-                            GTCEu.id("block/multiblock/steam_oven"))
+                            GTCEu.id("block/multiblock/steam_oven")))
                     .renderMultiblockXEIPreview(true)
                     .register();
 

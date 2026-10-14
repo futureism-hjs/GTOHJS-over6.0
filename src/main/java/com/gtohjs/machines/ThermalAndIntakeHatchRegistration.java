@@ -79,7 +79,7 @@ public final class ThermalAndIntakeHatchRegistration {
                 .tier(GTValues.MV)
                 .allRotation()
                 .abilities(PartAbility.IMPORT_ITEMS, PartAbility.IMPORT_FLUIDS)
-                .tooltips(
+                .tips(
                         Component.translatable("gtohjs.machine.electromagnetic_thermal_control.form_1")
                                 .withStyle(ChatFormatting.YELLOW),
                         Component.translatable("gtohjs.machine.electromagnetic_thermal_control_hatch.temperature"),
@@ -100,7 +100,7 @@ public final class ThermalAndIntakeHatchRegistration {
                 .langValue("Electromagnetic Thermal Control Hatch")
                 .tier(GTValues.MV)
                 .allRotation()
-                .tooltips(
+                .tips(
                         Component.translatable("gtohjs.machine.electromagnetic_thermal_control_hatch.temperature"),
                         Component.translatable("gtohjs.machine.electromagnetic_thermal_control.form_2")
                                 .withStyle(ChatFormatting.YELLOW),
@@ -122,7 +122,7 @@ public final class ThermalAndIntakeHatchRegistration {
                 .tier(GTValues.MV)
                 .allRotation()
                 .abilities(PartAbility.IMPORT_FLUIDS)
-                .tooltips(
+                .tips(
                         Component.translatable("gtohjs.machine.advanced_infinite_intake.capacity"),
                         Component.translatable("gtohjs.machine.advanced_infinite_intake.rate"),
                         Component.translatable("gtohjs.machine.advanced_infinite_intake.standalone_output")
@@ -141,7 +141,7 @@ public final class ThermalAndIntakeHatchRegistration {
                 .tier(GTValues.IV)
                 .allRotation()
                 .abilities(PartAbility.IMPORT_FLUIDS)
-                .tooltips(
+                .tips(
                         Component.translatable("gtohjs.machine.ultimate_infinite_intake.capacity"),
                         Component.translatable("gtohjs.machine.ultimate_infinite_intake.full"),
                         Component.translatable("gtohjs.machine.ultimate_infinite_intake.standalone_output")

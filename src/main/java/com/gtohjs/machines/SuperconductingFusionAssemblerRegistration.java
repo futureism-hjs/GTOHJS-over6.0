@@ -98,14 +98,14 @@ public final class SuperconductingFusionAssemblerRegistration {
                     .langValue(GtlPortedMachineText.machineNameEn(PATTERN_NAME))
                     .nonYAxisRotation()
                     .recipeTypes(EXPECTED_RECIPE_TYPES)
-                    .tooltips(GtlPortedMachineText.fusion(EXPECTED_RECIPE_TYPES))
+                    .tips(GtlPortedMachineText.fusion(EXPECTED_RECIPE_TYPES))
                     .parallelizableTooltips()
                     .multipleRecipesTooltips()
                     .block(() -> HyperdimensionalPatternResources.block(CASING_ID))
                     .structure(SuperconductingFusionAssemblerRegistration::buildStructure)
-                    .workableCasingRenderer(
+                    .renderer(() -> new com.gtohjs.client.renderer.ReliableWorkableCasingRenderer(
                             GTCEu.id("block/casings/solid/machine_casing_robust_tungstensteel"),
-                            GTCEu.id("block/multiblock/fusion_reactor"))
+                            GTCEu.id("block/multiblock/fusion_reactor")))
                     .renderMultiblockXEIPreview(true)
                     .register();
 

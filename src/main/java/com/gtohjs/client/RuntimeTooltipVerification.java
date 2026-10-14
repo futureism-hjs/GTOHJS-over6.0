@@ -2,6 +2,7 @@ package com.gtohjs.client;
 
 import com.gtohjs.GTOHJS;
 import com.gtohjs.coremod.ProofLog;
+import com.gtohjs.data.GTOHJSItems;
 import com.gtohjs.methods.FullRegistrationMethods;
 import net.minecraft.client.Minecraft;
 import net.minecraft.network.chat.contents.TranslatableContents;
@@ -28,7 +29,8 @@ public final class RuntimeTooltipVerification {
         done=true;
         int count=0;
         for(var id:ForgeRegistries.ITEMS.getKeys()) {
-            if(!GTOHJS.MOD_ID.equals(id.getNamespace()) && !FullRegistrationMethods.ownsMachine(id)) continue;
+            if(!GTOHJS.MOD_ID.equals(id.getNamespace()) && !FullRegistrationMethods.ownsMachine(id) &&
+                    !GTOHJSItems.NET_DATA_STICK.getId().equals(id)) continue;
             var item=ForgeRegistries.ITEMS.getValue(id);
             var lines=new ItemStack(item).getTooltipLines(player,TooltipFlag.Default.NORMAL);
             int matches=0;
@@ -46,7 +48,7 @@ public final class RuntimeTooltipVerification {
             if(matches!=1) throw new IllegalStateException("HJS attribution tooltip missing/duplicated: "+id);
             count++;
         }
-        if(count!=46) throw new IllegalStateException("Expected 46 owned-item tooltips, found "+count);
-        ProofLog.record("actual Minecraft tooltip generation: 46/46 purple attribution and orange name PASS");
+        if(count!=47) throw new IllegalStateException("Expected 47 owned-item tooltips, found "+count);
+        ProofLog.record("actual Minecraft tooltip generation: 47/47 purple attribution and orange name PASS");
     }
 }

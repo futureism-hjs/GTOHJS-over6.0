@@ -480,6 +480,7 @@ function methodGroup(definitions, marker) {
     };
 }
 function nextOpcode(node) { var n=node.getNext(); while(n!==null && n.getOpcode()<0)n=n.getNext(); return n; }
+function previousOpcode(node) { var n=node.getPrevious(); while(n!==null && n.getOpcode()<0)n=n.getPrevious(); return n; }
 function generatorBridge(clazz) {
     var marker='gtohjs$fix2$generator'; requireMarkerAbsent(clazz,marker);
     var constructor=uniqueMethod(clazz,'<init>','(Lcom/gregtechceu/gtceu/api/blockentity/MetaMachineBlockEntity;)V');
@@ -568,59 +569,49 @@ function vacuumBridge(clazz) {
 }
 function dev11WirelessUnitBridge(clazz) {
     var marker='gtohjs$dev11$wirelessUnit';requireMarkerAbsent(clazz,marker);
-    var anchor=null,count=0;
-    for(var m=0;m<clazz.methods.size();m++) {
-        var nodes=clazz.methods.get(m).instructions.toArray();
-        for(var i=0;i<nodes.length;i++) { var n=nodes[i];
-            if(n.getOpcode()===Opcodes.INVOKESTATIC && n.owner==='com/gtocore/api/pattern/GTOPredicates' &&
-                    n.name==='wirelessEnergyUnit' && n.desc==='()Lcom/gregtechceu/gtceu/api/pattern/TraceabilityPredicate;') {anchor=n;count++;}
+    var structure=uniqueMethod(clazz,'structure','(Lcom/gregtechceu/gtceu/api/machine/MultiblockMachineDefinition;)Lcom/gregtechceu/gtceu/api/machine/multiblockpro/Structure;');
+    var nodes=structure.instructions.toArray(),unit=null,frame=null,unitCount=0,frameCount=0;
+    for(var i=0;i<nodes.length;i++) {
+        var call=nodes[i];
+        if(call.getOpcode()===Opcodes.INVOKESTATIC && call.owner==='com/gtocore/api/pattern/GTOPredicates' && call.name==='wirelessEnergyUnit'){unit=call;unitCount++;}
+        if(call.getOpcode()===Opcodes.INVOKESTATIC && call.owner==='com/gregtechceu/gtceu/api/pattern/Predicates' && call.name==='blocks'
+                && call.desc==='([Lnet/minecraft/world/level/block/Block;)Lcom/gregtechceu/gtceu/api/pattern/TraceabilityPredicate;') {
+            var frameGet=call.getPrevious();while(frameGet!==null && frameGet.getOpcode()<0)frameGet=frameGet.getPrevious();
+            if(frameGet===null || frameGet.getOpcode()!==Opcodes.AASTORE)throw new Error('Unexpected dev15 tower frame predicate');
+            frame=call;frameCount++;
         }
     }
-    requireOne(count,'MultiBlockG wireless unit predicate');
-    anchor.owner='com/gtohjs/methods/InfiniteWirelessEnergyPredicate';
-    var towerMethod=null;
-    for(var m2=0;m2<clazz.methods.size();m2++) {
-        var current=clazz.methods.get(m2), currentNodes=current.instructions.toArray();
-        for(var j2=0;j2<currentNodes.length;j2++) if(currentNodes[j2]===anchor) towerMethod=current;
-    }
-    if(towerMethod===null) throw new Error('MultiBlockG tower structure method missing');
-    var towerNodes=towerMethod.instructions.toArray(), casingCall=null,casingCount=0;
-    for(var t=0;t<towerNodes.length;t++) {
-        var call=towerNodes[t];
-        if(call.name!=='wherePart' || call.owner!=='com/gregtechceu/gtceu/api/machine/multiblockpro/Symbols') continue;
-        for(var back=t-1;back>=Math.max(0,t-12);back--) {
-            var prior=towerNodes[back];
-            if(prior.getOpcode()===Opcodes.BIPUSH && prior.operand===65) {casingCall=call;casingCount++;break;}
-        }
-    }
-    requireOne(casingCount,'wireless tower A casing predicate');
-    towerMethod.instructions.insertBefore(casingCall,ASMAPI.buildMethodCall('com/gtohjs/adaptivenet/AdaptiveNetStructurePredicate',
+    requireOne(unitCount,'dev15 tower unit predicate');requireOne(frameCount,'dev15 tower frame predicate');
+    unit.owner='com/gtohjs/methods/InfiniteWirelessEnergyPredicate';
+    structure.instructions.insert(frame,ASMAPI.buildMethodCall('com/gtohjs/adaptivenet/AdaptiveNetStructurePredicate',
         'towerCasing','(Lcom/gregtechceu/gtceu/api/pattern/TraceabilityPredicate;)Lcom/gregtechceu/gtceu/api/pattern/TraceabilityPredicate;',ASMAPI.MethodType.STATIC));
-    recordMarker(clazz,marker);return clazz;
-}
-function adaptiveEnergyPortBridge(clazz) {
-    var marker='gtohjs$adaptive$rate';requireMarkerAbsent(clazz,marker);
-    var allowed=uniqueMethod(clazz,'allowed','(JI)J'),nodes=allowed.instructions.toArray(),bucket=null,count=0;
-    for(var i=0;i<nodes.length;i++) if(nodes[i].getOpcode()===Opcodes.GETFIELD && nodes[i].name==='rateBucket') {bucket=nodes[i];count++;}
-    requireOne(count,'EnergyPort.allowed bucket');
-    var label=new LabelNode(),branch=new InsnList();
-    branch.add(new VarInsnNode(Opcodes.ALOAD,0));
-    branch.add(ASMAPI.buildMethodCall('com/gtohjs/adaptivenet/AdaptiveGridRatePolicy','bypass',
-        '(Lcom/gtocore/api/wireless/energy/EnergyPort;)Z',ASMAPI.MethodType.STATIC));
-    branch.add(new JumpInsnNode(Opcodes.IFEQ,label));
-    branch.add(new VarInsnNode(Opcodes.LLOAD,1));branch.add(new InsnNode(Opcodes.LRETURN));branch.add(label);
-    allowed.instructions.insertBefore(bucket.getPrevious(),branch);
-    var names=[['shortfall','(JJ)J'],['serveTick','()V']];
-    for(var n=0;n<names.length;n++) {
-        var method=uniqueMethod(clazz,names[n][0],names[n][1]),ins=method.instructions.toArray(),rate=null,rateCount=0;
-        for(var k=0;k<ins.length;k++) if(ins[k].getOpcode()===Opcodes.GETFIELD &&
-                ins[k].owner==='com/gtocore/api/wireless/energy/EnergyAccount' && ins[k].name==='rate' && ins[k].desc==='J') {rate=ins[k];rateCount++;}
-        requireOne(rateCount,'EnergyPort.'+names[n][0]+' rate');
-        var suffix=new InsnList();suffix.add(new VarInsnNode(Opcodes.ALOAD,0));
-        suffix.add(ASMAPI.buildMethodCall('com/gtohjs/adaptivenet/AdaptiveGridRatePolicy','effectiveRate',
-            '(JLcom/gtocore/api/wireless/energy/EnergyPort;)J',ASMAPI.MethodType.STATIC));
-        method.instructions.insert(rate,suffix);method.maxStack=Math.max(method.maxStack,4);
+    var shell=uniqueMethod(clazz,'isShell','(Lnet/minecraft/world/level/block/state/BlockState;)Z');
+    var shellNodes=shell.instructions.toArray(),shellTests=0;
+    for(var j=0;j<shellNodes.length;j++) {
+        var test=shellNodes[j];
+        if(test.getOpcode()!==Opcodes.INVOKESTATIC || test.owner!=='com/gtocore/common/block/BlockMap' || test.name!=='test')continue;
+        var map=test.getPrevious();while(map!==null && map.getOpcode()<0)map=map.getPrevious();
+        if(map===null || map.getOpcode()!==Opcodes.GETSTATIC || map.name!=='GLASSMAP')throw new Error('Unexpected tower glass test');
+        shell.instructions.remove(map);
+        test.owner='com/gtohjs/adaptivenet/AdaptiveNetStructurePredicate';test.name='isTowerShell';
+        test.desc='(Lnet/minecraft/world/level/block/Block;)Z';shellTests++;
     }
+    requireOne(shellTests,'dev15 tower shell test');
+    var side=uniqueMethod(clazz,'isSideEnd','(Lcom/gregtechceu/gtceu/api/pattern/MultiblockState;)Z');
+    var sideNodes=side.instructions.toArray(),frameTests=0;
+    for(var k=0;k<sideNodes.length;k++) {
+        var get=sideNodes[k];
+        if(get.getOpcode()!==Opcodes.INVOKEVIRTUAL || get.owner!=='com/gto/registrate/util/entry/BlockEntry' || get.name!=='get')continue;
+        var field=get.getPrevious();while(field!==null && field.getOpcode()<0)field=field.getPrevious();
+        if(field===null || field.getOpcode()!==Opcodes.GETSTATIC || field.owner!=='com/gtocore/common/data/GTOBlocks' || field.name!=='WIRELESS_ENERGY_TOWER_FRAME')continue;
+        var jump=get.getNext();while(jump!==null && jump.getOpcode()<0)jump=jump.getNext();
+        if(jump===null || jump.getOpcode()!==Opcodes.IF_ACMPNE)throw new Error('Unexpected dev15 tower frame comparison');
+        side.instructions.remove(field);
+        side.instructions.set(get,ASMAPI.buildMethodCall('com/gtohjs/adaptivenet/AdaptiveNetStructurePredicate',
+            'isTowerFrame','(Lnet/minecraft/world/level/block/Block;)Z',ASMAPI.MethodType.STATIC));
+        jump.setOpcode(Opcodes.IFEQ);frameTests++;
+    }
+    if(frameTests!==2)throw new Error('Expected two dev15 tower frame comparisons, found '+frameTests);
     recordMarker(clazz,marker);return clazz;
 }
 function adaptiveNodeCardBridge(clazz) {
@@ -679,37 +670,88 @@ function dev11StationCapacityBridge(clazz) {
     }
     requireOne(count,'station capacity supplier');
     var register=uniqueMethod(clazz,'register','()V'),registerNodes=register.instructions.toArray();
-    var tierCall=null,tierLoad=null,tierJump=null,tierCount=0;
-    for(var j=0;j<registerNodes.length;j++) { var call=registerNodes[j];
-        if(call.getOpcode()!==Opcodes.INVOKEVIRTUAL || call.owner!=='com/gtocore/common/block/WirelessEnergyUnitBlock' ||
-                call.name!=='getTier' || call.desc!=='()I')continue;
-        var load=nextOpcode(call),jump=load===null?null:nextOpcode(load);
-        if(load!==null && load.getOpcode()===Opcodes.ILOAD && load.var===1 &&
-                jump!==null && jump.getOpcode()===Opcodes.IF_ICMPGT) {tierCall=call;tierLoad=load;tierJump=jump;tierCount++;}
+    var tierJump=null,tierLoad=null,tierCount=0,providerCall=null,providerIndex=-1,providerCount=0,overTierCount=0;
+    for(var j=0;j<registerNodes.length;j++) {
+        var node=registerNodes[j];
+        var previous=previousOpcode(node),beforePrevious=previous===null?null:previousOpcode(previous);
+        if(node.getOpcode()===Opcodes.IF_ICMPLE && previous!==null && previous.getOpcode()===Opcodes.ILOAD &&
+                previous.var===1 && beforePrevious!==null && beforePrevious.getOpcode()===Opcodes.ILOAD &&
+                beforePrevious.var===10) {tierJump=node;tierLoad=beforePrevious;tierCount++;}
+        if(node.getOpcode()===Opcodes.INVOKESTATIC && node.owner==='com/gtocore/api/wireless/energy/ProviderRegistry' &&
+                node.name==='registerTower') {providerCall=node;providerIndex=j;providerCount++;}
+        if(node.getOpcode()===Opcodes.INVOKESTATIC && node.owner===clazz.name && node.name==='overTier') {
+            register.instructions.insertBefore(node,new VarInsnNode(Opcodes.ALOAD,0));
+            node.owner='com/gtohjs/methods/InfiniteWirelessEnergyPredicate';node.name='overTier';
+            node.desc='(Lcom/google/common/collect/Multimap;ILcom/gtocore/common/machine/multiblock/storage/WirelessEnergySubstationMachine;)Z';
+            overTierCount++;
+        }
     }
-    requireOne(tierCount,'station unit versus glass tier guard');
-    var describe=uniqueMethod(clazz,'describeUnits','(I)V'),describeNodes=describe.instructions.toArray();
-    var warningTier=null,warningJump=null,warningCount=0;
-    for(var k=0;k<describeNodes.length;k++) { var first=describeNodes[k];
-        if(first.getOpcode()!==Opcodes.ILOAD || first.var!==6)continue;
-        var second=nextOpcode(first),branch=second===null?null:nextOpcode(second);
-        if(second!==null && second.getOpcode()===Opcodes.ILOAD && second.var===1 &&
-                branch!==null && branch.getOpcode()===Opcodes.IF_ICMPLE) {warningTier=first;warningJump=branch;warningCount++;}
-    }
-    requireOne(warningCount,'station over-tier warning guard');
+    requireOne(tierCount,'dev15 station glass-tier guard');
+    requireOne(providerCount,'dev15 station provider registration');
+    if(overTierCount!==2)throw new Error('Expected two dev15 tower warning calls, found '+overTierCount);
     anchor.owner='com/gtohjs/methods/InfiniteEnergyPresentation';anchor.name='stationCapacitySupplier';
-    register.instructions.insertBefore(tierCall,new VarInsnNode(Opcodes.ILOAD,1));
-    tierCall.setOpcode(Opcodes.INVOKESTATIC);tierCall.owner='com/gtohjs/methods/InfiniteWirelessEnergyPredicate';
-    tierCall.name='countsAtCasingTier';tierCall.desc='(Lcom/gtocore/common/block/WirelessEnergyUnitBlock;I)Z';
-    register.instructions.remove(tierLoad);tierJump.setOpcode(Opcodes.IFEQ);
-    var warningPrefix=new InsnList();warningPrefix.add(new VarInsnNode(Opcodes.ALOAD,0));
-    warningPrefix.add(new InsnNode(Opcodes.DUP));
-    warningPrefix.add(new FieldInsnNode(Opcodes.GETFIELD,clazz.name,'wirelessEnergyUnitPositions','Lcom/google/common/collect/Multimap;'));
-    describe.instructions.insertBefore(warningTier,warningPrefix);
-    var warningCall=ASMAPI.buildMethodCall('com/gtohjs/methods/InfiniteWirelessEnergyPredicate','allUnitsEligible',
-        '(Lcom/gtocore/common/machine/multiblock/storage/WirelessEnergySubstationMachine;Lcom/google/common/collect/Multimap;II)Z',ASMAPI.MethodType.STATIC);
-    describe.instructions.insertBefore(warningJump,warningCall);warningJump.setOpcode(Opcodes.IFNE);
-    describe.maxStack+=3;
+    register.instructions.insertBefore(tierLoad,new VarInsnNode(Opcodes.ALOAD,9));
+    register.instructions.remove(tierLoad);
+    register.instructions.insertBefore(tierJump,ASMAPI.buildMethodCall('com/gtohjs/methods/InfiniteWirelessEnergyPredicate',
+        'countsAtCasingTier','(Lcom/gtocore/common/block/WirelessEnergyTowerUnit;I)Z',ASMAPI.MethodType.STATIC));
+    tierJump.setOpcode(Opcodes.IFNE);
+    var unitsLoad=null;
+    for(var k=providerIndex-1;k>=Math.max(0,providerIndex-8);k--)
+        if(registerNodes[k].getOpcode()===Opcodes.ALOAD && registerNodes[k].var===7){unitsLoad=registerNodes[k];break;}
+    if(unitsLoad===null)throw new Error('Missing dev15 tower units load');
+    // Keep the original machine reference for ProviderRegistry.registerTower.
+    var positions=new InsnList();positions.add(new VarInsnNode(Opcodes.ALOAD,0));
+    positions.add(new VarInsnNode(Opcodes.ALOAD,0));
+    positions.add(new FieldInsnNode(Opcodes.GETFIELD,clazz.name,'storagePositions','Lcom/google/common/collect/Multimap;'));
+    register.instructions.insertBefore(unitsLoad,positions);
+    register.instructions.insert(unitsLoad,ASMAPI.buildMethodCall('com/gtohjs/methods/InfiniteWirelessEnergyPredicate',
+        'withInfiniteUnit','(Lcom/gtocore/common/machine/multiblock/storage/WirelessEnergySubstationMachine;Lcom/google/common/collect/Multimap;Ljava/util/List;)Ljava/util/List;',ASMAPI.MethodType.STATIC));
+    register.maxStack+=3;
+    recordMarker(clazz,marker);return clazz;
+}
+function stationThroughputTextBridge(clazz) {
+    var marker='gtohjs$dev15$stationThroughput';requireMarkerAbsent(clazz,marker);
+    var key='gtocore.machine.wireless_energy_substation.throughput.value';
+    var method=null,anchorCount=0;
+    for(var i=0;i<clazz.methods.size();i++) {
+        var candidate=clazz.methods.get(i),nodes=candidate.instructions.toArray();
+        for(var j=0;j<nodes.length;j++) if(nodes[j] instanceof LdcInsnNode && nodes[j].cst===key) {
+            method=candidate;anchorCount++;
+        }
+    }
+    requireOne(anchorCount,'dev15 station throughput translation anchor');
+    var nodes=method.instructions.toArray(),format=null,count=0;
+    for(var k=0;k<nodes.length;k++) { var n=nodes[k];
+        if(n.getOpcode()===Opcodes.INVOKESTATIC && n.owner==='com/gregtechceu/gtceu/utils/FormattingUtil' &&
+                n.name==='formatNumbers' && n.desc==='(J)Ljava/lang/String;') {format=n;count++;}
+    }
+    requireOne(count,'dev15 station throughput formatter');
+    format.owner='com/gtohjs/methods/InfiniteEnergyPresentation';format.name='limitText';
+    format.desc='(J)Lnet/minecraft/network/chat/Component;';
+    recordMarker(clazz,marker);return clazz;
+}
+function bankLimitTextBridge(clazz) {
+    var marker='gtohjs$dev15$bankLimit';requireMarkerAbsent(clazz,marker);
+    var method=uniqueMethod(clazz,'bankText','(Z)Lnet/minecraft/network/chat/Component;');
+    var nodes=method.instructions.toArray(),keyCount=0,limits=[];
+    for(var i=0;i<nodes.length;i++) { var n=nodes[i];
+        if(n instanceof LdcInsnNode && n.cst==='gtocore.machine.wireless_energy_substation.bank_value') keyCount++;
+        if(n.getOpcode()===Opcodes.INVOKEVIRTUAL && n.owner==='com/gtocore/api/wireless/energy/GridNode' &&
+                (n.name==='outputCapacity' || n.name==='inputCapacity') && n.desc==='(I)J') {
+            var format=nextOpcode(n);
+            if(format===null || format.getOpcode()!==Opcodes.INVOKESTATIC ||
+                    format.owner!=='com/gregtechceu/gtceu/utils/FormattingUtil' ||
+                    format.name!=='formatNumbers' || format.desc!=='(J)Ljava/lang/String;')
+                throw new Error('GTOHJS dev15 bank capacity formatter changed');
+            limits.push(format);
+        }
+    }
+    if(keyCount!==2 || limits.length!==2)
+        throw new Error('GTOHJS dev15 bank limit anchors changed: '+keyCount+'/'+limits.length);
+    for(var j=0;j<limits.length;j++) {
+        limits[j].owner='com/gtohjs/methods/InfiniteEnergyPresentation';
+        limits[j].name='limitText';limits[j].desc='(J)Lnet/minecraft/network/chat/Component;';
+    }
     recordMarker(clazz,marker);return clazz;
 }
 function dev11JadeBridge(clazz) {
@@ -729,12 +771,13 @@ function dev11JadeBridge(clazz) {
 function initializeCoreMod() {
     ASMAPI.log('ERROR', '[GTOHJS/PROOF] CoreMod JS initialized');
     return {
-        'gtohjs_adaptive_rate': {'target':{'type':'CLASS','name':'com.gtocore.api.wireless.energy.EnergyPort'},'transformer':adaptiveEnergyPortBridge},
         'gtohjs_adaptive_node_card': {'target':{'type':'CLASS','name':'com.gtocore.common.wireless.energy.map.GridNodeCard'},'transformer':adaptiveNodeCardBridge},
-        'gtohjs_dev11_wireless_unit': {'target':{'type':'CLASS','name':'com.gtocore.common.data.machines.MultiBlockG'},'transformer':dev11WirelessUnitBridge},
+        'gtohjs_dev11_wireless_unit': {'target':{'type':'CLASS','name':'com.gtocore.common.machine.multiblock.storage.WirelessEnergySubstationMachine'},'transformer':dev11WirelessUnitBridge},
         'gtohjs_dev11_monitor_storage': {'target':{'type':'CLASS','name':'com.gtocore.common.machine.monitor.MonitorEU'},'transformer':dev11MonitorStorageBridge},
         'gtohjs_dev11_summary_storage': {'target':{'type':'CLASS','name':'com.gtocore.common.wireless.energy.map.GridSummaryPanel'},'transformer':dev11SummaryStorageBridge},
         'gtohjs_dev11_station_capacity': {'target':{'type':'CLASS','name':'com.gtocore.common.machine.multiblock.storage.WirelessEnergySubstationMachine'},'transformer':dev11StationCapacityBridge},
+        'gtohjs_dev15_station_throughput': {'target':{'type':'CLASS','name':'com.gtocore.common.machine.multiblock.storage.WirelessEnergySubstationMachine'},'transformer':stationThroughputTextBridge},
+        'gtohjs_dev15_bank_limit': {'target':{'type':'CLASS','name':'com.gtocore.common.machine.multiblock.storage.WirelessEnergySubstationMachine'},'transformer':bankLimitTextBridge},
         'gtohjs_dev11_jade': {'target':{'type':'CLASS','name':'com.gtocore.integration.jade.GTOJadePlugin'},'transformer':dev11JadeBridge},
         'gtohjs_fix3_cover': {'target':{'type':'CLASS','name':'com.gtocore.common.data.GTOCovers'},'transformer':coverBridge},
         'gtohjs_fix3_proxy': {'target':{'type':'CLASS','name':'com.gtocore.common.machine.multiblock.part.ae.MEPatternBufferProxyPartMachine'},'transformer':proxyBridge},

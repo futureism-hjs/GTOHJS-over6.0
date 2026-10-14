@@ -17,7 +17,7 @@ import net.minecraftforge.registries.RegistryObject;
 
 public final class GTOHJSBlocks {
     public static final String INTEGRAL_BRONZE_FRAMEWORK_ID = "integral_bronze_framework";
-    public static final String INFINITE_WIRELESS_ENERGY_UNIT_ID = "infinite_wireless_energy_unit";
+    public static final String INFINITE_WIRELESS_ENERGY_UNIT_ID = "infinite_wireless_energy_storage_unit";
     private static final ResourceLocation EXPECTED_ID = GTOHJS.id(INTEGRAL_BRONZE_FRAMEWORK_ID);
     private static final DeferredRegister<Block> BLOCKS =
             DeferredRegister.create(ForgeRegistries.BLOCKS, GTOHJS.MOD_ID);
@@ -52,7 +52,8 @@ public final class GTOHJSBlocks {
         if (!expectedInfinite.equals(ForgeRegistries.BLOCKS.getKey(infinite)) ||
                 !expectedInfinite.equals(ForgeRegistries.ITEMS.getKey(infinite.asItem())) ||
                 !InfiniteWirelessEnergyUnitBlock.CAPACITY.equals(infinite.getCapacity()) ||
-                infinite.getLoss() != 0 || infinite.getTier() != GTValues.MAX) {
+                infinite.getLoss() != 0 || infinite.getTier() != GTValues.MAX ||
+                infinite.getThroughput() != Long.MAX_VALUE) {
             throw new IllegalStateException("Infinite wireless energy unit registry mismatch");
         }
     }

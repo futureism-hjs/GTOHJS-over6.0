@@ -22,7 +22,7 @@ public final class LargePetalApothecaryClientSync {
     private LargePetalApothecaryClientSync() {}
     @SubscribeEvent(priority=EventPriority.HIGHEST)
     public static synchronized void onRecipesUpdated(RecipesUpdatedEvent event) {
-        var definitions=LargePetalApothecaryRecipeTypeRegistration.definition().synchronizeClientRecipes(event.getRecipeManager());
+        var definitions=LargePetalApothecaryRecipeTypeRegistration.proxyLogic().synchronizeClientRecipes(event.getRecipeManager());
         if(GTORecipes.EMI_RECIPES==null) throw new IllegalStateException("GTO recipe display cache not initialized");
         LinkedHashSet<EmiRecipe> merged=new LinkedHashSet<>();
         for(EmiRecipe recipe:GTORecipes.EMI_RECIPES) if(!LAST.contains(recipe)) merged.add(recipe);

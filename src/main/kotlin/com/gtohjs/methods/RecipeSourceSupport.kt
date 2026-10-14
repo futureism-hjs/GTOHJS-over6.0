@@ -100,7 +100,7 @@ object RecipeSourceSupport {
         eut: Long, circuit: Int, temperature: Int, mana: Long) {
         val id = definition.id
         val circuits = (0 until definition.itemInputs.size()).filter {
-            definition.itemInputs.ingredient(it).kind == KeyIngredient.CIRCUIT
+            definition.itemInputs.ingredient(it).kind() == KeyIngredient.CIRCUIT
         }
         val regularInputs = (0 until definition.itemInputs.size()).filterNot { it in circuits }
         check(regularInputs.size == itemInputs.size) { "Generated item input count mismatch: $id" }

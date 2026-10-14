@@ -101,9 +101,9 @@ public final class OneStopRareEarthProcessingPlantRegistration {
                                 .where(' ', Predicates.any())
                                 )
                             .build())
-                        .workableCasingRenderer(
+                        .renderer(() -> new com.gtohjs.client.renderer.ReliableWorkableCasingRenderer(
                                 GTCEu.id("block/casings/solid/machine_casing_stable_titanium"),
-                                GTCEu.id("block/multiblock/gcym/large_material_press"))
+                                GTCEu.id("block/multiblock/gcym/large_material_press")))
                         .renderMultiblockXEIPreview(true)
                     .register();
             }

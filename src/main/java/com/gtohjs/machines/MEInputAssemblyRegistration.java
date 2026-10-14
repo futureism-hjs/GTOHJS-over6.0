@@ -75,12 +75,12 @@ public final class MEInputAssemblyRegistration {
                 .renderer(() -> new OverlayTieredMachineRenderer(
                         GTValues.EV,
                         GTCEu.id("block/machine/part/me_pattern_buffer")))
-                .tooltips(
+                .tips(
                         Component.translatable("gtohjs.machine.me_input_assembly.tooltip.0"),
                         Component.translatable("gtohjs.machine.me_input_assembly.tooltip.1"),
                         Component.translatable("gtceu.machine.me.copy_paste.tooltip"),
                         Component.translatable("gtceu.part_sharing.enabled"))
-                .tooltips(GTOMachineTooltips.AutoConnectMETooltips)
+                .tips(GTOMachineTooltips.AutoConnectMETooltips)
                 .register();
     }
 
@@ -100,13 +100,13 @@ public final class MEInputAssemblyRegistration {
                 .renderer(() -> new OverlayTieredMachineRenderer(
                         GTValues.LuV,
                         GTCEu.id("block/machine/part/me_pattern_buffer")))
-                .tooltips(
+                .tips(
                         Component.translatable("gtohjs.machine.me_stocking_input_assembly.tooltip.0"),
                         Component.translatable("gtohjs.machine.me_stocking_input_assembly.tooltip.1"),
                         Component.translatable("gtohjs.machine.me_stocking_input_assembly.tooltip.2"),
                         Component.translatable("gtceu.machine.me.copy_paste.tooltip"),
                         Component.translatable("gtceu.part_sharing.enabled"))
-                .tooltips(GTOMachineTooltips.AutoConnectMETooltips)
+                .tips(GTOMachineTooltips.AutoConnectMETooltips)
                 .register();
     }
 

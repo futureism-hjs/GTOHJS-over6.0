@@ -13,7 +13,7 @@ import com.gregtechceu.gtceu.api.pattern.TraceabilityPredicate;
 import com.gregtechceu.gtceu.api.registry.GTRegistries;
 import com.gregtechceu.gtceu.common.data.GTBlocks;
 import com.gregtechceu.gtceu.common.data.GTRecipeTypes;
-import com.gtocore.client.renderer.machine.ArrayMachineRenderer;
+import com.gtohjs.client.renderer.ReliableArrayMachineRenderer;
 import com.gtocore.common.data.GTOMachines;
 import com.gtocore.utils.register.MachineRegisterUtils;
 import com.gtohjs.machines.SteamBoilerArrayMachine;
@@ -58,9 +58,9 @@ public final class SteamArrayRegistration {
                     .langValue("Steam Array")
                     .nonYAxisRotation()
                     .recipeTypes(GTRecipeTypes.DUMMY_RECIPES)
-                    .tooltips(Component.translatable("gtohjs.machine.steam_array.limit", STORAGE_LIMIT))
-                    .tooltips(Component.translatable("gtohjs.machine.steam_array.output_bonus"))
-                    .tooltips(Component.translatable("gtohjs.machine.steam_array.allowed_boilers"))
+                    .tips(Component.translatable("gtohjs.machine.steam_array.limit", STORAGE_LIMIT))
+                    .tips(Component.translatable("gtohjs.machine.steam_array.output_bonus"))
+                    .tips(Component.translatable("gtohjs.machine.steam_array.allowed_boilers"))
                     .block(GTBlocks.FIREBOX_BRONZE)
                     .blockProp(properties -> properties.noOcclusion()
                             .isViewBlocking((state, level, pos) -> false))
@@ -85,7 +85,7 @@ public final class SteamArrayRegistration {
                             .where('#', Predicates.air())
                             )
                             .build())
-                    .renderer(() -> new ArrayMachineRenderer(
+                    .renderer(() -> new ReliableArrayMachineRenderer(
                             GTCEu.id("block/casings/solid/machine_casing_bronze_plated_bricks"),
                             GTCEu.id("block/multiblock/generator/large_bronze_boiler")))
                     .renderMultiblockXEIPreview(true)
@@ -113,8 +113,8 @@ public final class SteamArrayRegistration {
         if (buildPattern && candidate.getStructure() == null) {
             throw new IllegalStateException("Steam array pattern could not be built");
         }
-        if (GTCEu.isClientSide() && !(candidate.getRenderer() instanceof ArrayMachineRenderer)) {
-            throw new IllegalStateException("Steam array renderer is not ArrayMachineRenderer");
+        if (GTCEu.isClientSide() && !(candidate.getRenderer() instanceof ReliableArrayMachineRenderer)) {
+            throw new IllegalStateException("Steam array renderer is not ReliableArrayMachineRenderer");
         }
     }
 

@@ -48,7 +48,7 @@ public final class ULVFragmentWorldCollectionMachine {
                 .recipeType(recipeType)
                 .recipeModifier(GTORecipeModifiers.UPGRADE_OVERCLOCK)
                 .workableTieredHullRenderer(ResourceLocation.fromNamespaceAndPath("gtohjs", "block/machines/fragment_world_collection_machine"))
-                .tooltips(Component.translatable("gtohjs.machine.fragment_world_collection.tooltip"))
+                .tips(Component.translatable("gtohjs.machine.fragment_world_collection.tooltip"))
                 .register());
         ProofLog.record("ULV collector uses native SimpleTieredMachine; native tank capacity=" +
                 GTMachineUtils.largeTankSizeFunction.applyAsInt(GTValues.ULV) + "mB; recipes not adapted");

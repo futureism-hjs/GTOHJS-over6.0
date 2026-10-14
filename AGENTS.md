@@ -1,4 +1,4 @@
-# GTOHJS Dev11 Development Rules
+# GTOHJS Dev15 Development Rules
 
 Read this file and the workspace AGENT.md / AGENTS.md before each run.
 Read README_EN.md and, when present, README_codex.md before development.
@@ -6,13 +6,14 @@ README.md is the default Chinese user-facing document; do not read it during
 development. Read the local docs/INJECTION_FEASIBILITY.md, docs/DEVELOPMENT.md
 and docs/READ_INDEX.md when available in the active development workspace.
 
-- This is the active dev11 adaptation project. Old GTOHJS and all upstream
+- This is the active dev15 adaptation project. Old GTOHJS and all upstream
   GTOCore/GTOLib/Seal references remain read-only.
 - Never use DSH, its executable, bridge or tools for this task.
-- Restore every old feature without an equivalent dev11 replacement.
+- Restore every old feature without an equivalent dev15 replacement.
   Missing features remain incomplete.
-- Select injection mechanisms from actual dev11 source and original-bytecode
-  evidence. The user confirmed the current dev11 client tests passed.
+- Select injection mechanisms from actual dev15 source and original-bytecode
+  evidence. Previous dev11 client results are historical and do not validate
+  the dev15 client.
 - Use Java 21 and network-enabled ./gradlew clean build through IDEA MCP.
   Stop on network/dependency failure; never switch to offline.
 - Write or edit source and documentation only through Codex patches.

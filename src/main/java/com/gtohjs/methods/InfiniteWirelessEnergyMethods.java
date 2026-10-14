@@ -18,6 +18,8 @@ public final class InfiniteWirelessEnergyMethods {
 
     public static int loss() { return 0; }
 
+    public static long throughput() { return Long.MAX_VALUE; }
+
     public static boolean isInfiniteUnit(Block block) {
         return block instanceof InfiniteWirelessEnergyUnitBlock;
     }

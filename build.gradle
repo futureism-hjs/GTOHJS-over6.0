@@ -40,13 +40,13 @@ repositories {
 dependencies {
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
     // Compile against the authoritative release API; never embed its JAR.
-    // Isolate the dev11 mapped Core cache from prior pack snapshots.
-    compileOnly fg.deobf('local.gtohjs.dev11:gtocore-forge-1.20.1:26.10.1')
-    compileOnly fg.deobf('local.gtohjs:gtceu-1.20.1-forge-1.20.1:26.10.17')
-    compileOnly fg.deobf('local.gtohjs:datasynclib-forge-1.20.1:26.9.4')
+    // Isolate the dev15 mapped Core cache from prior pack snapshots.
+    compileOnly fg.deobf('local.gtohjs.dev15:gtocore-forge-1.20.1:26.10.5')
+    compileOnly fg.deobf('local.gtohjs:gtceu-1.20.1-forge-1.20.1:26.10.41')
+    compileOnly fg.deobf('local.gtohjs:datasynclib-forge-1.20.1:26.10.9')
     compileOnly('com.gto.fastcollection:FastCollection:26.8.7') { transitive = false }
     compileOnly fg.deobf('local.gtohjs:ldlib-forge-1.20.1:1.0.52.a')
-    compileOnly fg.deobf('local.gtohjs:appliedenergistics2-forge-1.20.1:15.2610.4')
+    compileOnly fg.deobf('local.gtohjs:appliedenergistics2-forge-1.20.1:15.2610.8')
     compileOnly fg.deobf('local.gtohjs:fastrecipesearch-1.20.1:26.8.4-forge')
     compileOnly('local.gtohjs:RecipeSearch:26.8.4')
     compileOnly fg.deobf('local.gtohjs:Botania-1.20.1:456-FORGE')
@@ -112,7 +112,7 @@ tasks.named('jar', Jar).configure {
     from('LICENSE') { into 'META-INF'; rename { 'LICENSE_GTOHJS' } }
     manifest {
         attributes 'Implementation-Version': project.version,
-                   'Implementation-Title': 'GTOHJS dev11 machine adaptation'
+                   'Implementation-Title': 'GTOHJS dev15 machine adaptation'
     }
     finalizedBy 'reobfJar'
 }
